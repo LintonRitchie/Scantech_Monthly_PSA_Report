@@ -1,0 +1,16 @@
+<RCC>
+  <qresource>
+    <file>Scantech_Logo.png</file>
+    <file>find_replace.ui</file>
+    <file>Resources\edit-copy.png</file>
+    <file>Resources\edit-cut.png</file>
+    <file>Resources\file-new.png</file>
+    <file>Resources\file-open.png</file>
+    <file>Resources\edit-paste.png</file>
+    <file>Resources\file-save.png</file>
+    <file>Resources\help-content.png</file>
+    <file>Resources\file-exit.png</file>
+    <file>Resources\Scantech sqr Logo.jpg</file>
+    <file>Resources\Scantech_Logo.png</file>
+  </qresource>
+</RCC>

@@ -1,0 +1,14 @@
+<!DOCTYPE RCC><RCC version="1.0">
+<qresource>
+    <file>edit-copy.png</file>
+    <file>edit-cut.png</file>
+    <file>file-new.png</file>
+    <file>file-open.png</file>
+    <file>edit-paste.png</file>
+    <file>file-save.png</file>
+    <file>help-content.png</file>
+    <file>file-exit.png</file>
+    <file>Scantech sqr Logo.jpg</file>
+    <file>Scantech_Logo.png</file>
+</qresource>
+</RCC>
