@@ -39,10 +39,10 @@
    <widget class="QLabel" name="label">
     <property name="geometry">
      <rect>
-      <x>0</x>
-      <y>0</y>
-      <width>400</width>
-      <height>50</height>
+      <x>31</x>
+      <y>41</y>
+      <width>354</width>
+      <height>33</height>
      </rect>
     </property>
     <property name="font">
@@ -58,63 +58,6 @@
     </property>
     <property name="indent">
      <number>5</number>
-    </property>
-   </widget>
-   <widget class="QLabel" name="WelcomeText">
-    <property name="geometry">
-     <rect>
-      <x>120</x>
-      <y>140</y>
-      <width>200</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <family>Calibri</family>
-      <pointsize>10</pointsize>
-     </font>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="NewReportPB">
-    <property name="geometry">
-     <rect>
-      <x>140</x>
-      <y>270</y>
-      <width>150</width>
-      <height>30</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <family>Calibri</family>
-      <pointsize>12</pointsize>
-     </font>
-    </property>
-    <property name="text">
-     <string>New Report</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="OpenReportPB">
-    <property name="geometry">
-     <rect>
-      <x>140</x>
-      <y>320</y>
-      <width>150</width>
-      <height>30</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <family>Calibri</family>
-      <pointsize>12</pointsize>
-     </font>
-    </property>
-    <property name="text">
-     <string>Open Report</string>
     </property>
    </widget>
    <widget class="QPushButton" name="CloseReportPB">
@@ -190,107 +133,140 @@
      </item>
     </layout>
    </widget>
-   <widget class="QComboBox" name="AnalyserListComboBox">
+   <widget class="QWidget" name="">
     <property name="geometry">
      <rect>
       <x>80</x>
-      <y>200</y>
-      <width>271</width>
-      <height>22</height>
+      <y>120</y>
+      <width>251</width>
+      <height>331</height>
      </rect>
     </property>
-   </widget>
-   <widget class="QLabel" name="WelcomeText_2">
-    <property name="geometry">
-     <rect>
-      <x>130</x>
-      <y>170</y>
-      <width>200</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <family>Calibri</family>
-      <pointsize>10</pointsize>
-     </font>
-    </property>
-    <property name="text">
-     <string>Select Analyser to process:</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="AnalyserToBeProcessed">
-    <property name="geometry">
-     <rect>
-      <x>120</x>
-      <y>240</y>
-      <width>200</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <family>Calibri</family>
-      <pointsize>10</pointsize>
-     </font>
-    </property>
-    <property name="text">
-     <string>Select Analyser to process:</string>
-    </property>
-   </widget>
-   <widget class="QComboBox" name="CalibratorListComboBox">
-    <property name="geometry">
-     <rect>
-      <x>90</x>
-      <y>90</y>
-      <width>271</width>
-      <height>22</height>
-     </rect>
-    </property>
-    <item>
-     <property name="text">
-      <string>Lucas Biggins</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>Daniel Rossouw</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>Linton Ritchie</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>Dr. Igor Nerush</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>Dr. Luke Balzan</string>
-     </property>
-    </item>
-   </widget>
-   <widget class="QLabel" name="WelcomeText_3">
-    <property name="geometry">
-     <rect>
-      <x>100</x>
-      <y>60</y>
-      <width>200</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <family>Calibri</family>
-      <pointsize>10</pointsize>
-     </font>
-    </property>
-    <property name="text">
-     <string>Please select your Name</string>
-    </property>
+    <layout class="QVBoxLayout" name="verticalLayout_2">
+     <item>
+      <widget class="QLabel" name="WelcomeText_3">
+       <property name="font">
+        <font>
+         <family>Calibri</family>
+         <pointsize>10</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>Please select your Name</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QComboBox" name="CalibratorListComboBox">
+       <item>
+        <property name="text">
+         <string>Lucas Biggins</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Daniel Rossouw</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Linton Ritchie</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Dr. Igor Nerush</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Dr. Luke Balzan</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="WelcomeText">
+       <property name="font">
+        <font>
+         <family>Calibri</family>
+         <pointsize>10</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>Placeholder</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="verticalSpacer_3">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>20</width>
+         <height>18</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QLabel" name="WelcomeText_2">
+       <property name="font">
+        <font>
+         <family>Calibri</family>
+         <pointsize>10</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>Select Analyser to process:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QComboBox" name="AnalyserListComboBox"/>
+     </item>
+     <item>
+      <widget class="QLabel" name="AnalyserToBeProcessed">
+       <property name="font">
+        <font>
+         <family>Calibri</family>
+         <pointsize>10</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>Report Control</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="NewReportPB">
+       <property name="font">
+        <font>
+         <family>Calibri</family>
+         <pointsize>12</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>New Report</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="OpenReportPB">
+       <property name="font">
+        <font>
+         <family>Calibri</family>
+         <pointsize>12</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>Open Report</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
