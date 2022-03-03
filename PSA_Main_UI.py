@@ -1,3 +1,4 @@
+import os.path
 import sys
 import pandas as pd
 from Regen_UI import regen_ui               # Load the function which runs a batch to regen the UI each time code runs.
@@ -21,15 +22,27 @@ from PyQt5 import QtCore
 from PyQt5 import QtGui
 import matplotlib.pyplot as plt
 
-# regen_ui()                  # Regenerate the UI. This is used to update the UI file after changes
-PSAMasterData = Read_Master()                 # Read in master file data from PSA Master file.
-AnalyserStatus = Read_AnalyserStatus()              # Read in PSA Report file data from PSA Report file.
-PeakControl = Read_PeakControl()                # Read in Analyser Peak Control Data
-VersionNumbers = Read_VersionNumbers()          #Read in version numbers data
-AnalyserIO = Read_AnalyserIO()
+#regen_ui()                  # Regenerate the UI. This is used to update the UI file after changes
+
+# Define a function which reads in the data from the relevant files. This may be called in a few different places.
+# this function takes 2 folder locations
+def ReadInData(folder):
+    PSAMaster = "C:\\Users\\l.ritchie\\PycharmProjects\\Scantech_Monthly_PSA_Report\\PSA_Master_List.xlsx"
+    PSAMasterData = Read_Master(PSAMaster)  # Read in master file data from PSA Master file.
+    AnalyserStatus = Read_AnalyserStatus(folder)  # Read in PSA Report file data from PSA Report file.
+    PeakControl = Read_PeakControl(folder)  # Read in Analyser Peak Control Data
+    VersionNumbers = Read_VersionNumbers(folder)  # Read in version numbers data
+    AnalyserIO = Read_AnalyserIO(folder)
+
+    return PSAMasterData, AnalyserStatus, PeakControl, VersionNumbers, AnalyserIO
+DefaultFolder = "C:\\Users\\l.ritchie\\PycharmProjects\\Scantech_Monthly_PSA_Report"
+PSAMasterData,AnalyserStatus, PeakControl, VersionNumbers, AnalyserIO = ReadInData(DefaultFolder)              # Read in master file data from PSA Master file.
+
 
 AnalyserToProcess = 0
 open_window = 0
+
+
 
 class HomeWindow(QMainWindow,Ui_PSAHome):
     def __init__(self, parent=None):
@@ -56,7 +69,7 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
         self.PB_pg_5.released.connect(self.show_page_5)
         self.PB_pg_6.released.connect(self.show_page_6)
         self.OpenReportPB.released.connect(self.openReport)
-        self.CalibratorListComboBox.activated.connect(self.updatehome)
+        self.CalibratorListComboBox.currentTextChanged.connect(self.updatehome)
         self.AnalyserListComboBox.activated.connect(self.updatehome)
 
     def updatehome(self):
@@ -165,7 +178,6 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
         self.page6.PlantPLCTable_7.setItem(0, 0, DiskSpace)
         self.page6.PlantPLCTable_7.setItem(1, 0, PercDiskSpace)
 
-
     def UpdateDetStab(self):
         Dets = PeakControl.shape[1]-2
         x=0
@@ -244,12 +256,12 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
 
         return diskspaceok
 
-
     def openReport(self):
         options = QFileDialog.Options()
         options |= QFileDialog.DontUseNativeDialog
         fileName, _ = QFileDialog.getOpenFileName(self,"Choose Report File to Open", "","csv (*.csv)",
         options=options)
+        print (fileName)
 
     def popanalysers(self):
         analysers = PSAMasterData["Analyser Number"]
@@ -294,6 +306,7 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
     def show_page_6(self):
         self.hide_pages()
         self.page6.show()
+
 
 
 class PSA_pg1(QMainWindow,Ui_PSAPage1):

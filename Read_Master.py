@@ -3,38 +3,43 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 
-def Read_Master():
+def Read_Master(PSAMaster):
     data_required = ["Analyser Number", "Customer Name", "Service Engineer", "Application", "PSA Expiry Date", "Region",
                      "PSA Report Required?", "Calibrator"]
-    data = pd.read_excel(r"C:\\Users\\l.ritchie\\PycharmProjects\\Scantech_Monthly_PSA_Report\\PSA_Master_List.xlsx", sheet_name="AnalyserDetails")
+    data = pd.read_excel(open(PSAMaster,'rb'), sheet_name="AnalyserDetails")
     df = pd.DataFrame(data, columns= data_required)
     return df
 
-def Read_AnalyserStatus():
+def Read_AnalyserStatus(folder):
+    fname = folder + "\\PSAReport.xls"
     StatusColumns = ["Result Name", "Value"]
-    AnalyserStatus = pd.read_excel(r"C:\\Users\\l.ritchie\\PycharmProjects\\Scantech_Monthly_PSA_Report\\PSAReport.xls", sheet_name="Analyser Status")
+    AnalyserStatus = pd.read_excel(open(fname,'rb'), sheet_name="Analyser Status")
     AnalyserStatusdf = pd.DataFrame(AnalyserStatus, columns= StatusColumns)
     return AnalyserStatusdf
 
-def Read_AnalyserIO():
+def Read_AnalyserIO(folder):
+    fname = folder + "\\PSAReport.xls"
     StatusColumns = ["Parameter Name", "Value"]
-    AnalyserIO = pd.read_excel(r"C:\\Users\\l.ritchie\\PycharmProjects\\Scantech_Monthly_PSA_Report\\PSAReport.xls", sheet_name="Analyser I_O")
+    AnalyserIO = pd.read_excel(open(fname,'rb'), sheet_name="Analyser I_O")
     AnalyserIOdf = pd.DataFrame(AnalyserIO, columns= StatusColumns)
     return AnalyserIOdf
 
-def Read_VersionNumbers():
+def Read_VersionNumbers(folder):
+    fname = folder + "\\PSAReport.xls"
     StatusColumns = ["Module", "Version"]
-    VersionNumbers = pd.read_excel(r"C:\\Users\\l.ritchie\\PycharmProjects\\Scantech_Monthly_PSA_Report\\PSAReport.xls", sheet_name="Version Numbers")
+    VersionNumbers = pd.read_excel(open(fname,'rb'), sheet_name="Version Numbers")
     VersionNumbersdf = pd.DataFrame(VersionNumbers, columns= StatusColumns)
     return VersionNumbersdf
 
-def Read_PeakControl():
-    PeakControl = pd.read_excel(r"C:\\Users\\l.ritchie\\PycharmProjects\\Scantech_Monthly_PSA_Report\\PSAReport.xls", sheet_name="Peak Control")
+def Read_PeakControl(folder):
+    fname = folder + "\\PSAReport.xls"
+    PeakControl = pd.read_excel(open(fname,'rb'), sheet_name="Peak Control")
     PeakControldf = pd.DataFrame(PeakControl)
     return PeakControldf
 
-def Read_PeakExtract():     #extracting the peak control data for determining detector stability
-    PeakExtract = pd.read_csv(r"C:\Users\l.ritchie\PycharmProjects\Scantech_Monthly_PSA_Report\PeakExtract.csv", index_col=0) #read the csv containing the data
+def Read_PeakExtract(folder):     #extracting the peak control data for determining detector stability
+    fname = folder + "\PeakExtract.csv"
+    PeakExtract = pd.read_csv(open(fname,'rb'), index_col=0) #read the csv containing the data
     PeakExtractdf = pd.DataFrame(PeakExtract.iloc[:, [3,10,17,24]]) #extract the 4 columns of dector data. This is only applicable to 4 detector analysers. This will need to be updated to do a selection to allow for any number of detecotrs
     PeakExtractdf.columns = ["Det1", "Det2", "Det3", "Det4"]    # renaming the columns of the new dataframe created for detector stability values only.
     DetStab = PeakExtractdf.plot().get_figure()             #plot the data
@@ -44,9 +49,9 @@ def Read_PeakExtract():     #extracting the peak control data for determining de
     DetStab.savefig("Resources\Detector_Stability.png")     # save the plot to file
     return PeakExtractdf
 
-def Read_TempExtract():                                                 #extracting the peak control data for determining detector stability
-    TempExtract = pd.read_csv(r"C:\Users\l.ritchie\PycharmProjects\Scantech_Monthly_PSA_Report\TempExtract.csv",
-                              index_col=0)                              # read the csv containing the data
+def Read_TempExtract(folder):                                                 #extracting the peak control data for determining detector stability
+    fname = folder + "\TempExtract.csv"
+    TempExtract = pd.read_csv(open(fname,'rb'), index_col=0)                              # read the csv containing the data
     # print(TempExtract)
     TempExtractdf = pd.DataFrame(TempExtract.iloc[:, [1,2,3]])          # extract the 3 columns of Temperature data.
     TempExtractdf.columns = ["Detector", "Cabinet", "Ambient"]          # renaming the columns of the new dataframe created for detector stability values only.
@@ -63,10 +68,10 @@ def Read_TempExtract():                                                 #extract
     TempStab.savefig("Resources\Temperatures.png")                      # save the plot to file
     return TempExtractdf
 
-def Read_A_08_Analyse():                                                 #extracting the peak control data for determining detector stability
+def Read_A_08_Analyse(folder):                                                 #extracting the peak control data for determining detector stability
     # this code is pretty rough and can be optimised dramatically but this does work.
-    AllExtract = pd.read_csv(r"C:\Users\l.ritchie\PycharmProjects\Scantech_Monthly_PSA_Report\A_08__Analyse.csv",
-                              index_col=1)                              # read the csv containing the data
+    fname = folder + "\A_08__Analyse.csv"
+    AllExtract = pd.read_csv(open(fname,'rb'), index_col=1)                              # read the csv containing the data
     TonsAnalysed = AllExtract.groupby('Date')[['S034','S029']].sum()
 
     # Plot Daily tonns as a stacked histograme of Tons Analsyed and TOns not analysed
