@@ -1,4 +1,4 @@
-import os.path
+import os
 import sys
 import pandas as pd
 from Regen_UI import regen_ui               # Load the function which runs a batch to regen the UI each time code runs.
@@ -25,7 +25,7 @@ import matplotlib.pyplot as plt
 #regen_ui()                  # Regenerate the UI. This is used to update the UI file after changes
 
 # Define a function which reads in the data from the relevant files. This may be called in a few different places.
-# this function takes 2 folder locations
+# this function takes 1 folder location and uses the PSA Master default location
 def ReadInData(folder):
     PSAMaster = "C:\\Users\\l.ritchie\\PycharmProjects\\Scantech_Monthly_PSA_Report\\PSA_Master_List.xlsx"
     PSAMasterData = Read_Master(PSAMaster)  # Read in master file data from PSA Master file.
@@ -56,6 +56,7 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
         self.page6 = PSA_pg6()
         self.connectSignalsSlots()
         self.popanalysers()
+        FolderInUse = "C:\\Users\\l.ritchie\\PycharmProjects\\Scantech_Monthly_PSA_Report"
 
     # Setup Signals and Slots for Pushbuttons
     def connectSignalsSlots(self):
@@ -70,10 +71,33 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
         self.PB_pg_6.released.connect(self.show_page_6)
         self.OpenReportPB.released.connect(self.openReport)
         self.CalibratorListComboBox.currentTextChanged.connect(self.updatehome)
-        self.AnalyserListComboBox.activated.connect(self.updatehome)
+        #self.AnalyserListComboBox.currentTextChanged.connect(self.updatehome)
+        self.AnalyserListComboBox.activated.connect(self.GetFolder)
+
+    def GetFolder(self):
+        anal = self.AnalyserListComboBox.currentText()
+        # Switches default folder based on which analyser is selected.
+        if anal[0:3] == "C15":
+            DefaultFolder, _ = os.path.dirname(QFileDialog.getOpenFileName(self,"Open PSA File in PSA Folder","J:\\Client Analysers\\NG-1500"))
+        elif anal[0:3] == "C21":
+            DefaultFolder, _ = os.path.dirname(QFileDialog.getOpenFileName(self, "Open PSA File in PSA Folder", "J:\\Client Analysers\\CS-2100"))
+        elif anal[0:3] == "CMM":
+            DefaultFolder, _ = os.path.dirname(QFileDialog.getOpenFileName(self, "Open PSA File in PSA Folder", "J:\\Client Analysers\\CMM-100"))
+        elif anal[0:3] == "OBA":
+            DefaultFolder, _ = os.path.dirname(QFileDialog.getOpenFileName(self, "Open PSA File in PSA Folder", "J:\\Client Analysers\\On Belt Analyser"))
+        elif anal[0:3] == "TBM":
+            DefaultFolder, _ = os.path.dirname(QFileDialog.getOpenFileName(self, "Open PSA File in PSA Folder", "J:\\Client Analysers\\TBM-210"))
+        else:
+            DefaultFolder, _ = os.path.dirname(QFileDialog.getOpenFileName(self, "Open PSA File in PSA Folder", "J:\\Client Analysers\\TBM-230"))
+        print(anal[0:2])
+        print(DefaultFolder)
+        # Update the data in the global variables
+        PSAMasterData, AnalyserStatus, PeakControl, VersionNumbers, AnalyserIO = ReadInData(DefaultFolder)
 
     def updatehome(self):
         anal = self.AnalyserListComboBox.currentText()
+
+        # Updates labels on Home Screen
         anallabel = 'Do you wish to process ' + str(anal) + "?"
         self.AnalyserToBeProcessed.setText(anallabel)
         calibrator = self.CalibratorListComboBox.currentText()
