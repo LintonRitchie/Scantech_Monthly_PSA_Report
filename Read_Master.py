@@ -2,6 +2,9 @@ import matplotlib.style
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
+import glob
+from PyQt5.QtCore import QDir
+
 
 def Read_Master(PSAMaster):
     data_required = ["Analyser Number", "Customer Name", "Service Engineer", "Application", "PSA Expiry Date", "Region",
@@ -11,7 +14,8 @@ def Read_Master(PSAMaster):
     return df
 
 def Read_AnalyserStatus(folder):
-    fname = folder + "\\PSAReport.xls"
+    fname = glob.glob(folder + "\\*Report.xls")
+    fname=fname[0]
     StatusColumns = ["Result Name", "Value"]
     AnalyserStatus = pd.read_excel(open(fname,'rb'), sheet_name="Analyser Status")
     AnalyserStatusdf = pd.DataFrame(AnalyserStatus, columns= StatusColumns)
@@ -32,7 +36,8 @@ def Read_VersionNumbers(folder):
     return VersionNumbersdf
 
 def Read_PeakControl(folder):
-    fname = folder + "\\PSAReport.xls"
+    fname = glob.glob(folder + "\\*Report.xls")
+    fname=fname[0]
     PeakControl = pd.read_excel(open(fname,'rb'), sheet_name="Peak Control")
     PeakControldf = pd.DataFrame(PeakControl)
     return PeakControldf
@@ -45,11 +50,12 @@ def Read_PeakExtract(folder):     #extracting the peak control data for determin
     DetStab = PeakExtractdf.plot().get_figure()             #plot the data
     plt.title("Detector Stability")                         # add a title
     plt.xticks(rotation=90)                                 # rotate the X axis titles
-    plt.show()                                                 # show the plot
+    # plt.show()                                                 # show the plot
     DetStab.savefig("Resources\Detector_Stability.png")     # save the plot to file
+
     return PeakExtractdf
 
-def Read_TempExtract(folder):                                                 #extracting the peak control data for determining detector stability
+def Read_TempExtract(folder):                                                 # extracting the temperature staibility data for the month
     fname = folder + "\TempExtract.csv"
     TempExtract = pd.read_csv(open(fname,'rb'), index_col=0)                              # read the csv containing the data
     # print(TempExtract)
@@ -68,9 +74,10 @@ def Read_TempExtract(folder):                                                 #e
     TempStab.savefig("Resources\Temperatures.png")                      # save the plot to file
     return TempExtractdf
 
-def Read_A_08_Analyse(folder):                                                 #extracting the peak control data for determining detector stability
-    # this code is pretty rough and can be optimised dramatically but this does work.
-    fname = folder + "\A_08__Analyse.csv"
+def Read_A_08_Analyse(folder):                                          # extracting the analysis results summary for the month
+    # implments a wildcard search for analysis data. This can be A_01__Analyse or A_0X__Analyse or anything in between
+    fname = glob.glob(folder + "\A*Analyse.csv")
+    fname = QDir.toNativeSeparators(fname[0])
     AllExtract = pd.read_csv(open(fname,'rb'), index_col=1)                              # read the csv containing the data
     TonsAnalysed = AllExtract.groupby('Date')[['S034','S029']].sum()
 
