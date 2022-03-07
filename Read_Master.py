@@ -51,7 +51,7 @@ def Read_PeakExtract(folder):     #extracting the peak control data for determin
     plt.title("Detector Stability")                         # add a title
     plt.xticks(rotation=90)                                 # rotate the X axis titles
     # plt.show()                                                 # show the plot
-    DetStab.savefig("Resources\Detector_Stability.png")     # save the plot to file
+    DetStab.savefig("C:\\Users\\l.ritchie\\PycharmProjects\\Scantech_Monthly_PSA_Report\\Resources\\Detector_Stability.png")     # save the plot to file
 
     return PeakExtractdf
 
@@ -71,15 +71,25 @@ def Read_TempExtract(folder):                                                 # 
     plt.grid(which='both', axis="y")                                    # display the axis ticks
     # plt.xticks(rotation=90)                                           # rotate the X axis titles
     #plt.show()                                                          # show the plot
-    TempStab.savefig("Resources\Temperatures.png")                      # save the plot to file
+    TempStab.savefig("C:\\Users\\l.ritchie\\PycharmProjects\\Scantech_Monthly_PSA_Report\\Resources\\Temperatures.png")                      # save the plot to file
     return TempExtractdf
 
-def Read_A_08_Analyse(folder):                                          # extracting the analysis results summary for the month
+def Read_A_08_Analyse(folder, PSAMaster, Analyser):                                          # extracting the analysis results summary for the month
     # implments a wildcard search for analysis data. This can be A_01__Analyse or A_0X__Analyse or anything in between
     fname = glob.glob(folder + "\A*Analyse.csv")
-    fname = QDir.toNativeSeparators(fname[0])
-    AllExtract = pd.read_csv(open(fname,'rb'), index_col=1)                              # read the csv containing the data
-    TonsAnalysed = AllExtract.groupby('Date')[['S034','S029']].sum()
+    fname = QDir.toNativeSeparators(fname[0])           # esnure folder path in correct windows format
+
+    AllExtract = pd.read_csv(open(fname,'rb'))                              # read the csv containing the data
+    AllExtract = AllExtract.fillna(0)           # replace all NaN with zeros
+
+    # Columns Check for Tonnage data
+    if "S034" in AllExtract.columns:            # check S034 in the array
+        if "S029" in AllExtract.columns:        # Check S029 in the array
+            TonsAnalysed = AllExtract.groupby('Date')[['S034','S029']].sum()    # perform the Tonnage total with S034 & S029
+        else:
+            TonsAnalysed = AllExtract.groupby('Date')[['S034']].sum()           # else perform with just S034
+    else:
+        TonsAnalysed = pd.DataFrame(columns=["S034","S029"])                    # else produce blank array
 
     # Plot Daily tonns as a stacked histograme of Tons Analsyed and TOns not analysed
     plt.figure(figsize=(10,6))
@@ -90,7 +100,7 @@ def Read_A_08_Analyse(folder):                                          # extrac
     plt.bar(TonsAnalysed.index,TonsAnalysed["S034"],0.4,bottom=TonsAnalysed["S029"],color = 'green', label='Tons Analysed',zorder=2)
     plt.legend(bbox_to_anchor=(0., 1.02, 1., .102), loc='lower left',
                ncol=2, mode="expand", borderaxespad=0)                  # places the legend above the plot
-    plt.savefig("Resources\Daily_Tonnes.png")
+    plt.savefig("C:\\Users\\l.ritchie\\PycharmProjects\\Scantech_Monthly_PSA_Report\\Resources\\Daily_Tonnes.png")
     plt.close()
     # Parameters for controlling Results plots
     lsize = 8
@@ -100,8 +110,19 @@ def Read_A_08_Analyse(folder):                                          # extrac
     tpad = 5
     figw = 10
     figh = 15
+
+    # read in the correct results to plot
+    data = pd.read_excel(open(PSAMaster,'rb'), sheet_name="AnalyserDetails")
+    df = pd.DataFrame(columns=["Date", "Result 1", "Result 2", "Result 3", "Result 4", "Result 5", "Result 6"])
+    df = data.iloc[:,[0,8,10,12,14,16,18]]
+
+    pltresults = df[df["Analyser Number"] == Analyser]
+
+    pltresults = pltresults.iloc[:,1:]#.to_string(index=False)
+    pltresults = pltresults.values.tolist()
+
     # Plot First 3 results for report as a single figure with 3 subplots
-    Results = AllExtract.groupby('Date')[['R040','R030','R031','R032','R033', 'R034', 'R035']].mean()
+    Results = AllExtract.groupby('Date')[pltresults].mean()
     fig = plt.figure(figsize=(figw,figh))
 
     # Plot First Result
@@ -127,7 +148,7 @@ def Read_A_08_Analyse(folder):                                          # extrac
 
     plt.subplots_adjust(bottom=0.07,top=0.97, hspace=0.5)
 
-    plt.savefig("Resources\Results1.png")
+    plt.savefig("C:\\Users\\l.ritchie\\PycharmProjects\\Scantech_Monthly_PSA_Report\\Resources\\Results1.png")
     plt.close()
 
     fig = plt.figure(figsize=(figw,figh))
@@ -155,7 +176,7 @@ def Read_A_08_Analyse(folder):                                          # extrac
 
     plt.subplots_adjust(bottom=0.07,top=0.97, hspace=0.5)
 
-    plt.savefig("Resources\Results2.png")
+    plt.savefig("C:\\Users\\l.ritchie\\PycharmProjects\\Scantech_Monthly_PSA_Report\\Resources\\Results2.png")
     plt.close()
 
 

@@ -27,23 +27,24 @@ import matplotlib.pyplot as plt
 class ReadInData:
     PSAMaster = "C:\\Users\\l.ritchie\\PycharmProjects\\Scantech_Monthly_PSA_Report\\PSA_Master_List.xlsx"
     defaultpath = "C:\\Users\\l.ritchie\\PycharmProjects\\Scantech_Monthly_PSA_Report\\"
-    PSAMasterData = Read_Master(PSAMaster)              # Read in master file data from PSA Master file.
-    AnalyserStatus = Read_AnalyserStatus(defaultpath)   # Read in PSA Report file data from PSA Report file.
-    PeakControl = Read_PeakControl(defaultpath)         # Read in Analyser Peak Control Data
-    VersionNumbers = Read_VersionNumbers(defaultpath)   # Read in version numbers data
-    AnalyserIO = Read_AnalyserIO(defaultpath)           # Read in Analyser IO Data
-    AnalyserA08 = Read_A_08_Analyse(defaultpath)        # Read in Analysis Data
-    PeakExtract = Read_PeakExtract(defaultpath)         # Readi in Peak Stability Data
-    TempExtract = Read_TempExtract(defaultpath)          # Read in Temp Stability Data
-    print(" Initial Default Path: " + defaultpath)
-    print(" Initial PSA Master Data: " + str(PSAMasterData))
-    print(" Initial Analayser Status: " + str(AnalyserStatus))
-    print(" Initial Peak Control: " + str(PeakControl))
-    print(" Initial Version Number: " + str(VersionNumbers))
-    print(" Initial Analyser IO: " + str(AnalyserIO))
-    print(" Initial Analsyer Results: " + str(AnalyserA08))
-    print(" Initial Peak Satbility: " + str(PeakExtract))
-    print(" Initial Temp data: " + str(TempExtract))
+    defaultanalyser = "OBA-040"
+    PSAMasterData = Read_Master(PSAMaster)                                          # Read in master file data from PSA Master file.
+    AnalyserStatus = Read_AnalyserStatus(defaultpath)                               # Read in PSA Report file data from PSA Report file.
+    PeakControl = Read_PeakControl(defaultpath)                                     # Read in Analyser Peak Control Data
+    VersionNumbers = Read_VersionNumbers(defaultpath)                               # Read in version numbers data
+    AnalyserIO = Read_AnalyserIO(defaultpath)                                       # Read in Analyser IO Data
+    AnalyserA08 = Read_A_08_Analyse(defaultpath,PSAMaster,defaultanalyser)          # Read in Analysis Data
+    PeakExtract = Read_PeakExtract(defaultpath)                                     # Readi in Peak Stability Data
+    TempExtract = Read_TempExtract(defaultpath)                                     # Read in Temp Stability Data
+    print(" Initial Default Path: \n" + defaultpath)
+    print(" Initial PSA Master Data: \n" + str(PSAMasterData))
+    print(" Initial Analayser Status: \n" + str(AnalyserStatus))
+    print(" Initial Peak Control: \n" + str(PeakControl))
+    print(" Initial Version Number: \n" + str(VersionNumbers))
+    print(" Initial Analyser IO: \n" + str(AnalyserIO))
+    print(" Initial Analsyer Results: \n" + str(AnalyserA08))
+    print(" Initial Peak Satbility: \n" + str(PeakExtract))
+    print(" Initial Temp data: \n" + str(TempExtract))
 
 
 ReadInData()              # Read in master file data from PSA Master file.
@@ -86,19 +87,19 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
         print(ReadInData.defaultpath)
         print("1")
         ReadInData.AnalyserStatus = Read_AnalyserStatus(ReadInData.defaultpath)     # Read in PSA Report file data from PSA Report file.
-        print(" Updated Analyser Status: " + str(ReadInData.AnalyserStatus))
+        print(" Updated Analyser Status: \n" + str(ReadInData.AnalyserStatus))
         ReadInData.PeakControl = Read_PeakControl(ReadInData.defaultpath)           # Read in Analyser Peak Control Data
-        print(" Updated Peak Control: " + str(ReadInData.PeakControl))
+        print(" Updated Peak Control: \n" + str(ReadInData.PeakControl))
         ReadInData.VersionNumbers = Read_VersionNumbers(ReadInData.defaultpath)     # Read in version numbers data
-        print(" Updated Version Numbers: " + str(ReadInData.VersionNumbers))
+        print(" Updated Version Numbers: \n" + str(ReadInData.VersionNumbers))
         ReadInData.AnalyserIO = Read_AnalyserIO(ReadInData.defaultpath)             # Read in Analyser IO Data
-        print(" Updated Analsyer IO: " + str(ReadInData.AnalyserIO))
+        print(" Updated Analsyer IO: \n" + str(ReadInData.AnalyserIO))
         ReadInData.AnalyserA08 = Read_A_08_Analyse(ReadInData.defaultpath)          # Read in Analysis Data
-        print(" Updated analysis results: " + str(ReadInData.AnalyserA08))
+        print(" Updated analysis results: \n" + str(ReadInData.AnalyserA08))
         ReadInData.PeakExtract = Read_PeakExtract(ReadInData.defaultpath)           # Readi in Peak Stability Data
-        print(" Updated Peak extract: " + str(ReadInData.PeakExtract))
+        print(" Updated Peak extract: \n" + str(ReadInData.PeakExtract))
         ReadInData.TempExtract = Read_TempExtract(ReadInData.defaultpath)           # Read in Temp Stability Data
-        print(" Updated Temp Extract: " + str(ReadInData.TempExtract))
+        print(" Updated Temp Extract: \n" + str(ReadInData.TempExtract))
 
 
     def GetFolder(self):
@@ -128,7 +129,7 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
         # Update the default path vairable in the ReadINData Class
         print("fname = " + fname)
         ReadInData.defaultpath = fname
-        print(" ReadiInData.deafult path = " + ReadInData.defaultpath)
+        print("ReadiInData.deafult path = " + ReadInData.defaultpath)
         print(type(fname))
 
         # Update the data in the Data Variables in Use
