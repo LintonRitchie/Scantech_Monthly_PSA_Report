@@ -74,13 +74,12 @@ def Read_TempExtract(folder):                                                 # 
     TempStab.savefig("C:\\Users\\l.ritchie\\PycharmProjects\\Scantech_Monthly_PSA_Report\\Resources\\Temperatures.png")                      # save the plot to file
     return TempExtractdf
 
-def Read_A_08_Analyse(folder, PSAMaster, Analyser):                                          # extracting the analysis results summary for the month
+def Read_A_08_Analyse(folder):                                          # extracting the analysis results summary for the month
     # implments a wildcard search for analysis data. This can be A_01__Analyse or A_0X__Analyse or anything in between
     fname = glob.glob(folder + "\A*Analyse.csv")
     fname = QDir.toNativeSeparators(fname[0])           # esnure folder path in correct windows format
 
-    AllExtract = pd.read_csv(open(fname,'rb'))                              # read the csv containing the data
-    AllExtract = AllExtract.fillna(0)           # replace all NaN with zeros
+    AllExtract = pd.read_csv(open(fname,'r'),header=0, index_col=False)                              # read the csv containing the data. Index Col must = false to ensure the headings are not shifted
 
     # Columns Check for Tonnage data
     if "S034" in AllExtract.columns:            # check S034 in the array
@@ -102,6 +101,7 @@ def Read_A_08_Analyse(folder, PSAMaster, Analyser):                             
                ncol=2, mode="expand", borderaxespad=0)                  # places the legend above the plot
     plt.savefig("C:\\Users\\l.ritchie\\PycharmProjects\\Scantech_Monthly_PSA_Report\\Resources\\Daily_Tonnes.png")
     plt.close()
+
     # Parameters for controlling Results plots
     lsize = 8
     lrot = 90
@@ -112,38 +112,35 @@ def Read_A_08_Analyse(folder, PSAMaster, Analyser):                             
     figh = 15
 
     # read in the correct results to plot
-    data = pd.read_excel(open(PSAMaster,'rb'), sheet_name="AnalyserDetails")
-    df = pd.DataFrame(columns=["Date", "Result 1", "Result 2", "Result 3", "Result 4", "Result 5", "Result 6"])
-    df = data.iloc[:,[0,8,10,12,14,16,18]]
 
-    pltresults = df[df["Analyser Number"] == Analyser]
-
-    pltresults = pltresults.iloc[:,1:]#.to_string(index=False)
-    pltresults = pltresults.values.tolist()
+    columns1 = [1, 3, 4, 5, 6, 7, 8]
+    df = AllExtract.iloc[:,columns1]
 
     # Plot First 3 results for report as a single figure with 3 subplots
-    Results = AllExtract.groupby('Date')[pltresults].mean()
+    Results = df.groupby('Date').mean()
+
+    # Setup the figure to be the size defined earlier
     fig = plt.figure(figsize=(figw,figh))
 
     # Plot First Result
     ax1 = fig.add_subplot(311)
-    ax1.plot(Results.index,Results["R030"])
+    ax1.plot(Results.iloc[:,0])
     plt.tick_params(axis='x', which='both', labelsize=lsize, labelrotation=lrot, grid_color=gcol, grid_alpha=galpha)
-    plt.title("R030", pad=tpad)
+    plt.title(str(Results.columns[0]), pad=tpad)
     plt.grid(which='both', axis='y')
 
     # Plot Second Result
     ax2 = fig.add_subplot(312)
-    ax2.plot(Results.index, Results["R031"])
+    ax2.plot(Results.iloc[:,1])
     plt.tick_params(axis='x', which='both', labelsize=lsize, labelrotation=lrot, grid_color=gcol, grid_alpha=galpha)
-    plt.title("R031", pad=tpad)
+    plt.title(str(Results.columns[1]), pad=tpad)
     plt.grid(which='both', axis='y')
 
     # Plot Third Result
     ax3 = fig.add_subplot(313)
-    ax3.plot(Results.index, Results["R032"])
+    ax3.plot(Results.iloc[:,2])
     plt.tick_params(axis='x', which='both', labelsize=lsize, labelrotation=lrot, grid_color=gcol, grid_alpha=galpha)
-    plt.title("R032", pad=tpad)
+    plt.title(str(Results.columns[2]), pad=tpad)
     plt.grid(which='both', axis='y')
 
     plt.subplots_adjust(bottom=0.07,top=0.97, hspace=0.5)
@@ -155,23 +152,23 @@ def Read_A_08_Analyse(folder, PSAMaster, Analyser):                             
 
     # Plot First Result
     ax1 = fig.add_subplot(311)
-    ax1.plot(Results.index,Results["R033"])
+    ax1.plot(Results.iloc[:,3])
     plt.tick_params(axis='x', which='both', labelsize=lsize, labelrotation=lrot, grid_color=gcol, grid_alpha=galpha)
-    plt.title("R033", pad=tpad)
+    plt.title(str(Results.columns[3]), pad=tpad)
     plt.grid(which='both', axis='y')
 
     # Plot Second Result
     ax2 = fig.add_subplot(312)
-    ax2.plot(Results.index, Results["R034"])
+    ax2.plot(Results.iloc[:,4])
     plt.tick_params(axis='x', which='both', labelsize=lsize, labelrotation=lrot, grid_color=gcol, grid_alpha=galpha)
-    plt.title("R034", pad=tpad)
+    plt.title(str(Results.columns[4]), pad=tpad)
     plt.grid(which='both', axis='y')
 
     # Plot Third Result
     ax3 = fig.add_subplot(313)
-    ax3.plot(Results.index, Results["R035"])
+    ax3.plot(Results.iloc[:,5])
     plt.tick_params(axis='x', which='both', labelsize=lsize, labelrotation=lrot, grid_color=gcol, grid_alpha=galpha)
-    plt.title("R035", pad=tpad)
+    plt.title(str(Results.columns[5]), pad=tpad)
     plt.grid(which='both', axis='y')
 
     plt.subplots_adjust(bottom=0.07,top=0.97, hspace=0.5)
