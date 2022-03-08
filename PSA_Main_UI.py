@@ -27,6 +27,7 @@ import matplotlib.pyplot as plt
 class ReadInData:
     PSAMaster = "C:\\Users\\l.ritchie\\PycharmProjects\\Scantech_Monthly_PSA_Report\\PSA_Master_List.xlsx"
     defaultpath = "C:\\Users\\l.ritchie\\PycharmProjects\\Scantech_Monthly_PSA_Report\\"
+    resourcepath = "C:\\Users\\l.ritchie\\PycharmProjects\\Scantech_Monthly_PSA_Report\\Resources\\"
     defaultanalyser = "OBA-040"
     PSAMasterData = Read_Master(PSAMaster)                                          # Read in master file data from PSA Master file.
     AnalyserStatus = Read_AnalyserStatus(defaultpath)                               # Read in PSA Report file data from PSA Report file.
@@ -84,23 +85,13 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
         self.AnalyserListComboBox.activated.connect(self.GetFolder)
 
     def updatereadindata(self):
-        #print(ReadInData.defaultpath)
-        #print("1")
         ReadInData.AnalyserStatus = Read_AnalyserStatus(ReadInData.defaultpath)     # Read in PSA Report file data from PSA Report file.
-        #print(" Updated Analyser Status: \n" + str(ReadInData.AnalyserStatus))
         ReadInData.PeakControl = Read_PeakControl(ReadInData.defaultpath)           # Read in Analyser Peak Control Data
-        #print(" Updated Peak Control: \n" + str(ReadInData.PeakControl))
         ReadInData.VersionNumbers = Read_VersionNumbers(ReadInData.defaultpath)     # Read in version numbers data
-        #print(" Updated Version Numbers: \n" + str(ReadInData.VersionNumbers))
         ReadInData.AnalyserIO = Read_AnalyserIO(ReadInData.defaultpath)             # Read in Analyser IO Data
-        #print(" Updated Analsyer IO: \n" + str(ReadInData.AnalyserIO))
         ReadInData.AnalyserA08 = Read_A_08_Analyse(ReadInData.defaultpath)          # Read in Analysis Data
-        #print(" Updated analysis results: \n" + str(ReadInData.AnalyserA08))
         ReadInData.PeakExtract = Read_PeakExtract(ReadInData.defaultpath)           # Readi in Peak Stability Data
-        #print(" Updated Peak extract: \n" + str(ReadInData.PeakExtract))
         ReadInData.TempExtract = Read_TempExtract(ReadInData.defaultpath)           # Read in Temp Stability Data
-        #print(" Updated Temp Extract: \n" + str(ReadInData.TempExtract))
-
 
     def GetFolder(self):
         anal = self.AnalyserListComboBox.currentText()
@@ -146,7 +137,9 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
         callabel = "Welcome " + calibrator
         self.WelcomeText.setText(callabel)
 
+    # Only called when the New Report button Pressed
     def updateReport(self):
+        print ("Entering Update report")
         anal = self.AnalyserListComboBox.currentText()
         repdate = str(datetime.date.today()) # egt todays date
         serveng = ReadInData.PSAMasterData.loc[ReadInData.PSAMasterData["Analyser Number"] == anal, "Service Engineer"].to_string(index=False) #get the service engineer as a string without dataframe nonsense
@@ -163,6 +156,8 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
         self.page1.disp_endiskspc.setText(self.DiskSpaceOK())
         self.UpdateDetStab()
         self.UpdatePg6()
+        self.UpdateFigs()
+        print("Exit Update Report")
 
     def EnabledYes(self):
         enabled = "Yes"
@@ -182,6 +177,17 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
         brush.setStyle(QtCore.Qt.SolidPattern)
         enableditem.setBackground(brush)
         brush = QtGui.QBrush(QtGui.QColor(0, 0, 0))
+        brush.setStyle(QtCore.Qt.SolidPattern)
+        enableditem.setForeground(brush)
+        return enableditem
+
+    def ClearTable(self):
+        enabled = ""
+        enableditem = QTableWidgetItem(enabled)
+        brush = QtGui.QBrush(QtGui.QColor(255, 255, 255))
+        brush.setStyle(QtCore.Qt.SolidPattern)
+        enableditem.setBackground(brush)
+        brush = QtGui.QBrush(QtGui.QColor(255, 255, 255))
         brush.setStyle(QtCore.Qt.SolidPattern)
         enableditem.setForeground(brush)
         return enableditem
@@ -244,8 +250,23 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
         self.page6.PlantPLCTable_7.setItem(0, 0, DiskSpace)
         self.page6.PlantPLCTable_7.setItem(1, 0, PercDiskSpace)
 
+    # used in Update report
+    def UpdateFigs(self):
+        self.page2.label_3.setPixmap(QtGui.QPixmap(ReadInData.resourcepath + "\\Detector_Stability.png"))
+        self.page3.Temps.setPixmap(QtGui.QPixmap(ReadInData.resourcepath + "\\Temperatures.png"))
+        self.page3.label_4.setPixmap(QtGui.QPixmap(ReadInData.resourcepath + "\\Daily_Tonnes.png"))
+        self.page4.Results1.setPixmap(QtGui.QPixmap(ReadInData.resourcepath + "\\Results1.png"))
+        self.page5.Results2.setPixmap(QtGui.QPixmap(ReadInData.resourcepath + "\\Results2.png"))
+
+    # used in Update report
     def UpdateDetStab(self):
+
         Dets = ReadInData.PeakControl.shape[1]-2
+
+        for i in range(6):
+            self.page2.tableWidget.setItem(0, i, self.ClearTable())
+            self.page2.tableWidget.setItem(1, i, self.ClearTable())
+
         x=0
         while x < Dets:
             disabled = ReadInData.PeakControl.loc[ReadInData.PeakControl["Result Name"] == "DetectorDisabled", "Detector "+str(x+1)].to_string(index=False)

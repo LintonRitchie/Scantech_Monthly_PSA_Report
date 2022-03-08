@@ -43,14 +43,84 @@ def Read_PeakControl(folder):
     return PeakControldf
 
 def Read_PeakExtract(folder):     #extracting the peak control data for determining detector stability
+
     fname = folder + "\PeakExtract.csv"
-    PeakExtract = pd.read_csv(open(fname,'rb'), index_col=0) #read the csv containing the data
-    PeakExtractdf = pd.DataFrame(PeakExtract.iloc[:, [3,10,17,24]]) #extract the 4 columns of dector data. This is only applicable to 4 detector analysers. This will need to be updated to do a selection to allow for any number of detecotrs
-    PeakExtractdf.columns = ["Det1", "Det2", "Det3", "Det4"]    # renaming the columns of the new dataframe created for detector stability values only.
-    DetStab = PeakExtractdf.plot().get_figure()             #plot the data
-    plt.title("Detector Stability")                         # add a title
-    plt.xticks(rotation=90)                                 # rotate the X axis titles
-    # plt.show()                                                 # show the plot
+
+    # read the csv containing the data. Since the 1st row is stupidly setup with tab & comma seperators as well as incomplete headings, we have to ignore it.
+    PeakExtract = pd.read_csv(open(fname,'rb'), skiprows=1,header=None)
+
+    # determine how many detectors are present
+    ndets = (PeakExtract.shape[1]-2)/7
+
+    # simplify dataframe with only detector stability data for the relevant number of detectors
+
+    if ndets == 1:
+        PeakExtractdf = pd.DataFrame(PeakExtract.iloc[:, [4]])  # extract the 4 columns of dector data. This is only applicable to 4 detector analysers. This will need to be updated to do a selection to allow for any number of detecotrs
+        PeakExtractdf.columns = ["Det1"]  # renaming the columns of the new dataframe created for detector stability values only.
+
+    elif ndets == 2:
+        PeakExtractdf = pd.DataFrame(PeakExtract.iloc[:, [4, 11]])  # extract the 4 columns of dector data. This is only applicable to 4 detector analysers. This will need to be updated to do a selection to allow for any number of detecotrs
+        PeakExtractdf.columns = ["Det1", "Det2"]  # renaming the columns of the new dataframe created for detector stability values only.
+
+    elif ndets == 3:
+        PeakExtractdf = pd.DataFrame(PeakExtract.iloc[:, [4, 11, 18]])  # extract the 4 columns of dector data. This is only applicable to 4 detector analysers. This will need to be updated to do a selection to allow for any number of detecotrs
+        PeakExtractdf.columns = ["Det1", "Det2", "Det3"]  # renaming the columns of the new dataframe created for detector stability values only.
+
+    elif ndets == 4:
+        PeakExtractdf = pd.DataFrame(PeakExtract.iloc[:, [4, 11, 18, 25]])     # extract the 4 columns of dector data. This is only applicable to 4 detector analysers. This will need to be updated to do a selection to allow for any number of detecotrs
+        PeakExtractdf.columns = ["Det1", "Det2", "Det3", "Det4"]            # renaming the columns of the new dataframe created for detector stability values only.
+
+    elif ndets == 5:
+        PeakExtractdf = pd.DataFrame(PeakExtract.iloc[:, [4, 11, 18, 25, 32]])  # extract the 4 columns of dector data. This is only applicable to 4 detector analysers. This will need to be updated to do a selection to allow for any number of detecotrs
+        PeakExtractdf.columns = ["Det1", "Det2", "Det3", "Det4", "Det5"]  # renaming the columns of the new dataframe created for detector stability values only.
+
+    elif ndets == 6:
+        PeakExtractdf = pd.DataFrame(PeakExtract.iloc[:, [4, 11, 18, 25, 32, 39]])  # extract the 4 columns of dector data. This is only applicable to 4 detector analysers. This will need to be updated to do a selection to allow for any number of detecotrs
+        PeakExtractdf.columns = ["Det1", "Det2", "Det3", "Det4", "Det5", "Det6"]  # renaming the columns of the new dataframe created for detector stability values only.
+
+    elif ndets == 7:
+        PeakExtractdf = pd.DataFrame(PeakExtract.iloc[:, [4, 11, 18, 25, 32, 39, 46]])  # extract the 4 columns of dector data. This is only applicable to 4 detector analysers. This will need to be updated to do a selection to allow for any number of detecotrs
+        PeakExtractdf.columns = ["Det1", "Det2", "Det3", "Det4", "Det5", "Det6", "Det7"]  # renaming the columns of the new dataframe created for detector stability values only.
+
+    elif ndets == 8:
+        PeakExtractdf = pd.DataFrame(PeakExtract.iloc[:, [4, 11, 18, 25, 32, 39, 46, 53]])  # extract the 4 columns of dector data. This is only applicable to 4 detector analysers. This will need to be updated to do a selection to allow for any number of detecotrs
+        PeakExtractdf.columns = ["Det1", "Det2", "Det3", "Det4", "Det5", "Det6", "Det7", "Det8"]  # renaming the columns of the new dataframe created for detector stability values only.
+
+    elif ndets == 9:
+        PeakExtractdf = pd.DataFrame(PeakExtract.iloc[:, [4, 11, 18, 25, 32, 39, 46, 53, 60]])  # extract the 4 columns of dector data. This is only applicable to 4 detector analysers. This will need to be updated to do a selection to allow for any number of detecotrs
+        PeakExtractdf.columns = ["Det1", "Det2", "Det3", "Det4", "Det5", "Det6", "Det7", "Det8", "Det9"]  # renaming the columns of the new dataframe created for detector stability values only.
+
+    elif ndets == 10:
+        PeakExtractdf = pd.DataFrame(PeakExtract.iloc[:, [4, 11, 18, 25, 32, 39, 46, 53, 60, 67]])  # extract the 4 columns of dector data. This is only applicable to 4 detector analysers. This will need to be updated to do a selection to allow for any number of detecotrs
+        PeakExtractdf.columns = ["Det1", "Det2", "Det3", "Det4", "Det5", "Det6", "Det7", "Det8", "Det9", "Det10"]  # renaming the columns of the new dataframe created for detector stability values only.
+
+    elif ndets == 11:
+        PeakExtractdf = pd.DataFrame(PeakExtract.iloc[:, [4, 11, 18, 25, 32, 39, 46, 53, 60, 67, 74]])  # extract the 4 columns of dector data. This is only applicable to 4 detector analysers. This will need to be updated to do a selection to allow for any number of detecotrs
+        PeakExtractdf.columns = ["Det1", "Det2", "Det3", "Det4", "Det5", "Det6", "Det7", "Det8", "Det9", "Det10", "Det11"]  # renaming the columns of the new dataframe created for detector stability values only.
+
+    elif ndets == 12:
+        PeakExtractdf = pd.DataFrame(PeakExtract.iloc[:, [4, 11, 18, 25, 32, 39, 46, 53, 60, 67, 74, 81]])  # extract the 4 columns of dector data. This is only applicable to 4 detector analysers. This will need to be updated to do a selection to allow for any number of detecotrs
+        PeakExtractdf.columns = ["Det1", "Det2", "Det3", "Det4", "Det5", "Det6", "Det7", "Det8", "Det9", "Det10", "Det11", "Det12"]  # renaming the columns of the new dataframe created for detector stability values only.
+
+    elif ndets == 13:
+        PeakExtractdf = pd.DataFrame(PeakExtract.iloc[:, [4, 11, 18, 25, 32, 39, 46, 53, 60, 67, 74, 81, 88]])  # extract the 4 columns of dector data. This is only applicable to 4 detector analysers. This will need to be updated to do a selection to allow for any number of detecotrs
+        PeakExtractdf.columns = ["Det1", "Det2", "Det3", "Det4", "Det5", "Det6", "Det7", "Det8", "Det9", "Det10", "Det11", "Det12", "Det13"]  # renaming the columns of the new dataframe created for detector stability values only.
+
+    elif ndets == 14:
+        PeakExtractdf = pd.DataFrame(PeakExtract.iloc[:, [4, 11, 18, 25, 32, 39, 46, 53, 60, 67, 74, 81, 88, 95]])  # extract the 4 columns of dector data. This is only applicable to 4 detector analysers. This will need to be updated to do a selection to allow for any number of detecotrs
+        PeakExtractdf.columns = ["Det1", "Det2", "Det3", "Det4", "Det5", "Det6", "Det7", "Det8", "Det9", "Det10", "Det11", "Det12", "Det13", "Det14"]  # renaming the columns of the new dataframe created for detector stability values only.
+
+    elif ndets == 15:
+        PeakExtractdf = pd.DataFrame(PeakExtract.iloc[:, [4, 11, 18, 25, 32, 39, 46, 53, 60, 67, 74, 81, 88, 95, 102]])  # extract the 4 columns of dector data. This is only applicable to 4 detector analysers. This will need to be updated to do a selection to allow for any number of detecotrs
+        PeakExtractdf.columns = ["Det1", "Det2", "Det3", "Det4", "Det5", "Det6", "Det7", "Det8", "Det9", "Det10", "Det11", "Det12", "Det13", "Det14", "Det15"]  # renaming the columns of the new dataframe created for detector stability values only.
+
+    else:
+        PeakExtractdf = pd.DataFrame(PeakExtract.iloc[:, [4, 11, 18, 25, 32, 39, 46, 53, 60, 67, 74, 81, 88, 95, 102, 109]])  # extract the 4 columns of dector data. This is only applicable to 4 detector analysers. This will need to be updated to do a selection to allow for any number of detecotrs
+        PeakExtractdf.columns = ["Det1", "Det2", "Det3", "Det4", "Det5", "Det6", "Det7", "Det8", "Det9", "Det10", "Det11", "Det12", "Det13", "Det14", "Det15", "Det16"]  # renaming the columns of the new dataframe created for detector stability values only.
+
+    DetStab = PeakExtractdf.plot().get_figure()                         # plot the data
+    plt.title("Detector Stability")                                     # add a title
+    plt.xticks(rotation=90)                                             # rotate the X axis titles
     DetStab.savefig("C:\\Users\\l.ritchie\\PycharmProjects\\Scantech_Monthly_PSA_Report\\Resources\\Detector_Stability.png")     # save the plot to file
 
     return PeakExtractdf
@@ -175,6 +245,7 @@ def Read_A_08_Analyse(folder):                                          # extrac
 
     plt.savefig("C:\\Users\\l.ritchie\\PycharmProjects\\Scantech_Monthly_PSA_Report\\Resources\\Results2.png")
     plt.close()
+    print("Read Master Complete")
 
 
 #Read_A_08_Analyse()
