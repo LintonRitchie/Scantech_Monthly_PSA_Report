@@ -260,28 +260,40 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
 
     # used in Update report
     def UpdateDetStab(self):
-
+        # calculate the number of detecotrs
         Dets = ReadInData.PeakControl.shape[1]-2
 
-        for i in range(6):
+        # clear the table each time the function is called.
+        for i in range(16):
             self.page2.tableWidget.setItem(0, i, self.ClearTable())
             self.page2.tableWidget.setItem(1, i, self.ClearTable())
 
         x=0
+        # update the detecotr status table based on the totoal number of detectors.
         while x < Dets:
+            # read in the detector disabled status
             disabled = ReadInData.PeakControl.loc[ReadInData.PeakControl["Result Name"] == "DetectorDisabled", "Detector "+str(x+1)].to_string(index=False)
+            # read in the detector Stability status
             stablity = ReadInData.PeakControl.iloc[21, x+1]
+
+            # Choose which colour and wording to update the Detector enabled row of detecotr stability table with
             if disabled == "FALSE":
                 value = self.EnabledYes()
             else:
                 value = self.EnabledNo()
+            # update the Enabled / Disabled row of the detector stability table with the wording chosen above
             self.page2.tableWidget.setItem(0, x, value)
+
+            # Choose which colour and wording to update the Stability row of detecotr stability table with
             if stablity == "Stable":
                 value = self.EnabledYes()
             else:
                 value = self.EnabledNo()
+            # update the stability row of the detector stability table with the wording chosen above
             self.page2.tableWidget.setItem(1, x, value)
+            # incrment the loop counter
             x += 1
+
 
     def RepPeriod(self):
         dates = ReadInData.AnalyserStatus.loc[ReadInData.AnalyserStatus["Result Name"] == "LastPsaReportTime", "Value"] # get the date of the last psa report generation
