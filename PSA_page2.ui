@@ -179,9 +179,9 @@
    <widget class="QTableWidget" name="tableWidget">
     <property name="geometry">
      <rect>
-      <x>74</x>
+      <x>5</x>
       <y>260</y>
-      <width>653</width>
+      <width>790</width>
       <height>65</height>
      </rect>
     </property>
@@ -197,6 +197,9 @@
     <property name="horizontalScrollBarPolicy">
      <enum>Qt::ScrollBarAlwaysOff</enum>
     </property>
+    <attribute name="horizontalHeaderDefaultSectionSize">
+     <number>46</number>
+    </attribute>
     <attribute name="horizontalHeaderMinimumSectionSize">
      <number>30</number>
     </attribute>
@@ -234,7 +237,7 @@
     </row>
     <column>
      <property name="text">
-      <string>Detector 1</string>
+      <string>Det 1</string>
      </property>
      <property name="font">
       <font>
@@ -247,7 +250,7 @@
     </column>
     <column>
      <property name="text">
-      <string>Detector 2</string>
+      <string>Det 2</string>
      </property>
      <property name="font">
       <font>
@@ -260,7 +263,7 @@
     </column>
     <column>
      <property name="text">
-      <string>Detector 3</string>
+      <string>Det 3</string>
      </property>
      <property name="font">
       <font>
@@ -273,7 +276,7 @@
     </column>
     <column>
      <property name="text">
-      <string>Detector 4</string>
+      <string>Det 4</string>
      </property>
      <property name="font">
       <font>
@@ -286,7 +289,7 @@
     </column>
     <column>
      <property name="text">
-      <string>Detector 5</string>
+      <string>Det 5</string>
      </property>
      <property name="font">
       <font>
@@ -299,77 +302,7 @@
     </column>
     <column>
      <property name="text">
-      <string>Detector 6</string>
-     </property>
-     <property name="font">
-      <font>
-       <family>Calibri</family>
-       <pointsize>10</pointsize>
-       <weight>75</weight>
-       <bold>true</bold>
-      </font>
-     </property>
-    </column>
-   </widget>
-   <widget class="QTableWidget" name="tableWidget_2">
-    <property name="geometry">
-     <rect>
-      <x>74</x>
-      <y>325</y>
-      <width>653</width>
-      <height>65</height>
-     </rect>
-    </property>
-    <property name="sizePolicy">
-     <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-      <horstretch>0</horstretch>
-      <verstretch>0</verstretch>
-     </sizepolicy>
-    </property>
-    <property name="verticalScrollBarPolicy">
-     <enum>Qt::ScrollBarAlwaysOff</enum>
-    </property>
-    <property name="horizontalScrollBarPolicy">
-     <enum>Qt::ScrollBarAlwaysOff</enum>
-    </property>
-    <attribute name="horizontalHeaderMinimumSectionSize">
-     <number>30</number>
-    </attribute>
-    <attribute name="verticalHeaderDefaultSectionSize">
-     <number>20</number>
-    </attribute>
-    <attribute name="verticalHeaderMinimumSectionSize">
-     <number>20</number>
-    </attribute>
-    <row>
-     <property name="text">
-      <string>Enabled</string>
-     </property>
-     <property name="font">
-      <font>
-       <family>Calibri</family>
-       <pointsize>10</pointsize>
-       <weight>75</weight>
-       <bold>true</bold>
-      </font>
-     </property>
-    </row>
-    <row>
-     <property name="text">
-      <string>Stable</string>
-     </property>
-     <property name="font">
-      <font>
-       <family>Calibri</family>
-       <pointsize>10</pointsize>
-       <weight>75</weight>
-       <bold>true</bold>
-      </font>
-     </property>
-    </row>
-    <column>
-     <property name="text">
-      <string>Detector 7</string>
+      <string>Det 6</string>
      </property>
      <property name="font">
       <font>
@@ -382,7 +315,7 @@
     </column>
     <column>
      <property name="text">
-      <string>Detector 8</string>
+      <string>Det 7</string>
      </property>
      <property name="font">
       <font>
@@ -395,7 +328,7 @@
     </column>
     <column>
      <property name="text">
-      <string>Detector 9</string>
+      <string>Det 8</string>
      </property>
      <property name="font">
       <font>
@@ -408,7 +341,7 @@
     </column>
     <column>
      <property name="text">
-      <string>Detector 10</string>
+      <string>Det 9</string>
      </property>
      <property name="font">
       <font>
@@ -421,7 +354,7 @@
     </column>
     <column>
      <property name="text">
-      <string>Detector 11</string>
+      <string>Det 10</string>
      </property>
      <property name="font">
       <font>
@@ -434,77 +367,7 @@
     </column>
     <column>
      <property name="text">
-      <string>Detector 12</string>
-     </property>
-     <property name="font">
-      <font>
-       <family>Calibri</family>
-       <pointsize>10</pointsize>
-       <weight>75</weight>
-       <bold>true</bold>
-      </font>
-     </property>
-    </column>
-   </widget>
-   <widget class="QTableWidget" name="tableWidget_3">
-    <property name="geometry">
-     <rect>
-      <x>74</x>
-      <y>390</y>
-      <width>653</width>
-      <height>65</height>
-     </rect>
-    </property>
-    <property name="sizePolicy">
-     <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-      <horstretch>0</horstretch>
-      <verstretch>0</verstretch>
-     </sizepolicy>
-    </property>
-    <property name="verticalScrollBarPolicy">
-     <enum>Qt::ScrollBarAlwaysOff</enum>
-    </property>
-    <property name="horizontalScrollBarPolicy">
-     <enum>Qt::ScrollBarAlwaysOff</enum>
-    </property>
-    <attribute name="horizontalHeaderMinimumSectionSize">
-     <number>30</number>
-    </attribute>
-    <attribute name="verticalHeaderDefaultSectionSize">
-     <number>20</number>
-    </attribute>
-    <attribute name="verticalHeaderMinimumSectionSize">
-     <number>20</number>
-    </attribute>
-    <row>
-     <property name="text">
-      <string>Enabled</string>
-     </property>
-     <property name="font">
-      <font>
-       <family>Calibri</family>
-       <pointsize>10</pointsize>
-       <weight>75</weight>
-       <bold>true</bold>
-      </font>
-     </property>
-    </row>
-    <row>
-     <property name="text">
-      <string>Stable</string>
-     </property>
-     <property name="font">
-      <font>
-       <family>Calibri</family>
-       <pointsize>10</pointsize>
-       <weight>75</weight>
-       <bold>true</bold>
-      </font>
-     </property>
-    </row>
-    <column>
-     <property name="text">
-      <string>Detector 13</string>
+      <string>Det 11</string>
      </property>
      <property name="font">
       <font>
@@ -517,7 +380,7 @@
     </column>
     <column>
      <property name="text">
-      <string>Detector 14</string>
+      <string>Det 12</string>
      </property>
      <property name="font">
       <font>
@@ -530,7 +393,7 @@
     </column>
     <column>
      <property name="text">
-      <string>Detector 15</string>
+      <string>Det 13</string>
      </property>
      <property name="font">
       <font>
@@ -543,7 +406,33 @@
     </column>
     <column>
      <property name="text">
-      <string>Detector 16</string>
+      <string>Det 14</string>
+     </property>
+     <property name="font">
+      <font>
+       <family>Calibri</family>
+       <pointsize>10</pointsize>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>Det 15</string>
+     </property>
+     <property name="font">
+      <font>
+       <family>Calibri</family>
+       <pointsize>10</pointsize>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>Det 16</string>
      </property>
      <property name="font">
       <font>
