@@ -1,0 +1,342 @@
+{
+ "Summary": [
+  {
+   "SiteName": "Teck Coal Ltd",
+   "ReportDate": "2022-03-28",
+   "AnalyserNo": "C21-105",
+   "ServEng": "Service Engineer:",
+   "Application": "Coal",
+   "Period": "January 2022",
+   "Email": "service.usa@scantech.com.au",
+   "NextPSA": "",
+   "TopUpDue": ""
+  }
+ ],
+ "ActionTaken": [
+  {
+   "Action1": [
+    {
+     "Date": "",
+     "Time": "",
+     "Action": "",
+     "Description": ""
+    }
+   ],
+   "Action2": [
+    {
+     "Date": "",
+     "Time": "",
+     "Action": "",
+     "Description": ""
+    }
+   ],
+   "Action3": [
+    {
+     "Date": "",
+     "Time": "",
+     "Action": "",
+     "Description": ""
+    }
+   ],
+   "Action4": [
+    {
+     "Date": "",
+     "Time": "",
+     "Action": "",
+     "Description": ""
+    }
+   ],
+   "Action5": [
+    {
+     "Date": "",
+     "Time": "",
+     "Action": "",
+     "Description": ""
+    }
+   ]
+  }
+ ],
+ "ActionRequired": [
+  {
+   "ActionReq1": [
+    {
+     "Action": "",
+     "ByWhom": "",
+     "ByWhen": ""
+    }
+   ],
+   "ActionReq2": [
+    {
+     "Action": "",
+     "ByWhom": "",
+     "ByWhen": ""
+    }
+   ],
+   "ActionReq3": [
+    {
+     "Action": "",
+     "ByWhom": "",
+     "ByWhen": ""
+    }
+   ],
+   "ActionReq4": [
+    {
+     "Action": "",
+     "ByWhom": "",
+     "ByWhen": ""
+    }
+   ],
+   "ActionReq5": [
+    {
+     "Action": "",
+     "ByWhom": "",
+     "ByWhen": ""
+    }
+   ]
+  }
+ ],
+ "DetectorStability": [
+  {
+   "Enabled": "",
+   "Stable": "",
+   "Detector1": "",
+   "Detector2": "",
+   "Detector3": "",
+   "Detector4": "",
+   "Detector5": "",
+   "Detector6": "",
+   "Detector7": "",
+   "Detector8": "",
+   "Detector9": "",
+   "Detector10": "",
+   "Detector11": "",
+   "Detector12": "",
+   "Detector13": "",
+   "Detector14": "",
+   "Detector15": "",
+   "Detector16": ""
+  }
+ ],
+ "Temperatures": [
+  {
+   "StableDetTemp": "",
+   "StableElecTemp": "",
+   "DetectorTemp": "",
+   "ElectronicsTemp": "",
+   "AmbientTemp": ""
+  }
+ ],
+ "Tonnages": [
+  {
+   "TonsAnalysed": "",
+   "TonsNotAnalysed": ""
+  }
+ ],
+ "Results": [
+  {
+   "Result1": "",
+   "Result2": "",
+   "Result3": "",
+   "Result4": "",
+   "Result5": "",
+   "Result6": ""
+  }
+ ],
+ "PLCStatus": [
+  {
+   "BeltRunning": [
+    {
+     "Current": "",
+     "1RepAgo": "",
+     "2RepAgo": "",
+     "Comment": ""
+    }
+   ],
+   "ForceAnalyse": [
+    {
+     "Current": "",
+     "1RepAgo": "",
+     "2RepAgo": "",
+     "Comment": ""
+    }
+   ],
+   "ForceStandardise": [
+    {
+     "Current": "",
+     "1RepAgo": "",
+     "2RepAgo": "",
+     "Comment": ""
+    }
+   ]
+  }
+ ],
+ "AnalyserStatus": [
+  {
+   "AnalyserOK": [
+    {
+     "Current": "",
+     "1RepAgo": "",
+     "2RepAgo": "",
+     "Comment": ""
+    }
+   ],
+   "StandardsOK": [
+    {
+     "Current": "",
+     "1RepAgo": "",
+     "2RepAgo": "",
+     "Comment": ""
+    }
+   ],
+   "IOControlOK": [
+    {
+     "Current": "",
+     "1RepAgo": "",
+     "2RepAgo": "",
+     "Comment": ""
+    }
+   ],
+   "SpectraStable": [
+    {
+     "Current": "",
+     "1RepAgo": "",
+     "2RepAgo": "",
+     "Comment": ""
+    }
+   ]
+  }
+ ],
+ "PLCResults": [
+  {
+   "SystemOK": [
+    {
+     "Current": "",
+     "1RepAgo": "",
+     "2RepAgo": "",
+     "Comment": ""
+    }
+   ],
+   "SourceControlFault": [
+    {
+     "Current": "",
+     "1RepAgo": "",
+     "2RepAgo": "",
+     "Comment": ""
+    }
+   ],
+   "SourceOff": [
+    {
+     "Current": "",
+     "1RepAgo": "",
+     "2RepAgo": "",
+     "Comment": ""
+    }
+   ],
+   "SourceOn": [
+    {
+     "Current": "",
+     "1RepAgo": "",
+     "2RepAgo": "",
+     "Comment": ""
+    }
+   ]
+  }
+ ],
+ "AnalyserConfiguration": [
+  {
+   "AnalysisPeriod": [
+    {
+     "Current": "",
+     "1RepAgo": "",
+     "2RepAgo": "",
+     "Comment": ""
+    }
+   ],
+   "AnalMinLoadLimit": [
+    {
+     "Current": "",
+     "1RepAgo": "",
+     "2RepAgo": "",
+     "Comment": ""
+    }
+   ],
+   "StandardisePeriod": [
+    {
+     "Current": "",
+     "1RepAgo": "",
+     "2RepAgo": "",
+     "Comment": ""
+    }
+   ]
+  }
+ ],
+ "Standardisation": [
+  {
+   "FirstStandardTime": [
+    {
+     "Current": "",
+     "1RepAgo": "",
+     "2RepAgo": "",
+     "Comment": ""
+    }
+   ],
+   "MostRecentStandard": [
+    {
+     "Current": "",
+     "1RepAgo": "",
+     "2RepAgo": "",
+     "Comment": ""
+    }
+   ],
+   "NumStdPeriodsSinceClear": [
+    {
+     "Current": "",
+     "1RepAgo": "",
+     "2RepAgo": "",
+     "Comment": ""
+    }
+   ],
+   "NumStdPeriodsThisMnth": ""
+  }
+ ],
+ "SoftwareVersions": [
+  {
+   "Product": [
+    {
+     "Current": "",
+     "1RepAgo": "",
+     "2RepAgo": "",
+     "Comment": ""
+    }
+   ],
+   "CsSchedule": [
+    {
+     "Current": "",
+     "1RepAgo": "",
+     "2RepAgo": "",
+     "Comment": ""
+    }
+   ]
+  }
+ ],
+ "DiskSpaceMem": [
+  {
+   "DiskSpace": [
+    {
+     "Current": "",
+     "1RepAgo": "",
+     "2RepAgo": "",
+     "Comment": ""
+    }
+   ],
+   "PercDiskSpace": [
+    {
+     "Current": "",
+     "1RepAgo": "",
+     "2RepAgo": "",
+     "Comment": ""
+    }
+   ]
+  }
+ ]
+}

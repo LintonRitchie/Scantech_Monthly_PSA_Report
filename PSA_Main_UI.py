@@ -7,6 +7,7 @@ from Read_Master import (Read_Master, Read_AnalyserStatus, Read_PeakControl, Rea
                          Read_TempExtract)  # import the function which reads from the Master PSA file
 # from PyQt5.QtGui import (QPixmap)
 import datetime
+import json
 from PSA_Home import Ui_PSAHome
 from PSA_Page1 import Ui_PSAPage1
 from PSA_Page2 import Ui_PSAPage2
@@ -17,6 +18,7 @@ from PSA_Page6 import Ui_PSAPage6
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QFileDialog, QTableWidgetItem)
 from PyQt5 import (QtCore, QtGui)
 from PyQt5.QtCore import QDir
+
 
 import matplotlib.pyplot as plt
 
@@ -47,12 +49,17 @@ class ReadInData:
     # print(" Initial Peak Satbility: \n" + str(PeakExtract))
     # print(" Initial Temp data: \n" + str(TempExtract))
 
-
-ReadInData()              # Read in master file data from PSA Master file.
+# Read in master file data from PSA Master file. This is run at the start of the program to ensure data is loaded prior to the UI starting up.
+ReadInData()
 
 AnalyserToProcess = 0
 open_window = 0
 
+# open the data interchange file as a global variable which can be accessed throughout the program.
+# This will be accessed multiple times by various functions within the functions.
+
+with open("ReportData.json") as f:
+    reportdata = json.load(f)
 
 
 class HomeWindow(QMainWindow,Ui_PSAHome):
@@ -83,6 +90,7 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
         self.CalibratorListComboBox.currentTextChanged.connect(self.updatehome)
         # self.AnalyserListComboBox.currentTextChanged.connect(self.updatehome)
         self.AnalyserListComboBox.activated.connect(self.GetFolder)
+        self.page1.NextPage.released.connect(self.UpdateJSON)
 
     def updatereadindata(self):
         ReadInData.AnalyserStatus = Read_AnalyserStatus(ReadInData.defaultpath)     # Read in PSA Report file data from PSA Report file.
@@ -118,14 +126,30 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
             return
 
         # Update the default path vairable in the ReadINData Class
-        #print("fname = " + fname)
         ReadInData.defaultpath = fname
-        # print("ReadiInData.deafult path = " + ReadInData.defaultpath)
-        # print(type(fname))
 
         # Update the data in the Data Variables in Use
         self.updatereadindata()
-        #print("Default updated")
+
+    def UpdateJSON(self):
+        print("Entering UpdateJSON")
+        # Update JSON File
+        reportdata['Summary'][0]['SiteName'] = self.page1.site_name.text()
+        reportdata['Summary'][0]['ReportDate'] = self.page1.rep_date_data.text()
+        reportdata['Summary'][0]['AnalyserNo'] = self.page1.rep_analyser_data.text()
+        reportdata['Summary'][0]['ServEng'] = self.page1.rep_serv_eng.text()
+        reportdata['Summary'][0]['Application'] = self.page1.rep_app_data.text()
+        reportdata['Summary'][0]['Period'] = self.page1.period_data.text()
+        reportdata['Summary'][0]['Email'] = self.page1.email_data.text()
+        #reportdata['Summary'][0]['NextPSA'] = str(self.page1.rep_app_data.text() +  )
+        #reportdata['Summary'][0]['TopUpDue'] = str( self.page1.rep_app_data.text() + )
+
+        with open("ReportData.json",'w') as file:
+            json.dump(reportdata, file, indent=1)
+
+        print("Exit JSON")
+
+
 
     def updatehome(self):
         anal = self.AnalyserListComboBox.currentText()
@@ -140,11 +164,14 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
     # Only called when the New Report button Pressed
     def updateReport(self):
         print ("Entering Update report")
+        # Update data accordingly
         anal = self.AnalyserListComboBox.currentText()
         repdate = str(datetime.date.today()) # egt todays date
         serveng = ReadInData.PSAMasterData.loc[ReadInData.PSAMasterData["Analyser Number"] == anal, "Service Engineer"].to_string(index=False) #get the service engineer as a string without dataframe nonsense
         application = ReadInData.PSAMasterData.loc[ReadInData.PSAMasterData["Analyser Number"] == anal, "Application"].to_string(index=False) #get the service engineer as a string without dataframe nonsense
         customer = ReadInData.PSAMasterData.loc[ReadInData.PSAMasterData["Analyser Number"] == anal, "Customer Name"].to_string(index=False) #get the service engineer as a string without dataframe nonsense
+
+        # Update UI
         self.page1.rep_analyser_data.setText(anal)
         self.page1.rep_date_data.setText(repdate)
         self.page1.rep_serv_eng_data.setText(serveng)
@@ -157,7 +184,7 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
         self.UpdateDetStab()
         self.UpdatePg6()
         self.UpdateFigs()
-        print("Exit Update Report")
+
 
     def EnabledYes(self):
         enabled = "Yes"
