@@ -809,5 +809,21 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>NextPage</sender>
+   <signal>released()</signal>
+   <receiver>PSAPage2</receiver>
+   <slot>hide()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>734</x>
+     <y>212</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>739</x>
+     <y>280</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
 </ui>

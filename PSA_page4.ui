@@ -163,5 +163,22 @@
  <resources>
   <include location="PSAReportResources.qrc"/>
  </resources>
- <connections/>
+ <connections>
+  <connection>
+   <sender>NextPage_2</sender>
+   <signal>released()</signal>
+   <receiver>PSAPage4</receiver>
+   <slot>hide()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>739</x>
+     <y>215</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>767</x>
+     <y>262</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>
