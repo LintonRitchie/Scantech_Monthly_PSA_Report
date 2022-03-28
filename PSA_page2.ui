@@ -146,7 +146,7 @@
        </widget>
       </item>
       <item row="4" column="1">
-       <widget class="QComboBox" name="ElecCabTempcomboBox">
+       <widget class="QComboBox" name="ElecCabTempStable">
         <property name="font">
          <font>
           <pointsize>10</pointsize>
@@ -188,7 +188,7 @@
        </widget>
       </item>
       <item row="3" column="1">
-       <widget class="QComboBox" name="DetTempcomboBox">
+       <widget class="QComboBox" name="DetTempStable">
         <property name="font">
          <font>
           <pointsize>10</pointsize>
@@ -778,9 +778,9 @@
  </resources>
  <connections>
   <connection>
-   <sender>DetTempcomboBox</sender>
+   <sender>DetTempStable</sender>
    <signal>currentTextChanged(QString)</signal>
-   <receiver>DetTempcomboBox</receiver>
+   <receiver>DetTempStable</receiver>
    <slot>setStyleSheet(QString)</slot>
    <hints>
     <hint type="sourcelabel">
@@ -794,9 +794,9 @@
    </hints>
   </connection>
   <connection>
-   <sender>ElecCabTempcomboBox</sender>
+   <sender>ElecCabTempStable</sender>
    <signal>currentTextChanged(QString)</signal>
-   <receiver>ElecCabTempcomboBox</receiver>
+   <receiver>ElecCabTempStable</receiver>
    <slot>setStyleSheet(QString)</slot>
    <hints>
     <hint type="sourcelabel">

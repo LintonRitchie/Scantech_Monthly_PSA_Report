@@ -71,9 +71,9 @@ class Ui_PSAPage3(object):
         self.groupBox.setFont(font)
         self.groupBox.setAlignment(QtCore.Qt.AlignCenter)
         self.groupBox.setObjectName("groupBox")
-        self.NextPage_2 = QtWidgets.QPushButton(self.groupBox)
-        self.NextPage_2.setGeometry(QtCore.QRect(20, 30, 75, 25))
-        self.NextPage_2.setObjectName("NextPage_2")
+        self.NextPage = QtWidgets.QPushButton(self.groupBox)
+        self.NextPage.setGeometry(QtCore.QRect(20, 30, 75, 25))
+        self.NextPage.setObjectName("NextPage")
         PSAPage3.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(PSAPage3)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 21))
@@ -84,7 +84,7 @@ class Ui_PSAPage3(object):
         PSAPage3.setStatusBar(self.statusbar)
 
         self.retranslateUi(PSAPage3)
-        self.NextPage_2.released.connect(PSAPage3.hide) # type: ignore
+        self.NextPage.released.connect(PSAPage3.hide) # type: ignore
         QtCore.QMetaObject.connectSlotsByName(PSAPage3)
 
     def retranslateUi(self, PSAPage3):
@@ -93,7 +93,7 @@ class Ui_PSAPage3(object):
         self.psa_report_title.setText(_translate("PSAPage3", "PSA Report"))
         self.psa_report_title_2.setText(_translate("PSAPage3", "Page 3"))
         self.groupBox.setTitle(_translate("PSAPage3", "Page Control"))
-        self.NextPage_2.setText(_translate("PSAPage3", "Close"))
+        self.NextPage.setText(_translate("PSAPage3", "Close"))
 import PSAReportResources_rc
 
 
