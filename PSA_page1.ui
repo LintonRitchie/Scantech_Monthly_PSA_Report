@@ -845,7 +845,7 @@
      <enum>Qt::Horizontal</enum>
     </property>
    </widget>
-   <widget class="QComboBox" name="comboBox_anopcor">
+   <widget class="QComboBox" name="AnalOpCor">
     <property name="geometry">
      <rect>
       <x>266</x>
@@ -886,7 +886,7 @@
      </property>
     </item>
    </widget>
-   <widget class="QComboBox" name="comboBox_endetstab">
+   <widget class="QComboBox" name="EnableDetStable">
     <property name="geometry">
      <rect>
       <x>266</x>
@@ -924,7 +924,7 @@
      </property>
     </item>
    </widget>
-   <widget class="QComboBox" name="comboBox_detenctempstab">
+   <widget class="QComboBox" name="DetEncTempStable">
     <property name="geometry">
      <rect>
       <x>266</x>
@@ -962,7 +962,7 @@
      </property>
     </item>
    </widget>
-   <widget class="QComboBox" name="comboBox_elecenctempstab">
+   <widget class="QComboBox" name="ElecEncTempStable">
     <property name="geometry">
      <rect>
       <x>266</x>
@@ -1042,7 +1042,7 @@
      <number>3</number>
     </property>
    </widget>
-   <widget class="QComboBox" name="comboBox">
+   <widget class="QComboBox" name="NextPSAMnth">
     <property name="geometry">
      <rect>
       <x>395</x>
@@ -1055,6 +1055,9 @@
      <font>
       <family>Calibri</family>
      </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgb(255, 255, 0);</string>
     </property>
     <item>
      <property name="text">
@@ -1117,7 +1120,7 @@
      </property>
     </item>
    </widget>
-   <widget class="QComboBox" name="comboBox_2">
+   <widget class="QComboBox" name="NextPSAYear">
     <property name="geometry">
      <rect>
       <x>485</x>
@@ -1130,6 +1133,9 @@
      <font>
       <family>Calibri</family>
      </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgb(255, 255, 0);</string>
     </property>
     <property name="currentText">
      <string>2022</string>
@@ -1175,7 +1181,7 @@
      </property>
     </item>
    </widget>
-   <widget class="QComboBox" name="comboBox_3">
+   <widget class="QComboBox" name="TopUpMonth">
     <property name="geometry">
      <rect>
       <x>395</x>
@@ -1188,6 +1194,9 @@
      <font>
       <family>Calibri</family>
      </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgb(255, 255, 0);</string>
     </property>
     <item>
      <property name="text">
@@ -1250,7 +1259,7 @@
      </property>
     </item>
    </widget>
-   <widget class="QComboBox" name="comboBox_4">
+   <widget class="QComboBox" name="TopUpYear">
     <property name="geometry">
      <rect>
       <x>485</x>
@@ -1263,6 +1272,9 @@
      <font>
       <family>Calibri</family>
      </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgb(255, 255, 0);</string>
     </property>
     <property name="currentText">
      <string>2022</string>
@@ -1729,7 +1741,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>716</x>
-     <y>198</y>
+     <y>219</y>
     </hint>
     <hint type="destinationlabel">
      <x>684</x>
@@ -1738,9 +1750,9 @@
    </hints>
   </connection>
   <connection>
-   <sender>comboBox_anopcor</sender>
+   <sender>AnalOpCor</sender>
    <signal>currentTextChanged(QString)</signal>
-   <receiver>comboBox_anopcor</receiver>
+   <receiver>AnalOpCor</receiver>
    <slot>setStyleSheet(QString)</slot>
    <hints>
     <hint type="sourcelabel">
@@ -1754,9 +1766,9 @@
    </hints>
   </connection>
   <connection>
-   <sender>comboBox_endetstab</sender>
+   <sender>EnableDetStable</sender>
    <signal>currentTextChanged(QString)</signal>
-   <receiver>comboBox_endetstab</receiver>
+   <receiver>EnableDetStable</receiver>
    <slot>setStyleSheet(QString)</slot>
    <hints>
     <hint type="sourcelabel">
@@ -1770,9 +1782,9 @@
    </hints>
   </connection>
   <connection>
-   <sender>comboBox_detenctempstab</sender>
+   <sender>DetEncTempStable</sender>
    <signal>currentTextChanged(QString)</signal>
-   <receiver>comboBox_detenctempstab</receiver>
+   <receiver>DetEncTempStable</receiver>
    <slot>setStyleSheet(QString)</slot>
    <hints>
     <hint type="sourcelabel">
@@ -1786,9 +1798,9 @@
    </hints>
   </connection>
   <connection>
-   <sender>comboBox_elecenctempstab</sender>
+   <sender>ElecEncTempStable</sender>
    <signal>currentTextChanged(QString)</signal>
-   <receiver>comboBox_elecenctempstab</receiver>
+   <receiver>ElecEncTempStable</receiver>
    <slot>setStyleSheet(QString)</slot>
    <hints>
     <hint type="sourcelabel">
@@ -1798,6 +1810,70 @@
     <hint type="destinationlabel">
      <x>337</x>
      <y>554</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>NextPSAMnth</sender>
+   <signal>currentTextChanged(QString)</signal>
+   <receiver>NextPSAMnth</receiver>
+   <slot>setStyleSheet(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>446</x>
+     <y>397</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>436</x>
+     <y>395</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>TopUpMonth</sender>
+   <signal>currentTextChanged(QString)</signal>
+   <receiver>TopUpMonth</receiver>
+   <slot>setStyleSheet(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>422</x>
+     <y>415</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>408</x>
+     <y>412</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>NextPSAYear</sender>
+   <signal>currentTextChanged(QString)</signal>
+   <receiver>NextPSAYear</receiver>
+   <slot>setStyleSheet(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>513</x>
+     <y>390</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>507</x>
+     <y>392</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>TopUpYear</sender>
+   <signal>currentTextChanged(QString)</signal>
+   <receiver>TopUpYear</receiver>
+   <slot>setStyleSheet(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>533</x>
+     <y>413</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>526</x>
+     <y>417</y>
     </hint>
    </hints>
   </connection>

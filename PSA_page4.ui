@@ -133,7 +133,7 @@
     <property name="alignment">
      <set>Qt::AlignCenter</set>
     </property>
-    <widget class="QPushButton" name="NextPage_2">
+    <widget class="QPushButton" name="NextPage">
      <property name="geometry">
       <rect>
        <x>20</x>
@@ -165,7 +165,7 @@
  </resources>
  <connections>
   <connection>
-   <sender>NextPage_2</sender>
+   <sender>NextPage</sender>
    <signal>released()</signal>
    <receiver>PSAPage4</receiver>
    <slot>hide()</slot>

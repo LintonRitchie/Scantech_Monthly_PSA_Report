@@ -506,9 +506,9 @@ class Ui_PSAPage6(object):
         self.groupBox.setFont(font)
         self.groupBox.setAlignment(QtCore.Qt.AlignCenter)
         self.groupBox.setObjectName("groupBox")
-        self.NextPage_2 = QtWidgets.QPushButton(self.groupBox)
-        self.NextPage_2.setGeometry(QtCore.QRect(20, 30, 75, 25))
-        self.NextPage_2.setObjectName("NextPage_2")
+        self.NextPage = QtWidgets.QPushButton(self.groupBox)
+        self.NextPage.setGeometry(QtCore.QRect(20, 30, 75, 25))
+        self.NextPage.setObjectName("NextPage")
         self.label.raise_()
         self.psa_report_title.raise_()
         self.psa_report_title_2.raise_()
@@ -537,7 +537,7 @@ class Ui_PSAPage6(object):
         PSAPage6.setStatusBar(self.statusbar)
 
         self.retranslateUi(PSAPage6)
-        self.NextPage_2.released.connect(PSAPage6.hide) # type: ignore
+        self.NextPage.released.connect(PSAPage6.hide) # type: ignore
         QtCore.QMetaObject.connectSlotsByName(PSAPage6)
 
     def retranslateUi(self, PSAPage6):
@@ -653,7 +653,7 @@ class Ui_PSAPage6(object):
         item.setText(_translate("PSAPage6", "Comment"))
         self.label_9.setText(_translate("PSAPage6", "Disk Space & Memory Remaining"))
         self.groupBox.setTitle(_translate("PSAPage6", "Page Control"))
-        self.NextPage_2.setText(_translate("PSAPage6", "Close"))
+        self.NextPage.setText(_translate("PSAPage6", "Close"))
 import PSAReportResources_rc
 
 

@@ -22,7 +22,7 @@ from PyQt5.QtCore import QDir
 
 import matplotlib.pyplot as plt
 
-# regen_ui()                  # Regenerate the UI. This is used to update the UI file after changes
+regen_ui()                  # Regenerate the UI. This is used to update the UI file after changes
 
 # Define a function which reads in the data from the relevant files. This may be called in a few different places.
 # this function takes 1 folder location and uses the PSA Master default location
