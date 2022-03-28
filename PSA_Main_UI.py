@@ -22,7 +22,7 @@ from PyQt5.QtCore import QDir
 
 import matplotlib.pyplot as plt
 
-regen_ui()                  # Regenerate the UI. This is used to update the UI file after changes
+# regen_ui()                  # Regenerate the UI. This is used to update the UI file after changes
 
 # Define a function which reads in the data from the relevant files. This may be called in a few different places.
 # this function takes 1 folder location and uses the PSA Master default location
@@ -141,8 +141,8 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
         reportdata['Summary'][0]['Application'] = self.page1.rep_app_data.text()
         reportdata['Summary'][0]['Period'] = self.page1.period_data.text()
         reportdata['Summary'][0]['Email'] = self.page1.email_data.text()
-        #reportdata['Summary'][0]['NextPSA'] = str(self.page1.rep_app_data.text() +  )
-        #reportdata['Summary'][0]['TopUpDue'] = str( self.page1.rep_app_data.text() + )
+        reportdata['Summary'][0]['NextPSA'] = str(self.page1.NextPSAMnth.currentText() + " " + self.page1.NextPSAYear.currentText())
+        reportdata['Summary'][0]['TopUpDue'] = str(self.page1.TopUpMonth.currentText() + " " + self.page1.TopUpYear.currentText())
 
         with open("ReportData.json",'w') as file:
             json.dump(reportdata, file, indent=1)

@@ -1,15 +1,15 @@
 {
  "Summary": [
   {
-   "SiteName": "Birchfield Coal Mines Ltd",
+   "SiteName": "Swakop Uranium",
    "ReportDate": "2022-03-28",
-   "AnalyserNo": "C21-054",
+   "AnalyserNo": "C15-040",
    "ServEng": "Service Engineer:",
-   "Application": "Coal",
+   "Application": "Uranium",
    "Period": "January 2022",
-   "Email": "service.newzealand@scantech.com.au",
-   "NextPSA": "",
-   "TopUpDue": ""
+   "Email": "service.fsu@scantech.com.au",
+   "NextPSA": "March 2023",
+   "TopUpDue": "February 2024"
   }
  ],
  "ActionTaken": [
