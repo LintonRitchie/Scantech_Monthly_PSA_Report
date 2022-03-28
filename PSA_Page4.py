@@ -78,6 +78,7 @@ class Ui_PSAPage4(object):
         PSAPage4.setStatusBar(self.statusbar)
 
         self.retranslateUi(PSAPage4)
+        self.NextPage_2.released.connect(PSAPage4.hide) # type: ignore
         QtCore.QMetaObject.connectSlotsByName(PSAPage4)
 
     def retranslateUi(self, PSAPage4):

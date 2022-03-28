@@ -1054,5 +1054,22 @@
  <resources>
   <include location="PSAReportResources.qrc"/>
  </resources>
- <connections/>
+ <connections>
+  <connection>
+   <sender>NextPage_2</sender>
+   <signal>released()</signal>
+   <receiver>PSAPage6</receiver>
+   <slot>hide()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>706</x>
+     <y>212</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>618</x>
+     <y>216</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

@@ -401,6 +401,7 @@ class Ui_PSAPage2(object):
         self.retranslateUi(PSAPage2)
         self.DetTempcomboBox.currentTextChanged['QString'].connect(self.DetTempcomboBox.setStyleSheet) # type: ignore
         self.ElecCabTempcomboBox.currentTextChanged['QString'].connect(self.ElecCabTempcomboBox.setStyleSheet) # type: ignore
+        self.NextPage.released.connect(PSAPage2.hide) # type: ignore
         QtCore.QMetaObject.connectSlotsByName(PSAPage2)
 
     def retranslateUi(self, PSAPage2):
