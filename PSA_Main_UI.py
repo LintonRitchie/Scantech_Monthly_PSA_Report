@@ -8,6 +8,7 @@ from Read_Master import (Read_Master, Read_AnalyserStatus, Read_PeakControl, Rea
 # from PyQt5.QtGui import (QPixmap)
 import datetime
 import json
+import base64
 from PSA_Home import Ui_PSAHome
 from PSA_Page1 import Ui_PSAPage1
 from PSA_Page2 import Ui_PSAPage2
@@ -91,6 +92,7 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
         # self.AnalyserListComboBox.currentTextChanged.connect(self.updatehome)
         self.AnalyserListComboBox.activated.connect(self.GetFolder)
         self.page1.NextPage.released.connect(self.UpdateJSON)
+        self.page2.NextPage.released.connect(self.UpdateJSON)
 
     def updatereadindata(self):
         ReadInData.AnalyserStatus = Read_AnalyserStatus(ReadInData.defaultpath)     # Read in PSA Report file data from PSA Report file.
@@ -143,9 +145,66 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
         reportdata['Summary'][0]['Email'] = self.page1.email_data.text()
         reportdata['Summary'][0]['NextPSA'] = str(self.page1.NextPSAMnth.currentText() + " " + self.page1.NextPSAYear.currentText())
         reportdata['Summary'][0]['TopUpDue'] = str(self.page1.TopUpMonth.currentText() + " " + self.page1.TopUpYear.currentText())
+        print("Entering Action taken section")
 
-        with open("ReportData.json",'w') as file:
-            json.dump(reportdata, file, indent=1)
+        # this loop populates the JSON by looking to see if any data exists in the first cell of the row. If not then it skips. If is does, the data is pulled into the JSON
+        # pull the data from the Action Taken table row 1 to fill the JSON
+        for i in range(0,4):
+            print(i)
+            it = self.page1.ActionTakenTable.item(i, 0)
+            if it and it.text():
+                jsonid = "Action" + str(i+1)
+                print(jsonid)
+                reportdata['ActionTaken'][0][jsonid][0]['Date']=str(self.page1.ActionTakenTable.item(i, 0).text())
+                reportdata['ActionTaken'][0][jsonid][0]['Time'] = str(self.page1.ActionTakenTable.item(i, 1).text())
+                reportdata['ActionTaken'][0][jsonid][0]['Action'] = str(self.page1.ActionTakenTable.item(i, 2).text())
+                reportdata['ActionTaken'][0][jsonid][0]['Description'] = str(self.page1.ActionTakenTable.item(i, 3).text())
+            else:
+                print("passing by")
+
+        # this loop populates the JSON by looking to see if any data exists in the first cell of the row. If not then it skips. If is does, the data is pulled into the JSON
+        # Populating the Action required section of the JSON file
+        for i in range(0,4):
+            print(i)
+            it = self.page1.ActionTakenTable.item(i, 0)
+            if it and it.text():
+                jsonid = "ActionReq" + str(i+1)
+                print(jsonid)
+                reportdata['ActionRequired'][0][jsonid][0]['Action'] = str(self.page1.ActionRequiredTable.item(i, 0).text())
+                reportdata['ActionRequired'][0][jsonid][0]['ByWhom'] = str(self.page1.ActionRequiredTable.item(i, 1).text())
+                reportdata['ActionRequired'][0][jsonid][0]['ByWhen'] = str(self.page1.ActionRequiredTable.item(i, 2).text())
+            else:
+                print("passing by")
+
+
+        # populating JSON with Detector stability info
+        for i in range(0,15):
+            print(i)
+            it = self.page2.tableWidget.item(0, i)
+            if it and it.text():
+                jsonid = "Detector" + str(i+1)
+                print(jsonid)
+                reportdata['DetectorStability'][0][jsonid][0]['Enabled'] = str(self.page2.tableWidget.item(0, i).text())
+                reportdata['DetectorStability'][0][jsonid][0]['Stable'] = str(self.page2.tableWidget.item(1, i).text())
+
+        # pull stability question data from the Temperature stability combo boxes
+        reportdata['Temperatures'][0]['StableDetTemp'] = str(self.page2.DetTempStable.currentText())
+        reportdata['Temperatures'][0]['StableElecTemp'] = str(self.page2.ElecCabTempStable.currentText())
+
+        # # encode Temperature Plot for storage in JSON
+        # data = {}
+        # with open(ReadInData.resourcepath + "\\Temperatures.png", mode="rb") as tf:
+        #     img = tf.read()
+        #
+        # data["Temps"] = base64.b64encode(img)
+        # reportdata['Temperatures'][0]['TempPlot'] = str(data)
+        #
+        # with open("ReportData.json",'w') as file:
+        #     json.dump(reportdata, file, indent=1)
+        #
+        # img_file = ReadInData.resourcepath + "\\Temperatures_output.png"
+        # with open(img_file, "wb") as fh:
+        #     fh.write(base64.b64decode(reportdata['Temperatures'][0]['TempPlot']))
 
         print("Exit JSON")
 
