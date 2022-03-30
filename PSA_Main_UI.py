@@ -191,20 +191,36 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
         reportdata['Temperatures'][0]['StableDetTemp'] = str(self.page2.DetTempStable.currentText())
         reportdata['Temperatures'][0]['StableElecTemp'] = str(self.page2.ElecCabTempStable.currentText())
 
-        # # encode Temperature Plot for storage in JSON
-        # data = {}
-        # with open(ReadInData.resourcepath + "\\Temperatures.png", mode="rb") as tf:
-        #     img = tf.read()
-        #
-        # data["Temps"] = base64.b64encode(img)
-        # reportdata['Temperatures'][0]['TempPlot'] = str(data)
-        #
-        # with open("ReportData.json",'w') as file:
-        #     json.dump(reportdata, file, indent=1)
-        #
-        # img_file = ReadInData.resourcepath + "\\Temperatures_output.png"
-        # with open(img_file, "wb") as fh:
-        #     fh.write(base64.b64decode(reportdata['Temperatures'][0]['TempPlot']))
+        # This section encodes the plots into the JSON File for transmission to engineer
+        # encode Temperature Plot for storage in JSON
+        with open(ReadInData.resourcepath + "\\Temperatures.png", mode="rb") as tf:
+             data = base64.b64encode(tf.read()).decode("utf-8")
+        reportdata['Plots'][0]['TempPlot'] = data
+        with open("ReportData.json",'w') as file:
+            json.dump(reportdata, file, indent=1)
+
+        # Decode Temperature plot data and produce image
+        imgfile = ReadInData.resourcepath + "\\Temperatures_output.png"
+        print(imgfile)
+        imgdata = reportdata['Plots'][0]['TempPlot']
+        imgplot = open(imgfile, "wb")
+        imgplot.write(base64.b64decode(imgdata))
+        imgplot.close()
+
+        # encode Detector Stability Plot for storage in JSON
+        with open(ReadInData.resourcepath + "\\Detector_Stability.png", mode="rb") as tf:
+            data = base64.b64encode(tf.read()).decode("utf-8")
+        reportdata['Plots'][0]['DetStabPlot'] = data
+        with open("ReportData.json", 'w') as file:
+            json.dump(reportdata, file, indent=1)
+
+        # Decode Detector Stability plot data and produce image. This will be commented for testing and used in the Engineer version of the code
+        imgfile = ReadInData.resourcepath + "\\Detector Stability_output.png"
+        print(imgfile)
+        imgdata = reportdata['Plots'][0]['DetStabPlot']
+        imgplot = open(imgfile, "wb")
+        imgplot.write(base64.b64decode(imgdata))
+        imgplot.close()
 
         print("Exit JSON")
 
