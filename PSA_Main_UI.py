@@ -191,6 +191,21 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
         reportdata['Temperatures'][0]['StableDetTemp'] = str(self.page2.DetTempStable.currentText())
         reportdata['Temperatures'][0]['StableElecTemp'] = str(self.page2.ElecCabTempStable.currentText())
 
+        # this section dumps data from page 6 into the JSON.
+        # PlantPLC Loop to dump to JSON
+        for i in range(0,2):
+            print(i)
+            it = self.page1.ActionTakenTable.item(i, 0)
+            if it and it.text():
+                jsonid = "ActionReq" + str(i+1)
+                print(jsonid)
+                reportdata['ActionRequired'][0][jsonid][0]['Action'] = str(self.page1.ActionRequiredTable.item(i, 0).text())
+                reportdata['ActionRequired'][0][jsonid][0]['ByWhom'] = str(self.page1.ActionRequiredTable.item(i, 1).text())
+                reportdata['ActionRequired'][0][jsonid][0]['ByWhen'] = str(self.page1.ActionRequiredTable.item(i, 2).text())
+            else:
+                print("passing by")
+
+
         # This section encodes the plots into the JSON File for transmission to engineer
         # encode Temperature Plot for storage in JSON
         with open(ReadInData.resourcepath + "\\Temperatures.png", mode="rb") as tf:
@@ -221,6 +236,53 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
         imgplot = open(imgfile, "wb")
         imgplot.write(base64.b64decode(imgdata))
         imgplot.close()
+
+        # encode Daily Tonnes Plot for storage in JSON
+        with open(ReadInData.resourcepath + "\\Daily_Tonnes.png", mode="rb") as tf:
+            data = base64.b64encode(tf.read()).decode("utf-8")
+        reportdata['Plots'][0]['DailyTonsPlot'] = data
+        with open("ReportData.json", 'w') as file:
+            json.dump(reportdata, file, indent=1)
+
+        # Decode Daily Tonnes plot data and produce image. This will be commented for testing and used in the Engineer version of the code
+        imgfile = ReadInData.resourcepath + "\\Daily_Tonnes_output.png"
+        print(imgfile)
+        imgdata = reportdata['Plots'][0]['DailyTonsPlot']
+        imgplot = open(imgfile, "wb")
+        imgplot.write(base64.b64decode(imgdata))
+        imgplot.close()
+
+        # encode Results 1 Plot for storage in JSON
+        with open(ReadInData.resourcepath + "\\Results1.png", mode="rb") as tf:
+            data = base64.b64encode(tf.read()).decode("utf-8")
+        reportdata['Plots'][0]['Results1Plot'] = data
+        with open("ReportData.json", 'w') as file:
+            json.dump(reportdata, file, indent=1)
+
+        # Decode Results 1 plot data and produce image. This will be commented for testing and used in the Engineer version of the code
+        imgfile = ReadInData.resourcepath + "\\Results1_output.png"
+        print(imgfile)
+        imgdata = reportdata['Plots'][0]['Results1Plot']
+        imgplot = open(imgfile, "wb")
+        imgplot.write(base64.b64decode(imgdata))
+        imgplot.close()
+
+        # encode Results 2 Plot for storage in JSON
+        with open(ReadInData.resourcepath + "\\Results2.png", mode="rb") as tf:
+            data = base64.b64encode(tf.read()).decode("utf-8")
+        reportdata['Plots'][0]['Results2Plot'] = data
+        with open("ReportData.json", 'w') as file:
+            json.dump(reportdata, file, indent=1)
+
+        # Decode Results 2 plot data and produce image. This will be commented for testing and used in the Engineer version of the code
+        imgfile = ReadInData.resourcepath + "\\Results2_output.png"
+        print(imgfile)
+        imgdata = reportdata['Plots'][0]['Results2Plot']
+        imgplot = open(imgfile, "wb")
+        imgplot.write(base64.b64decode(imgdata))
+        imgplot.close()
+
+
 
         print("Exit JSON")
 
