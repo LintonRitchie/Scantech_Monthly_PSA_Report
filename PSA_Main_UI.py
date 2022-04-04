@@ -8,6 +8,7 @@ from Read_Master import (Read_Master, Read_AnalyserStatus, Read_PeakControl, Rea
 # from PyQt5.QtGui import (QPixmap)
 import datetime
 import json
+import base64
 from PSA_Home import Ui_PSAHome
 from PSA_Page1 import Ui_PSAPage1
 from PSA_Page2 import Ui_PSAPage2
@@ -91,6 +92,7 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
         # self.AnalyserListComboBox.currentTextChanged.connect(self.updatehome)
         self.AnalyserListComboBox.activated.connect(self.GetFolder)
         self.page1.NextPage.released.connect(self.UpdateJSON)
+        self.page2.NextPage.released.connect(self.UpdateJSON)
 
     def updatereadindata(self):
         ReadInData.AnalyserStatus = Read_AnalyserStatus(ReadInData.defaultpath)     # Read in PSA Report file data from PSA Report file.
@@ -143,13 +145,261 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
         reportdata['Summary'][0]['Email'] = self.page1.email_data.text()
         reportdata['Summary'][0]['NextPSA'] = str(self.page1.NextPSAMnth.currentText() + " " + self.page1.NextPSAYear.currentText())
         reportdata['Summary'][0]['TopUpDue'] = str(self.page1.TopUpMonth.currentText() + " " + self.page1.TopUpYear.currentText())
+        print("Entering Action taken section")
 
+        # this loop populates the JSON by looking to see if any data exists in the first cell of the row. If not then it skips. If is does, the data is pulled into the JSON
+        # pull the data from the Action Taken table row 1 to fill the JSON
+        for i in range(0,4):
+            print(i)
+            it = self.page1.ActionTakenTable.item(i, 0)
+            if it and it.text():
+                jsonid = "Action" + str(i+1)
+                print(jsonid)
+                reportdata['ActionTaken'][0][jsonid][0]['Date']=str(self.page1.ActionTakenTable.item(i, 0).text())
+                reportdata['ActionTaken'][0][jsonid][0]['Time'] = str(self.page1.ActionTakenTable.item(i, 1).text())
+                reportdata['ActionTaken'][0][jsonid][0]['Action'] = str(self.page1.ActionTakenTable.item(i, 2).text())
+                reportdata['ActionTaken'][0][jsonid][0]['Description'] = str(self.page1.ActionTakenTable.item(i, 3).text())
+            else:
+                print("passing by")
+
+        # this loop populates the JSON by looking to see if any data exists in the first cell of the row. If not then it skips. If is does, the data is pulled into the JSON
+        # Populating the Action required section of the JSON file
+        for i in range(0,4):
+            print(i)
+            it = self.page1.ActionTakenTable.item(i, 0)
+            if it and it.text():
+                jsonid = "ActionReq" + str(i+1)
+                print(jsonid)
+                reportdata['ActionRequired'][0][jsonid][0]['Action'] = str(self.page1.ActionRequiredTable.item(i, 0).text())
+                reportdata['ActionRequired'][0][jsonid][0]['ByWhom'] = str(self.page1.ActionRequiredTable.item(i, 1).text())
+                reportdata['ActionRequired'][0][jsonid][0]['ByWhen'] = str(self.page1.ActionRequiredTable.item(i, 2).text())
+            else:
+                print("passing by")
+
+
+        # populating JSON with Detector stability info
+        for i in range(0,15):
+            print(i)
+            it = self.page2.tableWidget.item(0, i)
+            if it and it.text():
+                jsonid = "Detector" + str(i+1)
+                print(jsonid)
+                reportdata['DetectorStability'][0][jsonid][0]['Enabled'] = str(self.page2.tableWidget.item(0, i).text())
+                reportdata['DetectorStability'][0][jsonid][0]['Stable'] = str(self.page2.tableWidget.item(1, i).text())
+
+        # pull stability question data from the Temperature stability combo boxes
+        reportdata['Temperatures'][0]['StableDetTemp'] = str(self.page2.DetTempStable.currentText())
+        reportdata['Temperatures'][0]['StableElecTemp'] = str(self.page2.ElecCabTempStable.currentText())
+
+        # this section dumps data from page 6 into the JSON.
+        # PlantPLC Table dump to JSON
+        it = self.page6.PlantPLCTable.item(0, 0)
+        if it and it.text():
+            reportdata['PLCStatus'][0]['BeltRunning'][0]['Current'] = str(self.page6.PlantPLCTable.item(0, 0).text())
+            # reportdata['PLCStatus'][0]['BeltRunning'][0]['1RepAgo'] = str(self.page6.PlantPLCTable.item(0, 1).text())
+            # reportdata['PLCStatus'][0]['BeltRunning'][0]['2RepAgo'] = str(self.page6.PlantPLCTable.item(0, 2).text())
+            reportdata['PLCStatus'][0]['BeltRunning'][0]['Comment'] = str(self.page6.PlantPLCTable.item(0, 3).text())
+            reportdata['PLCStatus'][0]['ForceAnalyse'][0]['Current'] = str(self.page6.PlantPLCTable.item(1, 0).text())
+            # reportdata['PLCStatus'][0]['ForceAnalyse'][0]['1RepAgo'] = str(self.page6.PlantPLCTable.item(1, 1).text())
+            # reportdata['PLCStatus'][0]['ForceAnalyse'][0]['2RepAgo'] = str(self.page6.PlantPLCTable.item(1, 2).text())
+            reportdata['PLCStatus'][0]['ForceAnalyse'][0]['Comment'] = str(self.page6.PlantPLCTable.item(1, 3).text())
+            reportdata['PLCStatus'][0]['ForceStandardise'][0]['Current'] = str(self.page6.PlantPLCTable.item(2, 0).text())
+            # reportdata['PLCStatus'][0]['ForceStandardise'][0]['1RepAgo'] = str(self.page6.PlantPLCTable.item(2, 1).text())
+            # reportdata['PLCStatus'][0]['ForceStandardise'][0]['2RepAgo'] = str(self.page6.PlantPLCTable.item(2, 2).text())
+            reportdata['PLCStatus'][0]['ForceStandardise'][0]['Comment'] = str(self.page6.PlantPLCTable.item(2, 3).text())
+        else:
+            print("passing by")
+
+        # AnalyserStatus Table dump to JSON
+        it = self.page6.PlantPLCTable_2.item(0, 0)
+        if it and it.text():
+            reportdata['AnalyserStatus'][0]['AnalyserOK'][0]['Current'] = str(self.page6.PlantPLCTable_2.item(0, 0).text())
+            # reportdata['AnalyserStatus'][0]['AnalyserOK'][0]['1RepAgo'] = str(self.page6.PlantPLCTable_2.item(0, 1).text())
+            # reportdata['AnalyserStatus'][0]['AnalyserOK'][0]['2RepAgo'] = str(self.page6.PlantPLCTable_2.item(0, 2).text())
+            reportdata['AnalyserStatus'][0]['AnalyserOK'][0]['Comment'] = str(self.page6.PlantPLCTable_2.item(0, 3).text())
+            reportdata['AnalyserStatus'][0]['StandardsOK'][0]['Current'] = str(self.page6.PlantPLCTable_2.item(1, 0).text())
+            # reportdata['AnalyserStatus'][0]['StandardsOK'][0]['1RepAgo'] = str(self.page6.PlantPLCTable_2.item(1, 1).text())
+            # reportdata['AnalyserStatus'][0]['StandardsOK'][0]['2RepAgo'] = str(self.page6.PlantPLCTable_2.item(1, 2).text())
+            reportdata['AnalyserStatus'][0]['StandardsOK'][0]['Comment'] = str(self.page6.PlantPLCTable_2.item(1, 3).text())
+            reportdata['AnalyserStatus'][0]['IOControlOK'][0]['Current'] = str(self.page6.PlantPLCTable_2.item(2, 0).text())
+            # reportdata['AnalyserStatus'][0]['IOControlOK'][0]['1RepAgo'] = str(self.page6.PlantPLCTable_2.item(2, 1).text())
+            # reportdata['AnalyserStatus'][0]['IOControlOK'][0]['2RepAgo'] = str(self.page6.PlantPLCTable_2.item(2, 2).text())
+            reportdata['AnalyserStatus'][0]['IOControlOK'][0]['Comment'] = str(self.page6.PlantPLCTable_2.item(2, 3).text())
+            reportdata['AnalyserStatus'][0]['SpectraStable'][0]['Current'] = str(self.page6.PlantPLCTable_2.item(3, 0).text())
+            # reportdata['AnalyserStatus'][0]['SpectraStable'][0]['1RepAgo'] = str(self.page6.PlantPLCTable_2.item(3, 1).text())
+            # reportdata['AnalyserStatus'][0]['SpectraStable'][0]['2RepAgo'] = str(self.page6.PlantPLCTable_2.item(3, 2).text())
+            reportdata['AnalyserStatus'][0]['SpectraStable'][0]['Comment'] = str(self.page6.PlantPLCTable_2.item(3, 3).text())
+        else:
+            print("passing by")
+
+        # PLC Analyser Results Table dump to JSON
+        it = self.page6.PlantPLCTable_3.item(0, 0)
+        if it and it.text():
+            reportdata['PLCResults'][0]['SystemOK'][0]['Current'] = str(self.page6.PlantPLCTable_3.item(0, 0).text())
+            # reportdata['PLCResults'][0]['SystemOK'][0]['1RepAgo'] = str(self.page6.PlantPLCTable_3.item(0, 1).text())
+            # reportdata['PLCResults'][0]['SystemOK'][0]['2RepAgo'] = str(self.page6.PlantPLCTable_3.item(0, 2).text())
+            reportdata['PLCResults'][0]['SystemOK'][0]['Comment'] = str(self.page6.PlantPLCTable_3.item(0, 3).text())
+            reportdata['PLCResults'][0]['SourceControlFault'][0]['Current'] = str(self.page6.PlantPLCTable_3.item(1, 0).text())
+            # reportdata['PLCResults'][0]['SourceControlFault'][0]['1RepAgo'] = str(self.page6.PlantPLCTable_3.item(1, 1).text())
+            # reportdata['PLCResults'][0]['SourceControlFault'][0]['2RepAgo'] = str(self.page6.PlantPLCTable_3.item(1, 2).text())
+            reportdata['PLCResults'][0]['SourceControlFault'][0]['Comment'] = str(self.page6.PlantPLCTable_3.item(1, 3).text())
+            reportdata['PLCResults'][0]['SourceOff'][0]['Current'] = str(self.page6.PlantPLCTable_3.item(2, 0).text())
+            # reportdata['PLCResults'][0]['SourceOff'][0]['1RepAgo'] = str(self.page6.PlantPLCTable_3.item(2, 1).text())
+            # reportdata['PLCResults'][0]['SourceOff'][0]['2RepAgo'] = str(self.page6.PlantPLCTable_3.item(2, 2).text())
+            reportdata['PLCResults'][0]['SourceOff'][0]['Comment'] = str(self.page6.PlantPLCTable_3.item(2, 3).text())
+            reportdata['PLCResults'][0]['SourceOn'][0]['Current'] = str(self.page6.PlantPLCTable_3.item(3, 0).text())
+            # reportdata['PLCResults'][0]['SourceOn'][0]['1RepAgo'] = str(self.page6.PlantPLCTable_3.item(3, 1).text())
+            # reportdata['PLCResults'][0]['SourceOn'][0]['2RepAgo'] = str(self.page6.PlantPLCTable_3.item(3, 2).text())
+            reportdata['PLCResults'][0]['SourceOn'][0]['Comment'] = str(self.page6.PlantPLCTable_3.item(3, 3).text())
+        else:
+            print("passing by")
+
+        # Analyser Configuration Table dump to JSON
+        it = self.page6.PlantPLCTable_4.item(0, 0)
+        if it and it.text():
+            reportdata['AnalyserConfiguration'][0]['AnalysisPeriod'][0]['Current'] = str(self.page6.PlantPLCTable_4.item(0, 0).text())
+            # reportdata['AnalyserConfiguration'][0]['AnalysisPeriod'][0]['1RepAgo'] = str(self.page6.PlantPLCTable_4.item(0, 1).text())
+            # reportdata['AnalyserConfiguration'][0]['AnalysisPeriod'][0]['2RepAgo'] = str(self.page6.PlantPLCTable_4.item(0, 2).text())
+            reportdata['AnalyserConfiguration'][0]['AnalysisPeriod'][0]['Comment'] = str(self.page6.PlantPLCTable_4.item(0, 3).text())
+            reportdata['AnalyserConfiguration'][0]['AnalMinLoadLimit'][0]['Current'] = str(self.page6.PlantPLCTable_4.item(1, 0).text())
+            # reportdata['AnalyserConfiguration'][0]['AnalMinLoadLimit'][0]['1RepAgo'] = str(self.page6.PlantPLCTable_4.item(1, 1).text())
+            # reportdata['AnalyserConfiguration'][0]['AnalMinLoadLimit'][0]['2RepAgo'] = str(self.page6.PlantPLCTable_4.item(1, 2).text())
+            reportdata['AnalyserConfiguration'][0]['AnalMinLoadLimit'][0]['Comment'] = str(self.page6.PlantPLCTable_4.item(1, 3).text())
+            reportdata['AnalyserConfiguration'][0]['StandardisePeriod'][0]['Current'] = str(self.page6.PlantPLCTable_4.item(2, 0).text())
+            # reportdata['AnalyserConfiguration'][0]['StandardisePeriod'][0]['1RepAgo'] = str(self.page6.PlantPLCTable_4.item(2, 1).text())
+            # reportdata['AnalyserConfiguration'][0]['StandardisePeriod'][0]['2RepAgo'] = str(self.page6.PlantPLCTable_4.item(2, 2).text())
+            reportdata['AnalyserConfiguration'][0]['StandardisePeriod'][0]['Comment'] = str(self.page6.PlantPLCTable_4.item(2, 3).text())
+        else:
+            print("passing by")
+
+        # Standardisation Table dump to JSON
+        it = self.page6.PlantPLCTable_5.item(0, 0)
+        if it and it.text():
+            reportdata['Standardisation'][0]['FirstStandardTime'][0]['Current'] = str(self.page6.PlantPLCTable_5.item(0, 0).text())
+            # reportdata['Standardisation'][0]['FirstStandardTime'][0]['1RepAgo'] = str(self.page6.PlantPLCTable_5.item(0, 1).text())
+            # reportdata['Standardisation'][0]['FirstStandardTime'][0]['2RepAgo'] = str(self.page6.PlantPLCTable_5.item(0, 2).text())
+            reportdata['Standardisation'][0]['FirstStandardTime'][0]['Comment'] = str(self.page6.PlantPLCTable_5.item(0, 3).text())
+            reportdata['Standardisation'][0]['MostRecentStandard'][0]['Current'] = str(self.page6.PlantPLCTable_5.item(1, 0).text())
+            # reportdata['Standardisation'][0]['MostRecentStandard'][0]['1RepAgo'] = str(self.page6.PlantPLCTable_5.item(1, 1).text())
+            # reportdata['Standardisation'][0]['MostRecentStandard'][0]['2RepAgo'] = str(self.page6.PlantPLCTable_5.item(1, 2).text())
+            reportdata['Standardisation'][0]['MostRecentStandard'][0]['Comment'] = str(self.page6.PlantPLCTable_5.item(1, 3).text())
+            reportdata['Standardisation'][0]['NumStdPeriodsSinceClear'][0]['Current'] = str(self.page6.PlantPLCTable_5.item(2, 0).text())
+            # reportdata['Standardisation'][0]['NumStdPeriodsSinceClear'][0]['1RepAgo'] = str(self.page6.PlantPLCTable_5.item(2, 1).text())
+            # reportdata['Standardisation'][0]['NumStdPeriodsSinceClear'][0]['2RepAgo'] = str(self.page6.PlantPLCTable_5.item(2, 2).text())
+            reportdata['Standardisation'][0]['NumStdPeriodsSinceClear'][0]['Comment'] = str(self.page6.PlantPLCTable_5.item(2, 3).text())
+            reportdata['Standardisation'][0]['NumStdPeriodsThisMnth'][0]['Current'] = str(self.page6.PlantPLCTable_5.item(3, 0).text())
+            # reportdata['Standardisation'][0]['NumStdPeriodsThisMnth'][0]['1RepAgo'] = str(self.page6.PlantPLCTable_5.item(3, 1).text())
+            # reportdata['Standardisation'][0]['NumStdPeriodsThisMnth'][0]['2RepAgo'] = str(self.page6.PlantPLCTable_5.item(3, 2).text())
+            reportdata['Standardisation'][0]['NumStdPeriodsThisMnth'][0]['Comment'] = str(self.page6.PlantPLCTable_5.item(3, 3).text())
+        else:
+            print("passing by")
+
+        # SSoftware Versions Table dump to JSON
+        it = self.page6.PlantPLCTable_6.item(0, 0)
+        if it and it.text():
+            reportdata['SoftwareVersions'][0]['Product'][0]['Current'] = str(self.page6.PlantPLCTable_6.item(0, 0).text())
+            # reportdata['SoftwareVersions'][0]['Product'][0]['1RepAgo'] = str(self.page6.PlantPLCTable_6.item(0, 1).text())
+            # reportdata['SoftwareVersions'][0]['Product'][0]['2RepAgo'] = str(self.page6.PlantPLCTable_6.item(0, 2).text())
+            reportdata['SoftwareVersions'][0]['Product'][0]['Comment'] = str(self.page6.PlantPLCTable_6.item(0, 3).text())
+            reportdata['SoftwareVersions'][0]['CsSchedule'][0]['Current'] = str(self.page6.PlantPLCTable_6.item(1, 0).text())
+            # reportdata['SoftwareVersions'][0]['CsSchedule'][0]['1RepAgo'] = str(self.page6.PlantPLCTable_6.item(1, 1).text())
+            # reportdata['SoftwareVersions'][0]['CsSchedule'][0]['2RepAgo'] = str(self.page6.PlantPLCTable_6.item(1, 2).text())
+            reportdata['SoftwareVersions'][0]['CsSchedule'][0]['Comment'] = str(self.page6.PlantPLCTable_6.item(1, 3).text())
+        else:
+            print("passing by")
+
+        it = self.page6.PlantPLCTable_7.item(0, 0)
+        if it and it.text():
+            reportdata['DiskSpaceMem'][0]['DiskSpace'][0]['Current'] = str(self.page6.PlantPLCTable_7.item(0, 0).text())
+            # reportdata['DiskSpaceMem'][0]['DiskSpace'][0]['1RepAgo'] = str(self.page6.PlantPLCTable_7.item(0, 1).text())
+            # reportdata['DiskSpaceMem'][0]['DiskSpace'][0]['2RepAgo'] = str(self.page6.PlantPLCTable_7.item(0, 2).text())
+            reportdata['DiskSpaceMem'][0]['DiskSpace'][0]['Comment'] = str(self.page6.PlantPLCTable_7.item(0, 3).text())
+            reportdata['DiskSpaceMem'][0]['PercDiskSpace'][0]['Current'] = str(self.page6.PlantPLCTable_7.item(1, 0).text())
+            # reportdata['DiskSpaceMem'][0]['PercDiskSpace'][0]['1RepAgo'] = str(self.page6.PlantPLCTable_7.item(1, 1).text())
+            # reportdata['DiskSpaceMem'][0]['PercDiskSpace'][0]['2RepAgo'] = str(self.page6.PlantPLCTable_7.item(1, 2).text())
+            reportdata['DiskSpaceMem'][0]['PercDiskSpace'][0]['Comment'] = str(self.page6.PlantPLCTable_7.item(1, 3).text())
+        else:
+            print("passing by")
+
+        # This section encodes the plots into the JSON File for transmission to engineer
+        # encode Temperature Plot for storage in JSON
+        with open(ReadInData.resourcepath + "\\Temperatures.png", mode="rb") as tf:
+             data = base64.b64encode(tf.read()).decode("utf-8")
+        reportdata['Plots'][0]['TempPlot'] = data
         with open("ReportData.json",'w') as file:
             json.dump(reportdata, file, indent=1)
 
+        # Decode Temperature plot data and produce image
+        imgfile = ReadInData.resourcepath + "\\Temperatures_output.png"
+        print(imgfile)
+        imgdata = reportdata['Plots'][0]['TempPlot']
+        imgplot = open(imgfile, "wb")
+        imgplot.write(base64.b64decode(imgdata))
+        imgplot.close()
+
+        # encode Detector Stability Plot for storage in JSON
+        with open(ReadInData.resourcepath + "\\Detector_Stability.png", mode="rb") as tf:
+            data = base64.b64encode(tf.read()).decode("utf-8")
+        reportdata['Plots'][0]['DetStabPlot'] = data
+        with open("ReportData.json", 'w') as file:
+            json.dump(reportdata, file, indent=1)
+
+        # Decode Detector Stability plot data and produce image. This will be commented for testing and used in the Engineer version of the code
+        imgfile = ReadInData.resourcepath + "\\Detector Stability_output.png"
+        print(imgfile)
+        imgdata = reportdata['Plots'][0]['DetStabPlot']
+        imgplot = open(imgfile, "wb")
+        imgplot.write(base64.b64decode(imgdata))
+        imgplot.close()
+
+        # encode Daily Tonnes Plot for storage in JSON
+        with open(ReadInData.resourcepath + "\\Daily_Tonnes.png", mode="rb") as tf:
+            data = base64.b64encode(tf.read()).decode("utf-8")
+        reportdata['Plots'][0]['DailyTonsPlot'] = data
+        with open("ReportData.json", 'w') as file:
+            json.dump(reportdata, file, indent=1)
+
+        # Decode Daily Tonnes plot data and produce image. This will be commented for testing and used in the Engineer version of the code
+        imgfile = ReadInData.resourcepath + "\\Daily_Tonnes_output.png"
+        print(imgfile)
+        imgdata = reportdata['Plots'][0]['DailyTonsPlot']
+        imgplot = open(imgfile, "wb")
+        imgplot.write(base64.b64decode(imgdata))
+        imgplot.close()
+
+        # encode Results 1 Plot for storage in JSON
+        with open(ReadInData.resourcepath + "\\Results1.png", mode="rb") as tf:
+            data = base64.b64encode(tf.read()).decode("utf-8")
+        reportdata['Plots'][0]['Results1Plot'] = data
+        with open("ReportData.json", 'w') as file:
+            json.dump(reportdata, file, indent=1)
+
+        # Decode Results 1 plot data and produce image. This will be commented for testing and used in the Engineer version of the code
+        imgfile = ReadInData.resourcepath + "\\Results1_output.png"
+        print(imgfile)
+        imgdata = reportdata['Plots'][0]['Results1Plot']
+        imgplot = open(imgfile, "wb")
+        imgplot.write(base64.b64decode(imgdata))
+        imgplot.close()
+
+        # encode Results 2 Plot for storage in JSON
+        with open(ReadInData.resourcepath + "\\Results2.png", mode="rb") as tf:
+            data = base64.b64encode(tf.read()).decode("utf-8")
+        reportdata['Plots'][0]['Results2Plot'] = data
+        with open("ReportData.json", 'w') as file:
+            json.dump(reportdata, file, indent=1)
+
+        # Decode Results 2 plot data and produce image. This will be commented for testing and used in the Engineer version of the code
+        imgfile = ReadInData.resourcepath + "\\Results2_output.png"
+        print(imgfile)
+        imgdata = reportdata['Plots'][0]['Results2Plot']
+        imgplot = open(imgfile, "wb")
+        imgplot.write(base64.b64decode(imgdata))
+        imgplot.close()
+
+
+
         print("Exit JSON")
-
-
 
     def updatehome(self):
         anal = self.AnalyserListComboBox.currentText()
@@ -185,7 +435,6 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
         self.UpdatePg6()
         self.UpdateFigs()
 
-
     def EnabledYes(self):
         enabled = "Yes"
         enableditem = QTableWidgetItem(enabled)
@@ -220,13 +469,19 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
         return enableditem
 
     def UpdatePg6(self):
+
         # Update PLC Status Table
         BeltRunning = QTableWidgetItem(ReadInData.AnalyserIO.loc[ReadInData.AnalyserIO["Parameter Name"] == "BeltRunning","Value"].to_string(index=False))
         ForceAnalyse = QTableWidgetItem(ReadInData.AnalyserIO.loc[ReadInData.AnalyserIO["Parameter Name"] == "ForceAnalyse", "Value"].to_string(index=False))
         ForceStandardise = QTableWidgetItem(ReadInData.AnalyserIO.loc[ReadInData.AnalyserIO["Parameter Name"] == "ForceStandardise", "Value"].to_string(index=False))
+
         self.page6.PlantPLCTable.setItem(0, 0, BeltRunning)
         self.page6.PlantPLCTable.setItem(1, 0, ForceAnalyse)
         self.page6.PlantPLCTable.setItem(2, 0, ForceStandardise)
+        # Creating the comment item and populating with Blanks
+        self.page6.PlantPLCTable.setItem(0, 3, QTableWidgetItem(str("")))
+        self.page6.PlantPLCTable.setItem(1, 3, QTableWidgetItem(str("")))
+        self.page6.PlantPLCTable.setItem(2, 3, QTableWidgetItem(str("")))
         # Update Analyser Status Table
         AnalyserOK = QTableWidgetItem(ReadInData.AnalyserStatus.loc[ReadInData.AnalyserStatus["Result Name"] == "AnalyserOK","Value"].to_string(index=False))
         StandardsOK = QTableWidgetItem(ReadInData.AnalyserStatus.loc[ReadInData.AnalyserStatus["Result Name"] == "StandardsOK","Value"].to_string(index=False))
@@ -236,16 +491,29 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
         self.page6.PlantPLCTable_2.setItem(1, 0, StandardsOK)
         self.page6.PlantPLCTable_2.setItem(2, 0, IOControlOK)
         self.page6.PlantPLCTable_2.setItem(3, 0, SpectraStable)
+        # Creating the comment item and populating with Blanks
+        self.page6.PlantPLCTable_2.setItem(0, 3, QTableWidgetItem(str("")))
+        self.page6.PlantPLCTable_2.setItem(1, 3, QTableWidgetItem(str("")))
+        self.page6.PlantPLCTable_2.setItem(2, 3, QTableWidgetItem(str("")))
+        self.page6.PlantPLCTable_2.setItem(3, 3, QTableWidgetItem(str("")))
 
         # Update PLC Analyser Results
         SystemOK = QTableWidgetItem(ReadInData.AnalyserIO.loc[ReadInData.AnalyserIO["Parameter Name"] == "SystemRunning","Value"].to_string(index=False))
-        SourceControlFault = QTableWidgetItem(ReadInData.AnalyserIO.loc[ReadInData.AnalyserIO["Parameter Name"] == "SourceControlFault", "Value"].to_string(index=False))
+        if ReadInData.AnalyserIO.loc[ReadInData.AnalyserIO["Parameter Name"] == "SourceControlFault", "Value"].to_string(index=False) == "   OK\nFALSE":
+            SourceControlFault = QTableWidgetItem("FALSE")
+        else:
+            SourceControlFault = QTableWidgetItem("TRUE")
         SourceOff = QTableWidgetItem(ReadInData.AnalyserIO.loc[ReadInData.AnalyserIO["Parameter Name"] == "SourceOffProx", "Value"].to_string(index=False))
         SourceOn = QTableWidgetItem(ReadInData.AnalyserIO.loc[ReadInData.AnalyserIO["Parameter Name"] == "SourceOnProx", "Value"].to_string(index=False))
         self.page6.PlantPLCTable_3.setItem(0, 0, SystemOK)
         self.page6.PlantPLCTable_3.setItem(1, 0, SourceControlFault)
         self.page6.PlantPLCTable_3.setItem(2, 0, SourceOff)
         self.page6.PlantPLCTable_3.setItem(3, 0, SourceOn)
+        # Creating the comment item and populating with Blanks
+        self.page6.PlantPLCTable_3.setItem(0, 3, QTableWidgetItem(str("")))
+        self.page6.PlantPLCTable_3.setItem(1, 3, QTableWidgetItem(str("")))
+        self.page6.PlantPLCTable_3.setItem(2, 3, QTableWidgetItem(str("")))
+        self.page6.PlantPLCTable_3.setItem(3, 3, QTableWidgetItem(str("")))
 
         # Update Analyser Config Table
         AnalysisPeriod = QTableWidgetItem(ReadInData.AnalyserStatus.loc[ReadInData.AnalyserStatus["Result Name"] == "AnalysisPeriod","Value"].to_string(index=False))
@@ -254,28 +522,44 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
         self.page6.PlantPLCTable_4.setItem(0, 0, AnalysisPeriod)
         self.page6.PlantPLCTable_4.setItem(1, 0, AnalMinLoadLimit)
         self.page6.PlantPLCTable_4.setItem(2, 0, StandardisePeriod)
+        # Creating the comment item and populating with Blanks
+        self.page6.PlantPLCTable_4.setItem(0, 3, QTableWidgetItem(str("")))
+        self.page6.PlantPLCTable_4.setItem(1, 3, QTableWidgetItem(str("")))
+        self.page6.PlantPLCTable_4.setItem(2, 3, QTableWidgetItem(str("")))
 
         # Update Standardisation Table
         FirstStandard = QTableWidgetItem(ReadInData.AnalyserStatus.loc[ReadInData.AnalyserStatus["Result Name"] == "FirstStandardTime","Value"].to_string(index=False))
-        LastStandard = QTableWidgetItem(ReadInData.AnalyserStatus.loc[ReadInData.AnalyserStatus["Result Name"] == "LastStandardTime","Value"].to_string(index=False))
+        LastStandard = QTableWidgetItem(ReadInData.AnalyserStatus.loc[ReadInData.AnalyserStatus["Result Name"] == "LastStandardiseTime","Value"].to_string(index=False))
         NumStandard = QTableWidgetItem(ReadInData.AnalyserStatus.loc[ReadInData.AnalyserStatus["Result Name"] == "PeriodCount","Value"].to_string(index=False))
         NumStandardMonth = QTableWidgetItem("PlaceHolder")
         self.page6.PlantPLCTable_5.setItem(0, 0, FirstStandard)
         self.page6.PlantPLCTable_5.setItem(1, 0, LastStandard)
         self.page6.PlantPLCTable_5.setItem(2, 0, NumStandard)
         self.page6.PlantPLCTable_5.setItem(3, 0, NumStandardMonth)
+        # Creating the comment item and populating with Blanks
+        self.page6.PlantPLCTable_5.setItem(0, 3, QTableWidgetItem(str("")))
+        self.page6.PlantPLCTable_5.setItem(1, 3, QTableWidgetItem(str("")))
+        self.page6.PlantPLCTable_5.setItem(2, 3, QTableWidgetItem(str("")))
+        self.page6.PlantPLCTable_5.setItem(3, 3, QTableWidgetItem(str("")))
 
         # Update Software Versions Table
         Product = QTableWidgetItem(ReadInData.VersionNumbers.loc[ReadInData.VersionNumbers["Module"] == "Product","Version"].to_string(index=False))
         CsSchedule = QTableWidgetItem(ReadInData.VersionNumbers.loc[ReadInData.VersionNumbers["Module"] == "CsSchedule","Version"].to_string(index=False))
         self.page6.PlantPLCTable_6.setItem(0, 0, Product)
         self.page6.PlantPLCTable_6.setItem(1, 0, CsSchedule)
+        # Creating the comment item and populating with Blanks
+        self.page6.PlantPLCTable_6.setItem(0, 3, QTableWidgetItem(str("")))
+        self.page6.PlantPLCTable_6.setItem(1, 3, QTableWidgetItem(str("")))
+
 
         # Update Disk Space Table
         DiskSpace = QTableWidgetItem(ReadInData.VersionNumbers.loc[ReadInData.VersionNumbers["Module"] == "DiskSpace","Version"].to_string(index=False))
         PercDiskSpace = QTableWidgetItem(ReadInData.VersionNumbers.loc[ReadInData.VersionNumbers["Module"] == "%DiskSpace","Version"].to_string(index=False))
         self.page6.PlantPLCTable_7.setItem(0, 0, DiskSpace)
         self.page6.PlantPLCTable_7.setItem(1, 0, PercDiskSpace)
+        # Creating the comment item and populating with Blanks
+        self.page6.PlantPLCTable_7.setItem(0, 3, QTableWidgetItem(str("")))
+        self.page6.PlantPLCTable_7.setItem(1, 3, QTableWidgetItem(str("")))
 
     # used in Update report
     def UpdateFigs(self):
