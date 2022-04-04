@@ -1,13 +1,13 @@
 {
  "Summary": [
   {
-   "SiteName": "Assmang Beeshoek",
-   "ReportDate": "2022-03-31",
-   "AnalyserNo": "C15-037",
+   "SiteName": "Rolleston Coal Pty Ltd",
+   "ReportDate": "2022-04-04",
+   "AnalyserNo": "C15-039",
    "ServEng": "Service Engineer:",
-   "Application": "Iron Ore",
+   "Application": "Coal",
    "Period": "January 2022",
-   "Email": "service.southafrica@scantech.com.au",
+   "Email": "service.australia@scantech.com.au",
    "NextPSA": "January 2022",
    "TopUpDue": "January 2022"
   }
@@ -221,7 +221,7 @@
   {
    "BeltRunning": [
     {
-     "Current": "",
+     "Current": "TRUE",
      "1RepAgo": "",
      "2RepAgo": "",
      "Comment": ""
@@ -229,7 +229,7 @@
    ],
    "ForceAnalyse": [
     {
-     "Current": "",
+     "Current": "FALSE",
      "1RepAgo": "",
      "2RepAgo": "",
      "Comment": ""
@@ -237,7 +237,7 @@
    ],
    "ForceStandardise": [
     {
-     "Current": "",
+     "Current": "FALSE",
      "1RepAgo": "",
      "2RepAgo": "",
      "Comment": ""
@@ -249,7 +249,7 @@
   {
    "AnalyserOK": [
     {
-     "Current": "",
+     "Current": "OK",
      "1RepAgo": "",
      "2RepAgo": "",
      "Comment": ""
@@ -257,7 +257,7 @@
    ],
    "StandardsOK": [
     {
-     "Current": "",
+     "Current": "OK",
      "1RepAgo": "",
      "2RepAgo": "",
      "Comment": ""
@@ -265,7 +265,7 @@
    ],
    "IOControlOK": [
     {
-     "Current": "",
+     "Current": "OK",
      "1RepAgo": "",
      "2RepAgo": "",
      "Comment": ""
@@ -273,7 +273,7 @@
    ],
    "SpectraStable": [
     {
-     "Current": "",
+     "Current": "OK",
      "1RepAgo": "",
      "2RepAgo": "",
      "Comment": ""
@@ -285,7 +285,7 @@
   {
    "SystemOK": [
     {
-     "Current": "",
+     "Current": "OK",
      "1RepAgo": "",
      "2RepAgo": "",
      "Comment": ""
@@ -293,7 +293,7 @@
    ],
    "SourceControlFault": [
     {
-     "Current": "",
+     "Current": "   OK\nFALSE",
      "1RepAgo": "",
      "2RepAgo": "",
      "Comment": ""
@@ -301,7 +301,7 @@
    ],
    "SourceOff": [
     {
-     "Current": "",
+     "Current": "FALSE",
      "1RepAgo": "",
      "2RepAgo": "",
      "Comment": ""
@@ -309,7 +309,7 @@
    ],
    "SourceOn": [
     {
-     "Current": "",
+     "Current": "TRUE",
      "1RepAgo": "",
      "2RepAgo": "",
      "Comment": ""
@@ -321,7 +321,7 @@
   {
    "AnalysisPeriod": [
     {
-     "Current": "",
+     "Current": "30",
      "1RepAgo": "",
      "2RepAgo": "",
      "Comment": ""
@@ -329,7 +329,7 @@
    ],
    "AnalMinLoadLimit": [
     {
-     "Current": "",
+     "Current": "130",
      "1RepAgo": "",
      "2RepAgo": "",
      "Comment": ""
@@ -337,7 +337,7 @@
    ],
    "StandardisePeriod": [
     {
-     "Current": "",
+     "Current": "7200",
      "1RepAgo": "",
      "2RepAgo": "",
      "Comment": ""
@@ -378,7 +378,7 @@
   {
    "Product": [
     {
-     "Current": "",
+     "Current": "01.24.00",
      "1RepAgo": "",
      "2RepAgo": "",
      "Comment": ""
@@ -386,7 +386,7 @@
    ],
    "CsSchedule": [
     {
-     "Current": "",
+     "Current": "01.24.11",
      "1RepAgo": "",
      "2RepAgo": "",
      "Comment": ""
@@ -398,7 +398,7 @@
   {
    "DiskSpace": [
     {
-     "Current": "",
+     "Current": "24 GB",
      "1RepAgo": "",
      "2RepAgo": "",
      "Comment": ""
@@ -406,7 +406,7 @@
    ],
    "PercDiskSpace": [
     {
-     "Current": "",
+     "Current": "21.04%",
      "1RepAgo": "",
      "2RepAgo": "",
      "Comment": ""
