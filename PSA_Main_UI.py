@@ -144,7 +144,7 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
         reportdata['Summary'][0]['SiteName'] = self.page1.site_name.text()
         reportdata['Summary'][0]['ReportDate'] = self.page1.rep_date_data.text()
         reportdata['Summary'][0]['AnalyserNo'] = self.page1.rep_analyser_data.text()
-        reportdata['Summary'][0]['ServEng'] = self.page1.rep_serv_eng.text()
+        reportdata['Summary'][0]['ServEng'] = self.page1.rep_serv_eng_data.text()
         reportdata['Summary'][0]['Application'] = self.page1.rep_app_data.text()
         reportdata['Summary'][0]['Period'] = self.page1.period_data.text()
         reportdata['Summary'][0]['Email'] = self.page1.email_data.text()
