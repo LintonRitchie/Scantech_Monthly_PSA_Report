@@ -9,6 +9,7 @@ from Read_Master import (Read_Master, Read_AnalyserStatus, Read_PeakControl, Rea
 import datetime
 import json
 import base64
+import glob
 from PSA_Home import Ui_PSAHome
 from PSA_Page1 import Ui_PSAPage1
 from PSA_Page2 import Ui_PSAPage2
@@ -19,6 +20,7 @@ from PSA_Page6 import Ui_PSAPage6
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QFileDialog, QTableWidgetItem)
 from PyQt5 import (QtCore, QtGui)
 from PyQt5.QtCore import QDir
+
 
 
 import matplotlib.pyplot as plt
@@ -93,6 +95,9 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
         self.AnalyserListComboBox.activated.connect(self.GetFolder)
         self.page1.NextPage.released.connect(self.UpdateJSON)
         self.page2.NextPage.released.connect(self.UpdateJSON)
+        self.page6.RepAgo1.released.connect(self.UpdatePg6_1RepAgo)
+        self.page6.RepAgo2.released.connect(self.UpdatePg6_2RepAgo)
+        self.page6.NextPage.released.connect(self.UpdateJSON)
 
     def updatereadindata(self):
         ReadInData.AnalyserStatus = Read_AnalyserStatus(ReadInData.defaultpath)     # Read in PSA Report file data from PSA Report file.
@@ -196,16 +201,16 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
         it = self.page6.PlantPLCTable.item(0, 0)
         if it and it.text():
             reportdata['PLCStatus'][0]['BeltRunning'][0]['Current'] = str(self.page6.PlantPLCTable.item(0, 0).text())
-            # reportdata['PLCStatus'][0]['BeltRunning'][0]['1RepAgo'] = str(self.page6.PlantPLCTable.item(0, 1).text())
-            # reportdata['PLCStatus'][0]['BeltRunning'][0]['2RepAgo'] = str(self.page6.PlantPLCTable.item(0, 2).text())
+            reportdata['PLCStatus'][0]['BeltRunning'][0]['1RepAgo'] = str(self.page6.PlantPLCTable.item(0, 1).text())
+            reportdata['PLCStatus'][0]['BeltRunning'][0]['2RepAgo'] = str(self.page6.PlantPLCTable.item(0, 2).text())
             reportdata['PLCStatus'][0]['BeltRunning'][0]['Comment'] = str(self.page6.PlantPLCTable.item(0, 3).text())
             reportdata['PLCStatus'][0]['ForceAnalyse'][0]['Current'] = str(self.page6.PlantPLCTable.item(1, 0).text())
-            # reportdata['PLCStatus'][0]['ForceAnalyse'][0]['1RepAgo'] = str(self.page6.PlantPLCTable.item(1, 1).text())
-            # reportdata['PLCStatus'][0]['ForceAnalyse'][0]['2RepAgo'] = str(self.page6.PlantPLCTable.item(1, 2).text())
+            reportdata['PLCStatus'][0]['ForceAnalyse'][0]['1RepAgo'] = str(self.page6.PlantPLCTable.item(1, 1).text())
+            reportdata['PLCStatus'][0]['ForceAnalyse'][0]['2RepAgo'] = str(self.page6.PlantPLCTable.item(1, 2).text())
             reportdata['PLCStatus'][0]['ForceAnalyse'][0]['Comment'] = str(self.page6.PlantPLCTable.item(1, 3).text())
             reportdata['PLCStatus'][0]['ForceStandardise'][0]['Current'] = str(self.page6.PlantPLCTable.item(2, 0).text())
-            # reportdata['PLCStatus'][0]['ForceStandardise'][0]['1RepAgo'] = str(self.page6.PlantPLCTable.item(2, 1).text())
-            # reportdata['PLCStatus'][0]['ForceStandardise'][0]['2RepAgo'] = str(self.page6.PlantPLCTable.item(2, 2).text())
+            reportdata['PLCStatus'][0]['ForceStandardise'][0]['1RepAgo'] = str(self.page6.PlantPLCTable.item(2, 1).text())
+            reportdata['PLCStatus'][0]['ForceStandardise'][0]['2RepAgo'] = str(self.page6.PlantPLCTable.item(2, 2).text())
             reportdata['PLCStatus'][0]['ForceStandardise'][0]['Comment'] = str(self.page6.PlantPLCTable.item(2, 3).text())
         else:
             print("passing by")
@@ -214,20 +219,20 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
         it = self.page6.PlantPLCTable_2.item(0, 0)
         if it and it.text():
             reportdata['AnalyserStatus'][0]['AnalyserOK'][0]['Current'] = str(self.page6.PlantPLCTable_2.item(0, 0).text())
-            # reportdata['AnalyserStatus'][0]['AnalyserOK'][0]['1RepAgo'] = str(self.page6.PlantPLCTable_2.item(0, 1).text())
-            # reportdata['AnalyserStatus'][0]['AnalyserOK'][0]['2RepAgo'] = str(self.page6.PlantPLCTable_2.item(0, 2).text())
+            reportdata['AnalyserStatus'][0]['AnalyserOK'][0]['1RepAgo'] = str(self.page6.PlantPLCTable_2.item(0, 1).text())
+            reportdata['AnalyserStatus'][0]['AnalyserOK'][0]['2RepAgo'] = str(self.page6.PlantPLCTable_2.item(0, 2).text())
             reportdata['AnalyserStatus'][0]['AnalyserOK'][0]['Comment'] = str(self.page6.PlantPLCTable_2.item(0, 3).text())
             reportdata['AnalyserStatus'][0]['StandardsOK'][0]['Current'] = str(self.page6.PlantPLCTable_2.item(1, 0).text())
-            # reportdata['AnalyserStatus'][0]['StandardsOK'][0]['1RepAgo'] = str(self.page6.PlantPLCTable_2.item(1, 1).text())
-            # reportdata['AnalyserStatus'][0]['StandardsOK'][0]['2RepAgo'] = str(self.page6.PlantPLCTable_2.item(1, 2).text())
+            reportdata['AnalyserStatus'][0]['StandardsOK'][0]['1RepAgo'] = str(self.page6.PlantPLCTable_2.item(1, 1).text())
+            reportdata['AnalyserStatus'][0]['StandardsOK'][0]['2RepAgo'] = str(self.page6.PlantPLCTable_2.item(1, 2).text())
             reportdata['AnalyserStatus'][0]['StandardsOK'][0]['Comment'] = str(self.page6.PlantPLCTable_2.item(1, 3).text())
             reportdata['AnalyserStatus'][0]['IOControlOK'][0]['Current'] = str(self.page6.PlantPLCTable_2.item(2, 0).text())
-            # reportdata['AnalyserStatus'][0]['IOControlOK'][0]['1RepAgo'] = str(self.page6.PlantPLCTable_2.item(2, 1).text())
-            # reportdata['AnalyserStatus'][0]['IOControlOK'][0]['2RepAgo'] = str(self.page6.PlantPLCTable_2.item(2, 2).text())
+            reportdata['AnalyserStatus'][0]['IOControlOK'][0]['1RepAgo'] = str(self.page6.PlantPLCTable_2.item(2, 1).text())
+            reportdata['AnalyserStatus'][0]['IOControlOK'][0]['2RepAgo'] = str(self.page6.PlantPLCTable_2.item(2, 2).text())
             reportdata['AnalyserStatus'][0]['IOControlOK'][0]['Comment'] = str(self.page6.PlantPLCTable_2.item(2, 3).text())
             reportdata['AnalyserStatus'][0]['SpectraStable'][0]['Current'] = str(self.page6.PlantPLCTable_2.item(3, 0).text())
-            # reportdata['AnalyserStatus'][0]['SpectraStable'][0]['1RepAgo'] = str(self.page6.PlantPLCTable_2.item(3, 1).text())
-            # reportdata['AnalyserStatus'][0]['SpectraStable'][0]['2RepAgo'] = str(self.page6.PlantPLCTable_2.item(3, 2).text())
+            reportdata['AnalyserStatus'][0]['SpectraStable'][0]['1RepAgo'] = str(self.page6.PlantPLCTable_2.item(3, 1).text())
+            reportdata['AnalyserStatus'][0]['SpectraStable'][0]['2RepAgo'] = str(self.page6.PlantPLCTable_2.item(3, 2).text())
             reportdata['AnalyserStatus'][0]['SpectraStable'][0]['Comment'] = str(self.page6.PlantPLCTable_2.item(3, 3).text())
         else:
             print("passing by")
@@ -236,20 +241,20 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
         it = self.page6.PlantPLCTable_3.item(0, 0)
         if it and it.text():
             reportdata['PLCResults'][0]['SystemOK'][0]['Current'] = str(self.page6.PlantPLCTable_3.item(0, 0).text())
-            # reportdata['PLCResults'][0]['SystemOK'][0]['1RepAgo'] = str(self.page6.PlantPLCTable_3.item(0, 1).text())
-            # reportdata['PLCResults'][0]['SystemOK'][0]['2RepAgo'] = str(self.page6.PlantPLCTable_3.item(0, 2).text())
+            reportdata['PLCResults'][0]['SystemOK'][0]['1RepAgo'] = str(self.page6.PlantPLCTable_3.item(0, 1).text())
+            reportdata['PLCResults'][0]['SystemOK'][0]['2RepAgo'] = str(self.page6.PlantPLCTable_3.item(0, 2).text())
             reportdata['PLCResults'][0]['SystemOK'][0]['Comment'] = str(self.page6.PlantPLCTable_3.item(0, 3).text())
             reportdata['PLCResults'][0]['SourceControlFault'][0]['Current'] = str(self.page6.PlantPLCTable_3.item(1, 0).text())
-            # reportdata['PLCResults'][0]['SourceControlFault'][0]['1RepAgo'] = str(self.page6.PlantPLCTable_3.item(1, 1).text())
-            # reportdata['PLCResults'][0]['SourceControlFault'][0]['2RepAgo'] = str(self.page6.PlantPLCTable_3.item(1, 2).text())
+            reportdata['PLCResults'][0]['SourceControlFault'][0]['1RepAgo'] = str(self.page6.PlantPLCTable_3.item(1, 1).text())
+            reportdata['PLCResults'][0]['SourceControlFault'][0]['2RepAgo'] = str(self.page6.PlantPLCTable_3.item(1, 2).text())
             reportdata['PLCResults'][0]['SourceControlFault'][0]['Comment'] = str(self.page6.PlantPLCTable_3.item(1, 3).text())
             reportdata['PLCResults'][0]['SourceOff'][0]['Current'] = str(self.page6.PlantPLCTable_3.item(2, 0).text())
-            # reportdata['PLCResults'][0]['SourceOff'][0]['1RepAgo'] = str(self.page6.PlantPLCTable_3.item(2, 1).text())
-            # reportdata['PLCResults'][0]['SourceOff'][0]['2RepAgo'] = str(self.page6.PlantPLCTable_3.item(2, 2).text())
+            reportdata['PLCResults'][0]['SourceOff'][0]['1RepAgo'] = str(self.page6.PlantPLCTable_3.item(2, 1).text())
+            reportdata['PLCResults'][0]['SourceOff'][0]['2RepAgo'] = str(self.page6.PlantPLCTable_3.item(2, 2).text())
             reportdata['PLCResults'][0]['SourceOff'][0]['Comment'] = str(self.page6.PlantPLCTable_3.item(2, 3).text())
             reportdata['PLCResults'][0]['SourceOn'][0]['Current'] = str(self.page6.PlantPLCTable_3.item(3, 0).text())
-            # reportdata['PLCResults'][0]['SourceOn'][0]['1RepAgo'] = str(self.page6.PlantPLCTable_3.item(3, 1).text())
-            # reportdata['PLCResults'][0]['SourceOn'][0]['2RepAgo'] = str(self.page6.PlantPLCTable_3.item(3, 2).text())
+            reportdata['PLCResults'][0]['SourceOn'][0]['1RepAgo'] = str(self.page6.PlantPLCTable_3.item(3, 1).text())
+            reportdata['PLCResults'][0]['SourceOn'][0]['2RepAgo'] = str(self.page6.PlantPLCTable_3.item(3, 2).text())
             reportdata['PLCResults'][0]['SourceOn'][0]['Comment'] = str(self.page6.PlantPLCTable_3.item(3, 3).text())
         else:
             print("passing by")
@@ -258,16 +263,16 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
         it = self.page6.PlantPLCTable_4.item(0, 0)
         if it and it.text():
             reportdata['AnalyserConfiguration'][0]['AnalysisPeriod'][0]['Current'] = str(self.page6.PlantPLCTable_4.item(0, 0).text())
-            # reportdata['AnalyserConfiguration'][0]['AnalysisPeriod'][0]['1RepAgo'] = str(self.page6.PlantPLCTable_4.item(0, 1).text())
-            # reportdata['AnalyserConfiguration'][0]['AnalysisPeriod'][0]['2RepAgo'] = str(self.page6.PlantPLCTable_4.item(0, 2).text())
+            reportdata['AnalyserConfiguration'][0]['AnalysisPeriod'][0]['1RepAgo'] = str(self.page6.PlantPLCTable_4.item(0, 1).text())
+            reportdata['AnalyserConfiguration'][0]['AnalysisPeriod'][0]['2RepAgo'] = str(self.page6.PlantPLCTable_4.item(0, 2).text())
             reportdata['AnalyserConfiguration'][0]['AnalysisPeriod'][0]['Comment'] = str(self.page6.PlantPLCTable_4.item(0, 3).text())
             reportdata['AnalyserConfiguration'][0]['AnalMinLoadLimit'][0]['Current'] = str(self.page6.PlantPLCTable_4.item(1, 0).text())
-            # reportdata['AnalyserConfiguration'][0]['AnalMinLoadLimit'][0]['1RepAgo'] = str(self.page6.PlantPLCTable_4.item(1, 1).text())
-            # reportdata['AnalyserConfiguration'][0]['AnalMinLoadLimit'][0]['2RepAgo'] = str(self.page6.PlantPLCTable_4.item(1, 2).text())
+            reportdata['AnalyserConfiguration'][0]['AnalMinLoadLimit'][0]['1RepAgo'] = str(self.page6.PlantPLCTable_4.item(1, 1).text())
+            reportdata['AnalyserConfiguration'][0]['AnalMinLoadLimit'][0]['2RepAgo'] = str(self.page6.PlantPLCTable_4.item(1, 2).text())
             reportdata['AnalyserConfiguration'][0]['AnalMinLoadLimit'][0]['Comment'] = str(self.page6.PlantPLCTable_4.item(1, 3).text())
             reportdata['AnalyserConfiguration'][0]['StandardisePeriod'][0]['Current'] = str(self.page6.PlantPLCTable_4.item(2, 0).text())
-            # reportdata['AnalyserConfiguration'][0]['StandardisePeriod'][0]['1RepAgo'] = str(self.page6.PlantPLCTable_4.item(2, 1).text())
-            # reportdata['AnalyserConfiguration'][0]['StandardisePeriod'][0]['2RepAgo'] = str(self.page6.PlantPLCTable_4.item(2, 2).text())
+            reportdata['AnalyserConfiguration'][0]['StandardisePeriod'][0]['1RepAgo'] = str(self.page6.PlantPLCTable_4.item(2, 1).text())
+            reportdata['AnalyserConfiguration'][0]['StandardisePeriod'][0]['2RepAgo'] = str(self.page6.PlantPLCTable_4.item(2, 2).text())
             reportdata['AnalyserConfiguration'][0]['StandardisePeriod'][0]['Comment'] = str(self.page6.PlantPLCTable_4.item(2, 3).text())
         else:
             print("passing by")
@@ -276,20 +281,20 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
         it = self.page6.PlantPLCTable_5.item(0, 0)
         if it and it.text():
             reportdata['Standardisation'][0]['FirstStandardTime'][0]['Current'] = str(self.page6.PlantPLCTable_5.item(0, 0).text())
-            # reportdata['Standardisation'][0]['FirstStandardTime'][0]['1RepAgo'] = str(self.page6.PlantPLCTable_5.item(0, 1).text())
-            # reportdata['Standardisation'][0]['FirstStandardTime'][0]['2RepAgo'] = str(self.page6.PlantPLCTable_5.item(0, 2).text())
+            reportdata['Standardisation'][0]['FirstStandardTime'][0]['1RepAgo'] = str(self.page6.PlantPLCTable_5.item(0, 1).text())
+            reportdata['Standardisation'][0]['FirstStandardTime'][0]['2RepAgo'] = str(self.page6.PlantPLCTable_5.item(0, 2).text())
             reportdata['Standardisation'][0]['FirstStandardTime'][0]['Comment'] = str(self.page6.PlantPLCTable_5.item(0, 3).text())
             reportdata['Standardisation'][0]['MostRecentStandard'][0]['Current'] = str(self.page6.PlantPLCTable_5.item(1, 0).text())
-            # reportdata['Standardisation'][0]['MostRecentStandard'][0]['1RepAgo'] = str(self.page6.PlantPLCTable_5.item(1, 1).text())
-            # reportdata['Standardisation'][0]['MostRecentStandard'][0]['2RepAgo'] = str(self.page6.PlantPLCTable_5.item(1, 2).text())
+            reportdata['Standardisation'][0]['MostRecentStandard'][0]['1RepAgo'] = str(self.page6.PlantPLCTable_5.item(1, 1).text())
+            reportdata['Standardisation'][0]['MostRecentStandard'][0]['2RepAgo'] = str(self.page6.PlantPLCTable_5.item(1, 2).text())
             reportdata['Standardisation'][0]['MostRecentStandard'][0]['Comment'] = str(self.page6.PlantPLCTable_5.item(1, 3).text())
             reportdata['Standardisation'][0]['NumStdPeriodsSinceClear'][0]['Current'] = str(self.page6.PlantPLCTable_5.item(2, 0).text())
-            # reportdata['Standardisation'][0]['NumStdPeriodsSinceClear'][0]['1RepAgo'] = str(self.page6.PlantPLCTable_5.item(2, 1).text())
-            # reportdata['Standardisation'][0]['NumStdPeriodsSinceClear'][0]['2RepAgo'] = str(self.page6.PlantPLCTable_5.item(2, 2).text())
+            reportdata['Standardisation'][0]['NumStdPeriodsSinceClear'][0]['1RepAgo'] = str(self.page6.PlantPLCTable_5.item(2, 1).text())
+            reportdata['Standardisation'][0]['NumStdPeriodsSinceClear'][0]['2RepAgo'] = str(self.page6.PlantPLCTable_5.item(2, 2).text())
             reportdata['Standardisation'][0]['NumStdPeriodsSinceClear'][0]['Comment'] = str(self.page6.PlantPLCTable_5.item(2, 3).text())
             reportdata['Standardisation'][0]['NumStdPeriodsThisMnth'][0]['Current'] = str(self.page6.PlantPLCTable_5.item(3, 0).text())
-            # reportdata['Standardisation'][0]['NumStdPeriodsThisMnth'][0]['1RepAgo'] = str(self.page6.PlantPLCTable_5.item(3, 1).text())
-            # reportdata['Standardisation'][0]['NumStdPeriodsThisMnth'][0]['2RepAgo'] = str(self.page6.PlantPLCTable_5.item(3, 2).text())
+            reportdata['Standardisation'][0]['NumStdPeriodsThisMnth'][0]['1RepAgo'] = str(self.page6.PlantPLCTable_5.item(3, 1).text())
+            reportdata['Standardisation'][0]['NumStdPeriodsThisMnth'][0]['2RepAgo'] = str(self.page6.PlantPLCTable_5.item(3, 2).text())
             reportdata['Standardisation'][0]['NumStdPeriodsThisMnth'][0]['Comment'] = str(self.page6.PlantPLCTable_5.item(3, 3).text())
         else:
             print("passing by")
@@ -298,12 +303,12 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
         it = self.page6.PlantPLCTable_6.item(0, 0)
         if it and it.text():
             reportdata['SoftwareVersions'][0]['Product'][0]['Current'] = str(self.page6.PlantPLCTable_6.item(0, 0).text())
-            # reportdata['SoftwareVersions'][0]['Product'][0]['1RepAgo'] = str(self.page6.PlantPLCTable_6.item(0, 1).text())
-            # reportdata['SoftwareVersions'][0]['Product'][0]['2RepAgo'] = str(self.page6.PlantPLCTable_6.item(0, 2).text())
+            reportdata['SoftwareVersions'][0]['Product'][0]['1RepAgo'] = str(self.page6.PlantPLCTable_6.item(0, 1).text())
+            reportdata['SoftwareVersions'][0]['Product'][0]['2RepAgo'] = str(self.page6.PlantPLCTable_6.item(0, 2).text())
             reportdata['SoftwareVersions'][0]['Product'][0]['Comment'] = str(self.page6.PlantPLCTable_6.item(0, 3).text())
             reportdata['SoftwareVersions'][0]['CsSchedule'][0]['Current'] = str(self.page6.PlantPLCTable_6.item(1, 0).text())
-            # reportdata['SoftwareVersions'][0]['CsSchedule'][0]['1RepAgo'] = str(self.page6.PlantPLCTable_6.item(1, 1).text())
-            # reportdata['SoftwareVersions'][0]['CsSchedule'][0]['2RepAgo'] = str(self.page6.PlantPLCTable_6.item(1, 2).text())
+            reportdata['SoftwareVersions'][0]['CsSchedule'][0]['1RepAgo'] = str(self.page6.PlantPLCTable_6.item(1, 1).text())
+            reportdata['SoftwareVersions'][0]['CsSchedule'][0]['2RepAgo'] = str(self.page6.PlantPLCTable_6.item(1, 2).text())
             reportdata['SoftwareVersions'][0]['CsSchedule'][0]['Comment'] = str(self.page6.PlantPLCTable_6.item(1, 3).text())
         else:
             print("passing by")
@@ -311,12 +316,12 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
         it = self.page6.PlantPLCTable_7.item(0, 0)
         if it and it.text():
             reportdata['DiskSpaceMem'][0]['DiskSpace'][0]['Current'] = str(self.page6.PlantPLCTable_7.item(0, 0).text())
-            # reportdata['DiskSpaceMem'][0]['DiskSpace'][0]['1RepAgo'] = str(self.page6.PlantPLCTable_7.item(0, 1).text())
-            # reportdata['DiskSpaceMem'][0]['DiskSpace'][0]['2RepAgo'] = str(self.page6.PlantPLCTable_7.item(0, 2).text())
+            reportdata['DiskSpaceMem'][0]['DiskSpace'][0]['1RepAgo'] = str(self.page6.PlantPLCTable_7.item(0, 1).text())
+            reportdata['DiskSpaceMem'][0]['DiskSpace'][0]['2RepAgo'] = str(self.page6.PlantPLCTable_7.item(0, 2).text())
             reportdata['DiskSpaceMem'][0]['DiskSpace'][0]['Comment'] = str(self.page6.PlantPLCTable_7.item(0, 3).text())
             reportdata['DiskSpaceMem'][0]['PercDiskSpace'][0]['Current'] = str(self.page6.PlantPLCTable_7.item(1, 0).text())
-            # reportdata['DiskSpaceMem'][0]['PercDiskSpace'][0]['1RepAgo'] = str(self.page6.PlantPLCTable_7.item(1, 1).text())
-            # reportdata['DiskSpaceMem'][0]['PercDiskSpace'][0]['2RepAgo'] = str(self.page6.PlantPLCTable_7.item(1, 2).text())
+            reportdata['DiskSpaceMem'][0]['PercDiskSpace'][0]['1RepAgo'] = str(self.page6.PlantPLCTable_7.item(1, 1).text())
+            reportdata['DiskSpaceMem'][0]['PercDiskSpace'][0]['2RepAgo'] = str(self.page6.PlantPLCTable_7.item(1, 2).text())
             reportdata['DiskSpaceMem'][0]['PercDiskSpace'][0]['Comment'] = str(self.page6.PlantPLCTable_7.item(1, 3).text())
         else:
             print("passing by")
@@ -479,9 +484,15 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
         self.page6.PlantPLCTable.setItem(1, 0, ForceAnalyse)
         self.page6.PlantPLCTable.setItem(2, 0, ForceStandardise)
         # Creating the comment item and populating with Blanks
-        self.page6.PlantPLCTable.setItem(0, 3, QTableWidgetItem(str("")))
-        self.page6.PlantPLCTable.setItem(1, 3, QTableWidgetItem(str("")))
-        self.page6.PlantPLCTable.setItem(2, 3, QTableWidgetItem(str("")))
+        self.page6.PlantPLCTable.setItem(0, 1, QTableWidgetItem(str(reportdata['PLCStatus'][0]['BeltRunning'][0]['1RepAgo'])))
+        self.page6.PlantPLCTable.setItem(1, 1, QTableWidgetItem(str(reportdata['PLCStatus'][0]['ForceAnalyse'][0]['1RepAgo'])))
+        self.page6.PlantPLCTable.setItem(2, 1, QTableWidgetItem(str(reportdata['PLCStatus'][0]['ForceStandardise'][0]['1RepAgo'])))
+        self.page6.PlantPLCTable.setItem(0, 2, QTableWidgetItem(str(reportdata['PLCStatus'][0]['BeltRunning'][0]['2RepAgo'])))
+        self.page6.PlantPLCTable.setItem(1, 2, QTableWidgetItem(str(reportdata['PLCStatus'][0]['ForceAnalyse'][0]['2RepAgo'])))
+        self.page6.PlantPLCTable.setItem(2, 2, QTableWidgetItem(str(reportdata['PLCStatus'][0]['ForceStandardise'][0]['2RepAgo'])))
+        self.page6.PlantPLCTable.setItem(0, 3, QTableWidgetItem(str(reportdata['PLCStatus'][0]['BeltRunning'][0]['Comment'])))
+        self.page6.PlantPLCTable.setItem(1, 3, QTableWidgetItem(str(reportdata['PLCStatus'][0]['ForceAnalyse'][0]['Comment'])))
+        self.page6.PlantPLCTable.setItem(2, 3, QTableWidgetItem(str(reportdata['PLCStatus'][0]['ForceStandardise'][0]['Comment'])))
         # Update Analyser Status Table
         AnalyserOK = QTableWidgetItem(ReadInData.AnalyserStatus.loc[ReadInData.AnalyserStatus["Result Name"] == "AnalyserOK","Value"].to_string(index=False))
         StandardsOK = QTableWidgetItem(ReadInData.AnalyserStatus.loc[ReadInData.AnalyserStatus["Result Name"] == "StandardsOK","Value"].to_string(index=False))
@@ -492,10 +503,18 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
         self.page6.PlantPLCTable_2.setItem(2, 0, IOControlOK)
         self.page6.PlantPLCTable_2.setItem(3, 0, SpectraStable)
         # Creating the comment item and populating with Blanks
-        self.page6.PlantPLCTable_2.setItem(0, 3, QTableWidgetItem(str("")))
-        self.page6.PlantPLCTable_2.setItem(1, 3, QTableWidgetItem(str("")))
-        self.page6.PlantPLCTable_2.setItem(2, 3, QTableWidgetItem(str("")))
-        self.page6.PlantPLCTable_2.setItem(3, 3, QTableWidgetItem(str("")))
+        self.page6.PlantPLCTable_2.setItem(0, 1, QTableWidgetItem(str(reportdata['AnalyserStatus'][0]['AnalyserOK'][0]['1RepAgo'])))
+        self.page6.PlantPLCTable_2.setItem(1, 1, QTableWidgetItem(str(reportdata['AnalyserStatus'][0]['StandardsOK'][0]['1RepAgo'])))
+        self.page6.PlantPLCTable_2.setItem(2, 1, QTableWidgetItem(str(reportdata['AnalyserStatus'][0]['IOControlOK'][0]['1RepAgo'])))
+        self.page6.PlantPLCTable_2.setItem(3, 1, QTableWidgetItem(str(reportdata['AnalyserStatus'][0]['SpectraStable'][0]['1RepAgo'])))
+        self.page6.PlantPLCTable_2.setItem(0, 2, QTableWidgetItem(str(reportdata['AnalyserStatus'][0]['AnalyserOK'][0]['2RepAgo'])))
+        self.page6.PlantPLCTable_2.setItem(1, 2, QTableWidgetItem(str(reportdata['AnalyserStatus'][0]['StandardsOK'][0]['2RepAgo'])))
+        self.page6.PlantPLCTable_2.setItem(2, 2, QTableWidgetItem(str(reportdata['AnalyserStatus'][0]['IOControlOK'][0]['2RepAgo'])))
+        self.page6.PlantPLCTable_2.setItem(3, 2, QTableWidgetItem(str(reportdata['AnalyserStatus'][0]['SpectraStable'][0]['2RepAgo'])))
+        self.page6.PlantPLCTable_2.setItem(0, 3, QTableWidgetItem(str(reportdata['AnalyserStatus'][0]['AnalyserOK'][0]['Comment'])))
+        self.page6.PlantPLCTable_2.setItem(1, 3, QTableWidgetItem(str(reportdata['AnalyserStatus'][0]['StandardsOK'][0]['Comment'])))
+        self.page6.PlantPLCTable_2.setItem(2, 3, QTableWidgetItem(str(reportdata['AnalyserStatus'][0]['IOControlOK'][0]['Comment'])))
+        self.page6.PlantPLCTable_2.setItem(3, 3, QTableWidgetItem(str(reportdata['AnalyserStatus'][0]['SpectraStable'][0]['Comment'])))
 
         # Update PLC Analyser Results
         SystemOK = QTableWidgetItem(ReadInData.AnalyserIO.loc[ReadInData.AnalyserIO["Parameter Name"] == "SystemRunning","Value"].to_string(index=False))
@@ -510,10 +529,18 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
         self.page6.PlantPLCTable_3.setItem(2, 0, SourceOff)
         self.page6.PlantPLCTable_3.setItem(3, 0, SourceOn)
         # Creating the comment item and populating with Blanks
-        self.page6.PlantPLCTable_3.setItem(0, 3, QTableWidgetItem(str("")))
-        self.page6.PlantPLCTable_3.setItem(1, 3, QTableWidgetItem(str("")))
-        self.page6.PlantPLCTable_3.setItem(2, 3, QTableWidgetItem(str("")))
-        self.page6.PlantPLCTable_3.setItem(3, 3, QTableWidgetItem(str("")))
+        self.page6.PlantPLCTable_3.setItem(0, 1, QTableWidgetItem(str(reportdata['PLCResults'][0]['SystemOK'][0]['1RepAgo'])))
+        self.page6.PlantPLCTable_3.setItem(1, 1, QTableWidgetItem(str(reportdata['PLCResults'][0]['SourceControlFault'][0]['1RepAgo'])))
+        self.page6.PlantPLCTable_3.setItem(2, 1, QTableWidgetItem(str(reportdata['PLCResults'][0]['SourceOff'][0]['1RepAgo'])))
+        self.page6.PlantPLCTable_3.setItem(3, 1, QTableWidgetItem(str(reportdata['PLCResults'][0]['SourceOn'][0]['1RepAgo'])))
+        self.page6.PlantPLCTable_3.setItem(0, 2, QTableWidgetItem(str(reportdata['PLCResults'][0]['SystemOK'][0]['2RepAgo'])))
+        self.page6.PlantPLCTable_3.setItem(1, 2, QTableWidgetItem(str(reportdata['PLCResults'][0]['SourceControlFault'][0]['2RepAgo'])))
+        self.page6.PlantPLCTable_3.setItem(2, 2, QTableWidgetItem(str(reportdata['PLCResults'][0]['SourceOff'][0]['2RepAgo'])))
+        self.page6.PlantPLCTable_3.setItem(3, 2, QTableWidgetItem(str(reportdata['PLCResults'][0]['SourceOn'][0]['2RepAgo'])))
+        self.page6.PlantPLCTable_3.setItem(0, 3, QTableWidgetItem(str(reportdata['PLCResults'][0]['SystemOK'][0]['Comment'])))
+        self.page6.PlantPLCTable_3.setItem(1, 3, QTableWidgetItem(str(reportdata['PLCResults'][0]['SourceControlFault'][0]['Comment'])))
+        self.page6.PlantPLCTable_3.setItem(2, 3, QTableWidgetItem(str(reportdata['PLCResults'][0]['SourceOff'][0]['Comment'])))
+        self.page6.PlantPLCTable_3.setItem(3, 3, QTableWidgetItem(str(reportdata['PLCResults'][0]['SourceOn'][0]['Comment'])))
 
         # Update Analyser Config Table
         AnalysisPeriod = QTableWidgetItem(ReadInData.AnalyserStatus.loc[ReadInData.AnalyserStatus["Result Name"] == "AnalysisPeriod","Value"].to_string(index=False))
@@ -523,9 +550,15 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
         self.page6.PlantPLCTable_4.setItem(1, 0, AnalMinLoadLimit)
         self.page6.PlantPLCTable_4.setItem(2, 0, StandardisePeriod)
         # Creating the comment item and populating with Blanks
-        self.page6.PlantPLCTable_4.setItem(0, 3, QTableWidgetItem(str("")))
-        self.page6.PlantPLCTable_4.setItem(1, 3, QTableWidgetItem(str("")))
-        self.page6.PlantPLCTable_4.setItem(2, 3, QTableWidgetItem(str("")))
+        self.page6.PlantPLCTable_4.setItem(0, 1, QTableWidgetItem(str(reportdata['AnalyserConfiguration'][0]['AnalysisPeriod'][0]['1RepAgo'])))
+        self.page6.PlantPLCTable_4.setItem(1, 1, QTableWidgetItem(str(reportdata['AnalyserConfiguration'][0]['AnalMinLoadLimit'][0]['1RepAgo'])))
+        self.page6.PlantPLCTable_4.setItem(2, 1, QTableWidgetItem(str(reportdata['AnalyserConfiguration'][0]['StandardisePeriod'][0]['1RepAgo'])))
+        self.page6.PlantPLCTable_4.setItem(0, 2, QTableWidgetItem(str(reportdata['AnalyserConfiguration'][0]['AnalysisPeriod'][0]['2RepAgo'])))
+        self.page6.PlantPLCTable_4.setItem(1, 2, QTableWidgetItem(str(reportdata['AnalyserConfiguration'][0]['AnalMinLoadLimit'][0]['2RepAgo'])))
+        self.page6.PlantPLCTable_4.setItem(2, 2, QTableWidgetItem(str(reportdata['AnalyserConfiguration'][0]['StandardisePeriod'][0]['2RepAgo'])))
+        self.page6.PlantPLCTable_4.setItem(0, 3, QTableWidgetItem(str(reportdata['AnalyserConfiguration'][0]['AnalysisPeriod'][0]['Comment'])))
+        self.page6.PlantPLCTable_4.setItem(1, 3, QTableWidgetItem(str(reportdata['AnalyserConfiguration'][0]['AnalMinLoadLimit'][0]['Comment'])))
+        self.page6.PlantPLCTable_4.setItem(2, 3, QTableWidgetItem(str(reportdata['AnalyserConfiguration'][0]['StandardisePeriod'][0]['Comment'])))
 
         # Update Standardisation Table
         FirstStandard = QTableWidgetItem(ReadInData.AnalyserStatus.loc[ReadInData.AnalyserStatus["Result Name"] == "FirstStandardTime","Value"].to_string(index=False))
@@ -537,10 +570,19 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
         self.page6.PlantPLCTable_5.setItem(2, 0, NumStandard)
         self.page6.PlantPLCTable_5.setItem(3, 0, NumStandardMonth)
         # Creating the comment item and populating with Blanks
-        self.page6.PlantPLCTable_5.setItem(0, 3, QTableWidgetItem(str("")))
-        self.page6.PlantPLCTable_5.setItem(1, 3, QTableWidgetItem(str("")))
-        self.page6.PlantPLCTable_5.setItem(2, 3, QTableWidgetItem(str("")))
-        self.page6.PlantPLCTable_5.setItem(3, 3, QTableWidgetItem(str("")))
+        self.page6.PlantPLCTable_5.setItem(0, 1, QTableWidgetItem(str(reportdata['Standardisation'][0]['FirstStandardTime'][0]['1RepAgo'])))
+        self.page6.PlantPLCTable_5.setItem(1, 1, QTableWidgetItem(str(reportdata['Standardisation'][0]['MostRecentStandard'][0]['1RepAgo'])))
+        self.page6.PlantPLCTable_5.setItem(2, 1, QTableWidgetItem(str(reportdata['Standardisation'][0]['NumStdPeriodsSinceClear'][0]['1RepAgo'])))
+        self.page6.PlantPLCTable_5.setItem(3, 1, QTableWidgetItem(str(reportdata['Standardisation'][0]['NumStdPeriodsThisMnth'][0]['1RepAgo'])))
+        self.page6.PlantPLCTable_5.setItem(0, 2, QTableWidgetItem(str(reportdata['Standardisation'][0]['FirstStandardTime'][0]['2RepAgo'])))
+        self.page6.PlantPLCTable_5.setItem(1, 2, QTableWidgetItem(str(reportdata['Standardisation'][0]['MostRecentStandard'][0]['2RepAgo'])))
+        self.page6.PlantPLCTable_5.setItem(2, 2, QTableWidgetItem(str(reportdata['Standardisation'][0]['NumStdPeriodsSinceClear'][0]['2RepAgo'])))
+        self.page6.PlantPLCTable_5.setItem(3, 2, QTableWidgetItem(str(reportdata['Standardisation'][0]['NumStdPeriodsThisMnth'][0]['2RepAgo'])))
+        self.page6.PlantPLCTable_5.setItem(0, 3, QTableWidgetItem(str(reportdata['Standardisation'][0]['FirstStandardTime'][0]['Comment'])))
+        self.page6.PlantPLCTable_5.setItem(1, 3, QTableWidgetItem(str(reportdata['Standardisation'][0]['MostRecentStandard'][0]['Comment'])))
+        self.page6.PlantPLCTable_5.setItem(2, 3, QTableWidgetItem(str(reportdata['Standardisation'][0]['NumStdPeriodsSinceClear'][0]['Comment'])))
+        self.page6.PlantPLCTable_5.setItem(3, 3, QTableWidgetItem(str(reportdata['Standardisation'][0]['NumStdPeriodsThisMnth'][0]['Comment'])))
+
 
         # Update Software Versions Table
         Product = QTableWidgetItem(ReadInData.VersionNumbers.loc[ReadInData.VersionNumbers["Module"] == "Product","Version"].to_string(index=False))
@@ -548,8 +590,12 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
         self.page6.PlantPLCTable_6.setItem(0, 0, Product)
         self.page6.PlantPLCTable_6.setItem(1, 0, CsSchedule)
         # Creating the comment item and populating with Blanks
-        self.page6.PlantPLCTable_6.setItem(0, 3, QTableWidgetItem(str("")))
-        self.page6.PlantPLCTable_6.setItem(1, 3, QTableWidgetItem(str("")))
+        self.page6.PlantPLCTable_6.setItem(0, 1, QTableWidgetItem(str(reportdata['SoftwareVersions'][0]['Product'][0]['1RepAgo'])))
+        self.page6.PlantPLCTable_6.setItem(1, 1, QTableWidgetItem(str(reportdata['SoftwareVersions'][0]['CsSchedule'][0]['1RepAgo'])))
+        self.page6.PlantPLCTable_6.setItem(0, 2, QTableWidgetItem(str(reportdata['SoftwareVersions'][0]['Product'][0]['2RepAgo'])))
+        self.page6.PlantPLCTable_6.setItem(1, 2, QTableWidgetItem(str(reportdata['SoftwareVersions'][0]['CsSchedule'][0]['2RepAgo'])))
+        self.page6.PlantPLCTable_6.setItem(0, 3, QTableWidgetItem(str(reportdata['SoftwareVersions'][0]['Product'][0]['Comment'])))
+        self.page6.PlantPLCTable_6.setItem(1, 3, QTableWidgetItem(str(reportdata['SoftwareVersions'][0]['CsSchedule'][0]['Comment'])))
 
 
         # Update Disk Space Table
@@ -558,8 +604,240 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
         self.page6.PlantPLCTable_7.setItem(0, 0, DiskSpace)
         self.page6.PlantPLCTable_7.setItem(1, 0, PercDiskSpace)
         # Creating the comment item and populating with Blanks
-        self.page6.PlantPLCTable_7.setItem(0, 3, QTableWidgetItem(str("")))
-        self.page6.PlantPLCTable_7.setItem(1, 3, QTableWidgetItem(str("")))
+        self.page6.PlantPLCTable_7.setItem(0, 1, QTableWidgetItem(str(reportdata['DiskSpaceMem'][0]['DiskSpace'][0]['1RepAgo'])))
+        self.page6.PlantPLCTable_7.setItem(1, 1, QTableWidgetItem(str(reportdata['DiskSpaceMem'][0]['PercDiskSpace'][0]['1RepAgo'])))
+        self.page6.PlantPLCTable_7.setItem(0, 2, QTableWidgetItem(str(reportdata['DiskSpaceMem'][0]['DiskSpace'][0]['2RepAgo'])))
+        self.page6.PlantPLCTable_7.setItem(1, 2, QTableWidgetItem(str(reportdata['DiskSpaceMem'][0]['PercDiskSpace'][0]['2RepAgo'])))
+        self.page6.PlantPLCTable_7.setItem(0, 3, QTableWidgetItem(str(reportdata['DiskSpaceMem'][0]['DiskSpace'][0]['Comment'])))
+        self.page6.PlantPLCTable_7.setItem(1, 3, QTableWidgetItem(str(reportdata['DiskSpaceMem'][0]['PercDiskSpace'][0]['Comment'])))
+
+    def UpdatePg6_1RepAgo(self):
+        # **********************************************************************************************************************************************
+        # This section defines the filename where we need to pull the relevant PSAreport.xls file from in order to update the 1 Report Ago data
+        # **********************************************************************************************************************************************
+        anal = self.AnalyserListComboBox.currentText()
+        # Switches default folder based on which analyser is selected.
+        if anal[0:3] == "C15":
+            fname = QFileDialog.getExistingDirectory(self,"Open PSA File in PSA Folder","J:\\Client Analysers\\NG-1500")
+        elif anal[0:3] == "C21":
+            fname = QFileDialog.getExistingDirectory(self, "Open PSA File in PSA Folder", "J:\\Client Analysers\\CS-2100")
+        elif anal[0:3] == "CMM":
+            fname = QFileDialog.getExistingDirectory(self, "Open PSA File in PSA Folder", "J:\\Client Analysers\\CMM-100")
+        elif anal[0:3] == "OBA":
+            fname = QFileDialog.getExistingDirectory(self, "Open PSA File in PSA Folder", "J:\\Client Analysers\\On Belt Analyser")
+        elif anal[0:3] == "TBM":
+            fname = QFileDialog.getExistingDirectory(self, "Open PSA File in PSA Folder", "J:\\Client Analysers\\TBM-210")
+        else:
+            fname = QFileDialog.getExistingDirectory(self, "Open PSA File in PSA Folder", "J:\\Client Analysers\\TBM-230")
+
+        # ensures the file separators are correct for operating system
+        if fname:
+            fname = QDir.toNativeSeparators(fname)
+            fname = glob.glob(fname + "\\*Report.xls")
+            fname = fname[0]
+
+        # if user presses cancel, return control to calling function
+        if not fname:
+            return
+
+        # **************************************************************************************************************************************************
+        # This section imports the relevant data into the required data frames
+        # **************************************************************************************************************************************************
+        print ("Filename is: " + str(fname))
+        # Import the Analyser Status sheet from the PSAReport.xls file in the relevant folder defined by fname
+        StatusColumns1RA = ["Result Name", "Value"]
+        AnalyserStatus1RA = pd.read_excel(open(fname, 'rb'), sheet_name="Analyser Status")
+        AnalyserStatusdf1RA = pd.DataFrame(AnalyserStatus1RA, columns=StatusColumns1RA)
+
+        # Import the Analyser IO sheet from the PSAReport.xls file in the relevant folder defined by fname
+        StatusColumns1RA = ["Parameter Name", "Value"]
+        AnalyserIO1RA = pd.read_excel(open(fname, 'rb'), sheet_name="Analyser I_O")
+        AnalyserIOdf1RA = pd.DataFrame(AnalyserIO1RA, columns=StatusColumns1RA)
+
+        # Import the Version Numbers sheet from the PSAReport.xls file in the relevant folder defined by fname
+        StatusColumns1RA = ["Module", "Version"]
+        VersionNumbers1RA = pd.read_excel(open(fname, 'rb'), sheet_name="Version Numbers")
+        VersionNumbersdf1RA = pd.DataFrame(VersionNumbers1RA, columns=StatusColumns1RA)
+
+        # **************************************************************************************************************************************************
+        # This section updates the 1 Report ago section of the Page 6 status tables using the dataframes defined earlier
+        # **************************************************************************************************************************************************
+
+        # Update PLC Status Table
+        BeltRunning = QTableWidgetItem(AnalyserIOdf1RA.loc[AnalyserIOdf1RA["Parameter Name"] == "BeltRunning", "Value"].to_string(index=False))
+        ForceAnalyse = QTableWidgetItem(AnalyserIOdf1RA.loc[AnalyserIOdf1RA["Parameter Name"] == "ForceAnalyse", "Value"].to_string(index=False))
+        ForceStandardise = QTableWidgetItem(AnalyserIOdf1RA.loc[AnalyserIOdf1RA["Parameter Name"] == "ForceStandardise", "Value"].to_string(index=False))
+
+        self.page6.PlantPLCTable.setItem(0, 1, BeltRunning)
+        self.page6.PlantPLCTable.setItem(1, 1, ForceAnalyse)
+        self.page6.PlantPLCTable.setItem(2, 1, ForceStandardise)
+
+        # Update Analyser Status Table
+        AnalyserOK = QTableWidgetItem(AnalyserStatusdf1RA.loc[AnalyserStatusdf1RA["Result Name"] == "AnalyserOK", "Value"].to_string(index=False))
+        StandardsOK = QTableWidgetItem(AnalyserStatusdf1RA.loc[AnalyserStatusdf1RA["Result Name"] == "StandardsOK", "Value"].to_string(index=False))
+        IOControlOK = QTableWidgetItem(AnalyserStatusdf1RA.loc[AnalyserStatusdf1RA["Result Name"] == "IOControlOK", "Value"].to_string(index=False))
+        SpectraStable = QTableWidgetItem(AnalyserStatusdf1RA.loc[AnalyserStatusdf1RA["Result Name"] == "SpectraStable", "Value"].to_string(index=False))
+        self.page6.PlantPLCTable_2.setItem(0, 1, AnalyserOK)
+        self.page6.PlantPLCTable_2.setItem(1, 1, StandardsOK)
+        self.page6.PlantPLCTable_2.setItem(2, 1, IOControlOK)
+        self.page6.PlantPLCTable_2.setItem(3, 1, SpectraStable)
+
+        # Update PLC Analyser Results
+        SystemOK = QTableWidgetItem(AnalyserIOdf1RA.loc[AnalyserIOdf1RA["Parameter Name"] == "SystemRunning", "Value"].to_string(index=False))
+        if AnalyserIOdf1RA.loc[AnalyserIOdf1RA["Parameter Name"] == "SourceControlFault", "Value"].to_string(index=False) == "   OK\nFALSE":
+            SourceControlFault = QTableWidgetItem("FALSE")
+        else:
+            SourceControlFault = QTableWidgetItem("TRUE")
+        SourceOff = QTableWidgetItem(AnalyserIOdf1RA.loc[AnalyserIOdf1RA["Parameter Name"] == "SourceOffProx", "Value"].to_string(index=False))
+        SourceOn = QTableWidgetItem(AnalyserIOdf1RA.loc[AnalyserIOdf1RA["Parameter Name"] == "SourceOnProx", "Value"].to_string(index=False))
+        self.page6.PlantPLCTable_3.setItem(0, 1, SystemOK)
+        self.page6.PlantPLCTable_3.setItem(1, 1, SourceControlFault)
+        self.page6.PlantPLCTable_3.setItem(2, 1, SourceOff)
+        self.page6.PlantPLCTable_3.setItem(3, 1, SourceOn)
+
+        # Update Analyser Config Table
+        AnalysisPeriod = QTableWidgetItem(AnalyserStatusdf1RA.loc[AnalyserStatusdf1RA["Result Name"] == "AnalysisPeriod", "Value"].to_string(index=False))
+        AnalMinLoadLimit = QTableWidgetItem(AnalyserStatusdf1RA.loc[AnalyserStatusdf1RA["Result Name"] == "AnalMinLoadLimit", "Value"].to_string(index=False))
+        StandardisePeriod = QTableWidgetItem(AnalyserStatusdf1RA.loc[AnalyserStatusdf1RA["Result Name"] == "StandardisePeriod", "Value"].to_string(index=False))
+        self.page6.PlantPLCTable_4.setItem(0, 1, AnalysisPeriod)
+        self.page6.PlantPLCTable_4.setItem(1, 1, AnalMinLoadLimit)
+        self.page6.PlantPLCTable_4.setItem(2, 1, StandardisePeriod)
+
+        # Update Standardisation Table
+        FirstStandard = QTableWidgetItem(AnalyserStatusdf1RA.loc[AnalyserStatusdf1RA["Result Name"] == "FirstStandardTime", "Value"].to_string(index=False))
+        LastStandard = QTableWidgetItem(AnalyserStatusdf1RA.loc[AnalyserStatusdf1RA["Result Name"] == "LastStandardiseTime", "Value"].to_string(index=False))
+        NumStandard = QTableWidgetItem(AnalyserStatusdf1RA.loc[AnalyserStatusdf1RA["Result Name"] == "PeriodCount", "Value"].to_string(index=False))
+        NumStandardMonth = QTableWidgetItem("PlaceHolder")
+        self.page6.PlantPLCTable_5.setItem(0, 1, FirstStandard)
+        self.page6.PlantPLCTable_5.setItem(1, 1, LastStandard)
+        self.page6.PlantPLCTable_5.setItem(2, 1, NumStandard)
+        self.page6.PlantPLCTable_5.setItem(3, 1, NumStandardMonth)
+
+        # Update Software Versions Table
+        Product = QTableWidgetItem(VersionNumbersdf1RA.loc[VersionNumbersdf1RA["Module"] == "Product", "Version"].to_string(index=False))
+        CsSchedule = QTableWidgetItem(VersionNumbersdf1RA.loc[VersionNumbersdf1RA["Module"] == "CsSchedule", "Version"].to_string(index=False))
+        self.page6.PlantPLCTable_6.setItem(0, 1, Product)
+        self.page6.PlantPLCTable_6.setItem(1, 1, CsSchedule)
+
+        # Update Disk Space Table
+        DiskSpace = QTableWidgetItem(VersionNumbersdf1RA.loc[VersionNumbersdf1RA["Module"] == "DiskSpace", "Version"].to_string(index=False))
+        PercDiskSpace = QTableWidgetItem(VersionNumbersdf1RA.loc[VersionNumbersdf1RA["Module"] == "%DiskSpace", "Version"].to_string(index=False))
+        self.page6.PlantPLCTable_7.setItem(0, 1, DiskSpace)
+        self.page6.PlantPLCTable_7.setItem(1, 1, PercDiskSpace)
+
+    def UpdatePg6_2RepAgo(self):
+        # **********************************************************************************************************************************************
+        # This section defines the filename where we need to pull the relevant PSAreport.xls file from in order to update the 1 Report Ago data
+        # **********************************************************************************************************************************************
+        anal = self.AnalyserListComboBox.currentText()
+        # Switches default folder based on which analyser is selected.
+        if anal[0:3] == "C15":
+            fname = QFileDialog.getExistingDirectory(self, "Open PSA File in PSA Folder", "J:\\Client Analysers\\NG-1500")
+        elif anal[0:3] == "C21":
+            fname = QFileDialog.getExistingDirectory(self, "Open PSA File in PSA Folder", "J:\\Client Analysers\\CS-2100")
+        elif anal[0:3] == "CMM":
+            fname = QFileDialog.getExistingDirectory(self, "Open PSA File in PSA Folder", "J:\\Client Analysers\\CMM-100")
+        elif anal[0:3] == "OBA":
+            fname = QFileDialog.getExistingDirectory(self, "Open PSA File in PSA Folder", "J:\\Client Analysers\\On Belt Analyser")
+        elif anal[0:3] == "TBM":
+            fname = QFileDialog.getExistingDirectory(self, "Open PSA File in PSA Folder", "J:\\Client Analysers\\TBM-210")
+        else:
+            fname = QFileDialog.getExistingDirectory(self, "Open PSA File in PSA Folder", "J:\\Client Analysers\\TBM-230")
+
+        # ensures the file separators are correct for operating system
+        if fname:
+            fname = QDir.toNativeSeparators(fname)
+            fname = glob.glob(fname + "\\*Report.xls")
+            fname = fname[0]
+
+        # if user presses cancel, return control to calling function
+        if not fname:
+            return
+
+        # **************************************************************************************************************************************************
+        # This section imports the relevant data into the required data frames
+        # **************************************************************************************************************************************************
+        print("Filename is: " + str(fname))
+        # Import the Analyser Status sheet from the PSAReport.xls file in the relevant folder defined by fname
+        StatusColumns2RA = ["Result Name", "Value"]
+        AnalyserStatus2RA = pd.read_excel(open(fname, 'rb'), sheet_name="Analyser Status")
+        AnalyserStatusdf2RA = pd.DataFrame(AnalyserStatus2RA, columns=StatusColumns2RA)
+
+        # Import the Analyser IO sheet from the PSAReport.xls file in the relevant folder defined by fname
+        StatusColumns2RA = ["Parameter Name", "Value"]
+        AnalyserIO2RA = pd.read_excel(open(fname, 'rb'), sheet_name="Analyser I_O")
+        AnalyserIOdf2RA = pd.DataFrame(AnalyserIO2RA, columns=StatusColumns2RA)
+
+        # Import the Version Numbers sheet from the PSAReport.xls file in the relevant folder defined by fname
+        StatusColumns2RA = ["Module", "Version"]
+        VersionNumbers2RA = pd.read_excel(open(fname, 'rb'), sheet_name="Version Numbers")
+        VersionNumbersdf2RA = pd.DataFrame(VersionNumbers2RA, columns=StatusColumns2RA)
+
+        # **************************************************************************************************************************************************
+        # This section updates the 1 Report ago section of the Page 6 status tables using the dataframes defined earlier
+        # **************************************************************************************************************************************************
+
+        # Update PLC Status Table
+        BeltRunning = QTableWidgetItem(AnalyserIOdf2RA.loc[AnalyserIOdf2RA["Parameter Name"] == "BeltRunning", "Value"].to_string(index=False))
+        ForceAnalyse = QTableWidgetItem(AnalyserIOdf2RA.loc[AnalyserIOdf2RA["Parameter Name"] == "ForceAnalyse", "Value"].to_string(index=False))
+        ForceStandardise = QTableWidgetItem(AnalyserIOdf2RA.loc[AnalyserIOdf2RA["Parameter Name"] == "ForceStandardise", "Value"].to_string(index=False))
+
+        self.page6.PlantPLCTable.setItem(0, 2, BeltRunning)
+        self.page6.PlantPLCTable.setItem(1, 2, ForceAnalyse)
+        self.page6.PlantPLCTable.setItem(2, 2, ForceStandardise)
+
+        # Update Analyser Status Table
+        AnalyserOK = QTableWidgetItem(AnalyserStatusdf2RA.loc[AnalyserStatusdf2RA["Result Name"] == "AnalyserOK", "Value"].to_string(index=False))
+        StandardsOK = QTableWidgetItem(AnalyserStatusdf2RA.loc[AnalyserStatusdf2RA["Result Name"] == "StandardsOK", "Value"].to_string(index=False))
+        IOControlOK = QTableWidgetItem(AnalyserStatusdf2RA.loc[AnalyserStatusdf2RA["Result Name"] == "IOControlOK", "Value"].to_string(index=False))
+        SpectraStable = QTableWidgetItem(AnalyserStatusdf2RA.loc[AnalyserStatusdf2RA["Result Name"] == "SpectraStable", "Value"].to_string(index=False))
+        self.page6.PlantPLCTable_2.setItem(0, 2, AnalyserOK)
+        self.page6.PlantPLCTable_2.setItem(1, 2, StandardsOK)
+        self.page6.PlantPLCTable_2.setItem(2, 2, IOControlOK)
+        self.page6.PlantPLCTable_2.setItem(3, 2, SpectraStable)
+
+        # Update PLC Analyser Results
+        SystemOK = QTableWidgetItem(AnalyserIOdf2RA.loc[AnalyserIOdf2RA["Parameter Name"] == "SystemRunning", "Value"].to_string(index=False))
+        if AnalyserIOdf2RA.loc[AnalyserIOdf2RA["Parameter Name"] == "SourceControlFault", "Value"].to_string(index=False) == "   OK\nFALSE":
+            SourceControlFault = QTableWidgetItem("FALSE")
+        else:
+            SourceControlFault = QTableWidgetItem("TRUE")
+        SourceOff = QTableWidgetItem(AnalyserIOdf2RA.loc[AnalyserIOdf2RA["Parameter Name"] == "SourceOffProx", "Value"].to_string(index=False))
+        SourceOn = QTableWidgetItem(AnalyserIOdf2RA.loc[AnalyserIOdf2RA["Parameter Name"] == "SourceOnProx", "Value"].to_string(index=False))
+        self.page6.PlantPLCTable_3.setItem(0, 2, SystemOK)
+        self.page6.PlantPLCTable_3.setItem(1, 2, SourceControlFault)
+        self.page6.PlantPLCTable_3.setItem(2, 2, SourceOff)
+        self.page6.PlantPLCTable_3.setItem(3, 2, SourceOn)
+
+        # Update Analyser Config Table
+        AnalysisPeriod = QTableWidgetItem(AnalyserStatusdf2RA.loc[AnalyserStatusdf2RA["Result Name"] == "AnalysisPeriod", "Value"].to_string(index=False))
+        AnalMinLoadLimit = QTableWidgetItem(AnalyserStatusdf2RA.loc[AnalyserStatusdf2RA["Result Name"] == "AnalMinLoadLimit", "Value"].to_string(index=False))
+        StandardisePeriod = QTableWidgetItem(AnalyserStatusdf2RA.loc[AnalyserStatusdf2RA["Result Name"] == "StandardisePeriod", "Value"].to_string(index=False))
+        self.page6.PlantPLCTable_4.setItem(0, 2, AnalysisPeriod)
+        self.page6.PlantPLCTable_4.setItem(1, 2, AnalMinLoadLimit)
+        self.page6.PlantPLCTable_4.setItem(2, 2, StandardisePeriod)
+
+        # Update Standardisation Table
+        FirstStandard = QTableWidgetItem(AnalyserStatusdf2RA.loc[AnalyserStatusdf2RA["Result Name"] == "FirstStandardTime", "Value"].to_string(index=False))
+        LastStandard = QTableWidgetItem(AnalyserStatusdf2RA.loc[AnalyserStatusdf2RA["Result Name"] == "LastStandardiseTime", "Value"].to_string(index=False))
+        NumStandard = QTableWidgetItem(AnalyserStatusdf2RA.loc[AnalyserStatusdf2RA["Result Name"] == "PeriodCount", "Value"].to_string(index=False))
+        NumStandardMonth = QTableWidgetItem("PlaceHolder")
+        self.page6.PlantPLCTable_5.setItem(0, 2, FirstStandard)
+        self.page6.PlantPLCTable_5.setItem(1, 2, LastStandard)
+        self.page6.PlantPLCTable_5.setItem(2, 2, NumStandard)
+        self.page6.PlantPLCTable_5.setItem(3, 2, NumStandardMonth)
+
+        # Update Software Versions Table
+        Product = QTableWidgetItem(VersionNumbersdf2RA.loc[VersionNumbersdf2RA["Module"] == "Product", "Version"].to_string(index=False))
+        CsSchedule = QTableWidgetItem(VersionNumbersdf2RA.loc[VersionNumbersdf2RA["Module"] == "CsSchedule", "Version"].to_string(index=False))
+        self.page6.PlantPLCTable_6.setItem(0, 2, Product)
+        self.page6.PlantPLCTable_6.setItem(1, 2, CsSchedule)
+
+        # Update Disk Space Table
+        DiskSpace = QTableWidgetItem(VersionNumbersdf2RA.loc[VersionNumbersdf2RA["Module"] == "DiskSpace", "Version"].to_string(index=False))
+        PercDiskSpace = QTableWidgetItem(VersionNumbersdf2RA.loc[VersionNumbersdf2RA["Module"] == "%DiskSpace", "Version"].to_string(index=False))
+        self.page6.PlantPLCTable_7.setItem(0, 2, DiskSpace)
+        self.page6.PlantPLCTable_7.setItem(1, 2, PercDiskSpace)
 
     # used in Update report
     def UpdateFigs(self):
