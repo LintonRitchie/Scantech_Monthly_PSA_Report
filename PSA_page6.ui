@@ -1020,6 +1020,56 @@
      </property>
     </widget>
    </widget>
+   <widget class="QGroupBox" name="HistoricalDataGroup">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>150</y>
+      <width>260</width>
+      <height>85</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Calibri</family>
+      <pointsize>10</pointsize>
+      <weight>75</weight>
+      <bold>true</bold>
+     </font>
+    </property>
+    <property name="title">
+     <string>Update Historical data</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+    <widget class="QPushButton" name="RepAgo1">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>17</y>
+       <width>220</width>
+       <height>25</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Import From 1 Report Ago</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="RepAgo2">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>50</y>
+       <width>220</width>
+       <height>25</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Import From 2 Reports Ago</string>
+     </property>
+    </widget>
+   </widget>
    <zorder>label</zorder>
    <zorder>psa_report_title</zorder>
    <zorder>psa_report_title_2</zorder>
@@ -1038,6 +1088,7 @@
    <zorder>PlantPLCTable_7</zorder>
    <zorder>label_9</zorder>
    <zorder>groupBox</zorder>
+   <zorder>HistoricalDataGroup</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
