@@ -1,0 +1,21 @@
+<RCC>
+  <qresource>
+    <file>find_replace.ui</file>
+    <file>ResourcesEng\edit-copy.png</file>
+    <file>ResourcesEng\edit-cut.png</file>
+    <file>ResourcesEng\file-new.png</file>
+    <file>ResourcesEng\file-open.png</file>
+    <file>ResourcesEng\edit-paste.png</file>
+    <file>ResourcesEng\file-save.png</file>
+    <file>ResourcesEng\help-content.png</file>
+    <file>ResourcesEng\file-exit.png</file>
+    <file>ResourcesEng\ScantechSqrLogo.png</file>
+    <file>ResourcesEng\ScantechReportHeader.png</file>
+	<file>ResourcesEng\ScantechFullLogo.png</file>
+	<file>ResourcesEng\Detector_Stability_output.png</file>
+	<file>ResourcesEng\Temperatures_output.png</file>
+	<file>ResourcesEng\Daily_Tonnes_output.png</file>
+	<file>ResourcesEng\Results1_output.png</file>
+	<file>ResourcesEng\Results2_output.png</file>
+  </qresource>
+</RCC>
