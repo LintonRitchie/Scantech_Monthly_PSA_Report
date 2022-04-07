@@ -51,17 +51,6 @@ from PyQt5.QtCore import QDir
 # # Read in master file data from PSA Master file. This is run at the start of the program to ensure data is loaded prior to the UI starting up.
 # ReadInData()
 
-AnalyserToProcess = 0
-open_window = 0
-
-
-
-# open the data interchange file as a global variable which can be accessed throughout the program.
-# This will be accessed multiple times by various functions within the functions.
-
-
-
-
 class HomeWindow(QMainWindow,Ui_PSAHome):
     reportdata = []                     # Class Variable for report data to be used throughout the report
     fname = ""                          # Root directory indicator class variable
@@ -77,10 +66,6 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
         self.page5 = PSA_pg5()
         self.page6 = PSA_pg6()
         self.connectSignalsSlots()
-
-    # Setup Signals and Slots for Pushbuttons
-
-
 
     def importReport(self):
         fname = QFileDialog.getExistingDirectory(self, "Open PSA File in PSA Folder")
@@ -100,7 +85,7 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
         HomeWindow.fname2 = fname2
         self.DecodeFigs()
 
-
+    # Setup Signals and Slots for Pushbuttons
     def connectSignalsSlots(self):
         self.PreviewReportPB.released.connect(self.show_page_1)
         self.PreviewReportPB.clicked.connect(self.updateReport)
@@ -115,6 +100,7 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
         self.page1.NextPage.released.connect(self.UpdateJSON)
         self.page2.NextPage.released.connect(self.UpdateJSON)
         self.page6.NextPage.released.connect(self.UpdateJSON)
+
 
     # def updatereadindata(self):
     #     ReadInData.AnalyserStatus = Read_AnalyserStatus(ReadInData.defaultpath)     # Read in PSA Report file data from PSA Report file.
@@ -167,6 +153,12 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
         HomeWindow.reportdata['Summary'][0]['Email'] = self.page1.email_data.text()
         HomeWindow.reportdata['Summary'][0]['NextPSA'] = str(self.page1.NextPSAMnth.currentText() + " " + self.page1.NextPSAYear.currentText())
         HomeWindow.reportdata['Summary'][0]['TopUpDue'] = str(self.page1.TopUpMonth.currentText() + " " + self.page1.TopUpYear.currentText())
+        HomeWindow.reportdata['Summary'][0]['AnalyserOpCorrect'] = self.page1.AnalOpCor.currentText()
+        HomeWindow.reportdata['Summary'][0]['AllDetStable'] = self.page1.EnableDetStable.currentText()
+        HomeWindow.reportdata['Summary'][0]['DetTempStable'] = self.page1.DetEncTempStable.currentText()
+        HomeWindow.reportdata['Summary'][0]['ElecTempStable'] = self.page1.ElecEncTempStable.currentText()
+        HomeWindow.reportdata['Summary'][0]['STDUpToDate'] = self.page1.disp_stduptodate.text()
+        HomeWindow.reportdata['Summary'][0]['EnoughDiskSpace'] = self.page1.disp_endiskspc.text()
         print("Entering Action taken section")
 
         # this loop populates the JSON by looking to see if any data exists in the first cell of the row. If not then it skips. If is does, the data is pulled into the JSON
@@ -485,7 +477,6 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
         self.page1.disp_endiskspc.setText(self.DiskSpaceOK())
         self.UpdateDetStab()
         self.UpdatePg6()
-
 
     def EnabledYes(self):
         enabled = "Yes"
@@ -902,7 +893,6 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
             # update the stability row of the detector stability table with the wording chosen above
             self.page2.tableWidget.setItem(1, i, value)
 
-
     # def RepPeriod(self):
     #     dates = ReadInData.AnalyserStatus.loc[ReadInData.AnalyserStatus["Result Name"] == "LastPsaReportTime", "Value"] # get the date of the last psa report generation
     #     dates1 = pd.to_datetime(dates,yearfirst=True)   #setup dataframe as a date time series in the correct format
@@ -998,8 +988,6 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
     def show_page_6(self):
         self.hide_pages()
         self.page6.show()
-
-
 
 class PSA_pg1(QMainWindow,Ui_PSAPage1):
     def __init__(self, parent=None):
