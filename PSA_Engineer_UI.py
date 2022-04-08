@@ -1,5 +1,5 @@
-import os
 import sys
+from GeneratePSAReportPDF import gen_pdf
 import pandas as pd
 from Regen_UI import regen_ui_eng               # Load the function which runs a batch to regen the UI each time code runs.
 # This is used for Development
@@ -23,34 +23,6 @@ from PyQt5.QtCore import QDir
 
 # regen_ui_eng()                  # Regenerate the UI. This is used to update the UI file after changes
 
-# Define a function which reads in the data from the relevant files. This may be called in a few different places.
-# this function takes 1 folder location and uses the PSA Master default location
-# class ReadInData:
-#     PSAMaster = "C:\\Users\\l.ritchie\\PycharmProjects\\Scantech_Monthly_PSA_Report\\PSA_Master_List.xlsx"
-#     defaultpath = "C:\\Users\\l.ritchie\\PycharmProjects\\Scantech_Monthly_PSA_Report\\"
-#     resourcepath = "C:\\Users\\l.ritchie\\PycharmProjects\\Scantech_Monthly_PSA_Report\\Resources\\"
-#     defaultanalyser = "OBA-040"
-#     PSAMasterData = Read_Master(PSAMaster)                                          # Read in master file data from PSA Master file.
-#     AnalyserStatus = Read_AnalyserStatus(defaultpath)                               # Read in PSA Report file data from PSA Report file.
-#     PeakControl = Read_PeakControl(defaultpath)                                     # Read in Analyser Peak Control Data
-#     VersionNumbers = Read_VersionNumbers(defaultpath)                               # Read in version numbers data
-#     AnalyserIO = Read_AnalyserIO(defaultpath)                                       # Read in Analyser IO Data
-#     AnalyserA08 = Read_A_08_Analyse(defaultpath)          # Read in Analysis Data
-#     PeakExtract = Read_PeakExtract(defaultpath)                                     # Readi in Peak Stability Data
-#     TempExtract = Read_TempExtract(defaultpath)                                     # Read in Temp Stability Data
-#     # print(" Initial Default Path: \n" + defaultpath)
-#     # print(" Initial PSA Master Data: \n" + str(PSAMasterData))
-#     # print(" Initial Analayser Status: \n" + str(AnalyserStatus))
-#     # print(" Initial Peak Control: \n" + str(PeakControl))
-#     # print(" Initial Version Number: \n" + str(VersionNumbers))
-#     # print(" Initial Analyser IO: \n" + str(AnalyserIO))
-#     # print(" Initial Analsyer Results: \n" + str(AnalyserA08))
-#     # print(" Initial Peak Satbility: \n" + str(PeakExtract))
-#     # print(" Initial Temp data: \n" + str(TempExtract))
-#
-# # Read in master file data from PSA Master file. This is run at the start of the program to ensure data is loaded prior to the UI starting up.
-# ReadInData()
-
 class HomeWindow(QMainWindow,Ui_PSAHome):
     reportdata = []                     # Class Variable for report data to be used throughout the report
     fname = ""                          # Root directory indicator class variable
@@ -65,6 +37,7 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
         self.page4 = PSA_pg4()
         self.page5 = PSA_pg5()
         self.page6 = PSA_pg6()
+        #self.genpdf = gen_pdf()
         self.connectSignalsSlots()
 
     def importReport(self):
@@ -100,6 +73,7 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
         self.page1.NextPage.released.connect(self.UpdateJSON)
         self.page2.NextPage.released.connect(self.UpdateJSON)
         self.page6.NextPage.released.connect(self.UpdateJSON)
+        self.ExportReportPB.released.connect(self.generate_pdf)
 
 
     # def updatereadindata(self):
@@ -989,6 +963,10 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
         self.hide_pages()
         self.page6.show()
 
+    def generate_pdf(self):
+        print("Outoutting PDF")
+        gen_pdf
+
 class PSA_pg1(QMainWindow,Ui_PSAPage1):
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -1018,8 +996,6 @@ class PSA_pg6(QMainWindow,Ui_PSAPage6):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setupUi(self)
-
-
 
 
 
