@@ -71,6 +71,7 @@ def create_title(title, sitename, pdf, date, analyser, serveng, application, per
     pdf.cell(40,5,topup,border=0,align='L',ln=1)
     pdf.ln(1)
 
+
 def create_summary():
     pdf.ln(2)
     pdf.set_font('Helvetica', 'bu', SUBTITLEFONTSIZE)
@@ -90,6 +91,7 @@ def create_summary():
     pdf.cell(85, 5,"Is there enough (>10%) disk space available? ",border=1,align='L')
     pdf.cell(35, 5, reportdata['Summary'][0]['EnoughDiskSpace'], border=1, align='C', ln=1)
     pdf.ln(10)
+
 
 def create_action_taken():
     # Section Title
@@ -131,6 +133,7 @@ def create_action_taken():
     pdf.cell(105, 5, reportdata['ActionTaken'][0]['Action5'][0]["Description"], border=1, align='C', ln=1)
     pdf.ln(10)
 
+
 def create_action_required():
     # Section Title
     pdf.ln(2)
@@ -164,6 +167,7 @@ def create_action_required():
     pdf.cell(35, 5, reportdata['ActionRequired'][0]['ActionReq5'][0]["ByWhen"], border=1, align='C')
     pdf.cell(105, 5, reportdata['ActionRequired'][0]['ActionReq5'][0]["Action"], border=1, align='C', ln=1)
     pdf.ln(10)
+
 
 def create_page_2(title, sitename, analyser):
     # Add main title
@@ -279,6 +283,82 @@ def create_page_2(title, sitename, analyser):
     pdf.ln(10)
 
 
+def create_page_3(title, sitename, analyser):
+    # Add main title
+    pdf.set_font('Helvetica', 'b', TITLEFONTSIZE)
+    pdf.ln(35)
+    pdf.multi_cell(0, 10, title, border=0, align='C')
+    #pdf.ln(1)
+    # Add Subtitle
+    pdf.set_font('Helvetica', 'b', SUBTITLEFONTSIZE)
+    #pdf.ln(1)
+    pdf.multi_cell(0, 10, analyser + " at " + sitename, border=0, align='C')
+    # pdf.ln(1)
+    #
+    # pdf.ln(1)
+    pdf.image(".\\ResourcesEng\\Temperatures_output.png", x=5, w=200)
+    # pdf.ln(1)
+    #
+    # pdf.ln(1)
+    pdf.image(".\\ResourcesEng\\Daily_Tonnes_output.png", x=5, w=200, h=110)
+    pdf.ln(1)
+
+
+def create_page_4(title, sitename, analyser):
+    # Add main title
+    pdf.set_font('Helvetica', 'b', TITLEFONTSIZE)
+    pdf.ln(35)
+    pdf.multi_cell(0, 10, title, border=0, align='C')
+    # Add Subtitle
+    pdf.set_font('Helvetica', 'b', SUBTITLEFONTSIZE)
+    # Results 1 tables image
+    pdf.multi_cell(0, 10, analyser + " at " + sitename, border=0, align='C')
+    pdf.image(".\\ResourcesEng\\Results1_output.png", x=20, w=170, h=210)
+
+
+def create_page_5(title, sitename, analyser):
+    # Add main title
+    pdf.set_font('Helvetica', 'b', TITLEFONTSIZE)
+    pdf.ln(35)
+    pdf.multi_cell(0, 10, title, border=0, align='C')
+    # Add Subtitle
+    pdf.set_font('Helvetica', 'b', SUBTITLEFONTSIZE)
+    pdf.multi_cell(0, 10, analyser + " at " + sitename, border=0, align='C')
+    # Results 2 tables image
+    pdf.image(".\\ResourcesEng\\Results2_output.png", x=20, w=170, h=210)
+    pdf.ln(1)
+
+
+def create_page_6(title, sitename, analyser):
+    # Add main title
+    pdf.set_font('Helvetica', 'b', TITLEFONTSIZE)
+    pdf.ln(35)
+    pdf.multi_cell(0, 10, title, border=0, align='C')
+    # Add Subtitle
+    pdf.set_font('Helvetica', 'b', SUBTITLEFONTSIZE)
+    pdf.multi_cell(0, 10, analyser + " at " + sitename, border=0, align='C')
+    # PLC Plant Status Table
+    # Title
+    pdf.set_font('Helvetica', 'bu', SUBTITLEFONTSIZE)
+    pdf.cell(95, 5, "Plant PLC Status", border=0, align='L', ln=1)
+    pdf.ln(2)
+
+    # Populate table
+    # headings
+    pdf.set_font('Helvetica', 'b', 8)
+    pdf.cell(25, 5, "", border=0, align='C')
+    pdf.cell(25, 5, "Current", border=0, align='C')
+    pdf.cell(25, 5, "1 Report Ago", border=0, align='C')
+    pdf.cell(25, 5, "2 Reports Ago", border=0, align='C')
+    pdf.cell(25, 5, "Comment", border=0, align='C')
+
+    # Data
+    pdf.set_font('Helvetica', '', 8)
+    pdf.cell(25, 5, "Belt Running", border=0, align='C')
+    pdf.cell(25, 5, reportdata['PLCStatus'][0]['BeltRunning'][0]['Current'], border=0, align='C')
+    pdf.cell(25, 5, reportdata['PLCStatus'][0]['BeltRunning'][0]['1RepAgo'], border=0, align='C')
+    pdf.cell(25, 5, reportdata['PLCStatus'][0]['BeltRunning'][0]['2RepAgo'], border=0, align='C')
+    pdf.cell(25, 5, reportdata['PLCStatus'][0]['BeltRunning'][0]['Comment'], border=0, align='C')
 
 
 def write_to_pdf(pdf, words):
@@ -342,7 +422,52 @@ pdf.add_page()
 # Add lettterhead
 create_letterhead(pdf, WIDTH)
 
+# Populate Page 2
 create_page_2(TITLE, SITENAME, ANALYSER)
+
+'''
+Third Page of PDF
+'''
+# Add Page
+pdf.add_page()
+
+# Add lettterhead
+create_letterhead(pdf, WIDTH)
+
+create_page_3(TITLE, SITENAME, ANALYSER)
+
+'''
+Fourth Page of PDF
+'''
+# Add Page
+pdf.add_page()
+
+# Add lettterhead
+create_letterhead(pdf, WIDTH)
+
+create_page_4(TITLE, SITENAME, ANALYSER)
+
+'''
+Fifth Page of PDF
+'''
+# Add Page
+pdf.add_page()
+
+# Add lettterhead
+create_letterhead(pdf, WIDTH)
+
+create_page_5(TITLE, SITENAME, ANALYSER)
+
+'''
+Sixth Page of PDF
+'''
+# Add Page
+pdf.add_page()
+
+# Add lettterhead
+create_letterhead(pdf, WIDTH)
+
+create_page_6(TITLE, SITENAME, ANALYSER)
 
 
 # Add some words to PDF
