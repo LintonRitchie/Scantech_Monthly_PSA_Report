@@ -1751,7 +1751,7 @@
   </connection>
   <connection>
    <sender>AnalOpCor</sender>
-   <signal>currentTextChanged(QString)</signal>
+   <signal>highlighted(QString)</signal>
    <receiver>AnalOpCor</receiver>
    <slot>setStyleSheet(QString)</slot>
    <hints>
@@ -1767,7 +1767,7 @@
   </connection>
   <connection>
    <sender>EnableDetStable</sender>
-   <signal>currentTextChanged(QString)</signal>
+   <signal>highlighted(QString)</signal>
    <receiver>EnableDetStable</receiver>
    <slot>setStyleSheet(QString)</slot>
    <hints>
@@ -1783,7 +1783,7 @@
   </connection>
   <connection>
    <sender>DetEncTempStable</sender>
-   <signal>currentTextChanged(QString)</signal>
+   <signal>highlighted(QString)</signal>
    <receiver>DetEncTempStable</receiver>
    <slot>setStyleSheet(QString)</slot>
    <hints>
@@ -1799,7 +1799,7 @@
   </connection>
   <connection>
    <sender>ElecEncTempStable</sender>
-   <signal>currentTextChanged(QString)</signal>
+   <signal>highlighted(QString)</signal>
    <receiver>ElecEncTempStable</receiver>
    <slot>setStyleSheet(QString)</slot>
    <hints>
@@ -1815,7 +1815,7 @@
   </connection>
   <connection>
    <sender>NextPSAMnth</sender>
-   <signal>currentTextChanged(QString)</signal>
+   <signal>highlighted(QString)</signal>
    <receiver>NextPSAMnth</receiver>
    <slot>setStyleSheet(QString)</slot>
    <hints>
@@ -1831,7 +1831,7 @@
   </connection>
   <connection>
    <sender>TopUpMonth</sender>
-   <signal>currentTextChanged(QString)</signal>
+   <signal>highlighted(QString)</signal>
    <receiver>TopUpMonth</receiver>
    <slot>setStyleSheet(QString)</slot>
    <hints>
@@ -1847,7 +1847,7 @@
   </connection>
   <connection>
    <sender>NextPSAYear</sender>
-   <signal>currentTextChanged(QString)</signal>
+   <signal>highlighted(QString)</signal>
    <receiver>NextPSAYear</receiver>
    <slot>setStyleSheet(QString)</slot>
    <hints>
@@ -1863,7 +1863,7 @@
   </connection>
   <connection>
    <sender>TopUpYear</sender>
-   <signal>currentTextChanged(QString)</signal>
+   <signal>highlighted(QString)</signal>
    <receiver>TopUpYear</receiver>
    <slot>setStyleSheet(QString)</slot>
    <hints>

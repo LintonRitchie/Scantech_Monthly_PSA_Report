@@ -2,14 +2,14 @@
  "Summary": [
   {
    "SiteName": "Assmang Beeshoek",
-   "ReportDate": "2022-04-08",
+   "ReportDate": "2022-04-11",
    "AnalyserNo": "C15-038",
    "ServEng": "Service Engineer:",
    "Application": "Iron Ore",
    "Period": "January 2022",
    "Email": "service.southafrica@scantech.com.au",
-   "NextPSA": "March 2023",
-   "TopUpDue": "April 2024",
+   "NextPSA": "January 2022",
+   "TopUpDue": "January 2022",
    "AnalyserOpCorrect": "Yes",
    "AllDetStable": "Yes",
    "DetTempStable": "Yes",
@@ -203,8 +203,8 @@
  ],
  "Temperatures": [
   {
-   "StableDetTemp": "Yes",
-   "StableElecTemp": "Yes"
+   "StableDetTemp": "",
+   "StableElecTemp": ""
   }
  ],
  "Tonnages": [

@@ -111,6 +111,9 @@
      <layout class="QVBoxLayout" name="verticalLayout">
       <item>
        <widget class="QPushButton" name="PB_pg">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="text">
          <string>Page 1</string>
         </property>
@@ -118,6 +121,9 @@
       </item>
       <item>
        <widget class="QPushButton" name="PB_pg_2">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="text">
          <string>Page 2</string>
         </property>
@@ -125,6 +131,9 @@
       </item>
       <item>
        <widget class="QPushButton" name="PB_pg_3">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="text">
          <string>Page 3</string>
         </property>
@@ -132,6 +141,9 @@
       </item>
       <item>
        <widget class="QPushButton" name="PB_pg_4">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="text">
          <string>Page 4</string>
         </property>
@@ -139,6 +151,9 @@
       </item>
       <item>
        <widget class="QPushButton" name="PB_pg_5">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="text">
          <string>Page 5</string>
         </property>
@@ -146,6 +161,9 @@
       </item>
       <item>
        <widget class="QPushButton" name="PB_pg_6">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="text">
          <string>Page 6</string>
         </property>
@@ -197,6 +215,9 @@
      </property>
     </widget>
     <widget class="QPushButton" name="PreviewReportPB">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <property name="geometry">
       <rect>
        <x>60</x>
@@ -216,6 +237,9 @@
      </property>
     </widget>
     <widget class="QPushButton" name="ExportReportPB">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <property name="geometry">
       <rect>
        <x>60</x>

@@ -579,95 +579,100 @@ class PDF(FPDF):
 
 
 class gen_pdf():
-    with open(".\\ReportData.json", "r") as f:
-        reportdata = json.load(f)
 
-    # Global Variables
-    TITLEFONTSIZE = 20
-    SUBTITLEFONTSIZE = 14
-    GENERALFONTSIZE = 10
-    TITLE = "PSA Report"
-    SITENAME = reportdata['Summary'][0]['SiteName']
-    WIDTH = 210
-    HEIGHT = 297
-    DATE = reportdata['Summary'][0]['ReportDate']
-    ANALYSER = reportdata['Summary'][0]['AnalyserNo']
-    SERVENG = reportdata['Summary'][0]['ServEng']
-    APPLICATION = reportdata['Summary'][0]['Application']
-    PERIOD = reportdata['Summary'][0]['Period']
-    EMAIL = reportdata['Summary'][0]['Email']
-    NEXTPSA = reportdata['Summary'][0]['NextPSA']
-    TOPUP = reportdata['Summary'][0]['TopUpDue']
+    def generate_pdf(self, fname):
+        print(fname)
+        fname2 = fname + "\\ReportData.json"
+        print(fname2)
+        with open(fname2, "r") as f:
+            reportdata = json.load(f)
 
-    # Create PDF
-    pdf = PDF()  # A4 (210 by 297 mm)
+        # Global Variables
+        TITLEFONTSIZE = 20
+        SUBTITLEFONTSIZE = 14
+        GENERALFONTSIZE = 10
+        TITLE = "PSA Report"
+        SITENAME = reportdata['Summary'][0]['SiteName']
+        WIDTH = 210
+        HEIGHT = 297
+        DATE = reportdata['Summary'][0]['ReportDate']
+        ANALYSER = reportdata['Summary'][0]['AnalyserNo']
+        SERVENG = reportdata['Summary'][0]['ServEng']
+        APPLICATION = reportdata['Summary'][0]['Application']
+        PERIOD = reportdata['Summary'][0]['Period']
+        EMAIL = reportdata['Summary'][0]['Email']
+        NEXTPSA = reportdata['Summary'][0]['NextPSA']
+        TOPUP = reportdata['Summary'][0]['TopUpDue']
 
-    '''
-    First Page of PDF
-    '''
-    # Add Page
-    pdf.add_page()
+        # Create PDF
+        pdf = PDF()  # A4 (210 by 297 mm)
 
-    # Add lettterhead and title
-    create_letterhead(pdf, WIDTH)
-    create_title(TITLE, SITENAME, pdf, DATE, ANALYSER, SERVENG, APPLICATION, PERIOD, EMAIL, NEXTPSA, TOPUP, TITLEFONTSIZE, SUBTITLEFONTSIZE, GENERALFONTSIZE)
-    # Populate report page 1
-    create_summary(pdf, SUBTITLEFONTSIZE, GENERALFONTSIZE, reportdata)
-    create_action_taken(pdf, SUBTITLEFONTSIZE, GENERALFONTSIZE, reportdata)
-    create_action_required(pdf, SUBTITLEFONTSIZE, GENERALFONTSIZE, reportdata)
+        '''
+        First Page of PDF
+        '''
+        # Add Page
+        pdf.add_page()
 
-    '''
-    Second Page of PDF
-    '''
-    # Add Page
-    pdf.add_page()
-    # Add lettterhead
-    create_letterhead(pdf, WIDTH)
-    # Populate Page 2
-    create_page_2(pdf, TITLEFONTSIZE, SUBTITLEFONTSIZE, GENERALFONTSIZE, reportdata, TITLE, SITENAME, ANALYSER)
+        # Add lettterhead and title
+        create_letterhead(pdf, WIDTH)
+        create_title(TITLE, SITENAME, pdf, DATE, ANALYSER, SERVENG, APPLICATION, PERIOD, EMAIL, NEXTPSA, TOPUP, TITLEFONTSIZE, SUBTITLEFONTSIZE, GENERALFONTSIZE)
+        # Populate report page 1
+        create_summary(pdf, SUBTITLEFONTSIZE, GENERALFONTSIZE, reportdata)
+        create_action_taken(pdf, SUBTITLEFONTSIZE, GENERALFONTSIZE, reportdata)
+        create_action_required(pdf, SUBTITLEFONTSIZE, GENERALFONTSIZE, reportdata)
 
-    '''
-    Third Page of PDF
-    '''
-    # Add Page
-    pdf.add_page()
-    # Add lettterhead
-    create_letterhead(pdf, WIDTH)
-    # Populate Page 3
-    create_page_3(pdf, TITLEFONTSIZE, SUBTITLEFONTSIZE, TITLE, SITENAME, ANALYSER)
+        '''
+        Second Page of PDF
+        '''
+        # Add Page
+        pdf.add_page()
+        # Add lettterhead
+        create_letterhead(pdf, WIDTH)
+        # Populate Page 2
+        create_page_2(pdf, TITLEFONTSIZE, SUBTITLEFONTSIZE, GENERALFONTSIZE, reportdata, TITLE, SITENAME, ANALYSER)
 
-    '''
-    Fourth Page of PDF
-    '''
-    # Add Page
-    pdf.add_page()
-    # Add lettterhead
-    create_letterhead(pdf, WIDTH)
-    # Populate Page 4
-    create_page_4(pdf, TITLEFONTSIZE, SUBTITLEFONTSIZE, TITLE, SITENAME, ANALYSER)
+        '''
+        Third Page of PDF
+        '''
+        # Add Page
+        pdf.add_page()
+        # Add lettterhead
+        create_letterhead(pdf, WIDTH)
+        # Populate Page 3
+        create_page_3(pdf, TITLEFONTSIZE, SUBTITLEFONTSIZE, TITLE, SITENAME, ANALYSER)
 
-    '''
-    Fifth Page of PDF
-    '''
-    # Add Page
-    pdf.add_page()
-    # Add lettterhead
-    create_letterhead(pdf, WIDTH)
-    # Populate Page 5
-    create_page_5(pdf, TITLEFONTSIZE, SUBTITLEFONTSIZE, TITLE, SITENAME, ANALYSER)
+        '''
+        Fourth Page of PDF
+        '''
+        # Add Page
+        pdf.add_page()
+        # Add lettterhead
+        create_letterhead(pdf, WIDTH)
+        # Populate Page 4
+        create_page_4(pdf, TITLEFONTSIZE, SUBTITLEFONTSIZE, TITLE, SITENAME, ANALYSER)
 
-    '''
-    Sixth Page of PDF
-    '''
-    # Add Page
-    pdf.add_page()
-    # Add lettterhead
-    create_letterhead(pdf, WIDTH)
-    # Populate Page 6
-    create_page_6(pdf, TITLEFONTSIZE, SUBTITLEFONTSIZE, reportdata, TITLE, SITENAME, ANALYSER)
+        '''
+        Fifth Page of PDF
+        '''
+        # Add Page
+        pdf.add_page()
+        # Add lettterhead
+        create_letterhead(pdf, WIDTH)
+        # Populate Page 5
+        create_page_5(pdf, TITLEFONTSIZE, SUBTITLEFONTSIZE, TITLE, SITENAME, ANALYSER)
 
-    # Generate the PDF
-    pdfname = ".\\" + ANALYSER + " PSA Report " + reportdata['Summary'][0]['Period'] + ".pdf"
-    pdf.output(pdfname, 'F')
+        '''
+        Sixth Page of PDF
+        '''
+        # Add Page
+        pdf.add_page()
+        # Add lettterhead
+        create_letterhead(pdf, WIDTH)
+        # Populate Page 6
+        create_page_6(pdf, TITLEFONTSIZE, SUBTITLEFONTSIZE, reportdata, TITLE, SITENAME, ANALYSER)
+
+        # Generate the PDF
+        pdfname = fname + "\\" + ANALYSER + " PSA Report " + reportdata['Summary'][0]['Period'] + ".pdf"
+        pdf.output(pdfname, 'F')
 
 
