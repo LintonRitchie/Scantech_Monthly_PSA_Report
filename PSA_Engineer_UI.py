@@ -21,13 +21,20 @@ from PyQt5.QtWidgets import (QApplication, QMainWindow, QFileDialog, QTableWidge
 from PyQt5 import (QtCore, QtGui)
 from PyQt5.QtCore import QDir
 import GeneratePSAReportPDF as genpdf
+import pyi_splash # this is just here for the packaging to allow the splash screen to close. It will always throw an error since the library cannot be installed.
+
+pyi_splash.update_text("Scantech Monthly PSA Report Generator")
+pyi_splash.update_text("Scantech Monthly PSA Report Generator")
+pyi_splash.update_text("Apparently you have to do this twice")
 
 # regen_ui_eng()                  # Regenerate the UI. This is used to update the UI file after changes
 
 class HomeWindow(QMainWindow,Ui_PSAHome):
+    pyi_splash.close()
     reportdata = []                     # Class Variable for report data to be used throughout the report
     fname = ""                          # Root directory indicator class variable
     fname2 = ""                         # Root directory indicator class variable No.2
+    rootfile = "C:\\PSAGen"
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -84,7 +91,7 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
             HomeWindow.reportdata = json.load(f)
 
     def UpdateJSON(self):
-        print("Entering UpdateJSON")
+
         # Update JSON File
         HomeWindow.reportdata['Summary'][0]['SiteName'] = self.page1.site_name.text()
         HomeWindow.reportdata['Summary'][0]['ReportDate'] = self.page1.rep_date_data.text()
@@ -101,7 +108,6 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
         HomeWindow.reportdata['Summary'][0]['ElecTempStable'] = self.page1.ElecEncTempStable.currentText()
         HomeWindow.reportdata['Summary'][0]['STDUpToDate'] = self.page1.disp_stduptodate.text()
         HomeWindow.reportdata['Summary'][0]['EnoughDiskSpace'] = self.page1.disp_endiskspc.text()
-        print("Entering Action taken section")
 
         # this loop populates the JSON by looking to see if any data exists in the first cell of the row. If not then it skips. If is does, the data is pulled into the JSON
         # pull the data from the Action Taken table row 1 to fill the JSON
@@ -154,7 +160,7 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
             HomeWindow.reportdata['PLCStatus'][0]['ForceStandardise'][0]['2RepAgo'] = str(self.page6.PlantPLCTable.item(2, 2).text())
             HomeWindow.reportdata['PLCStatus'][0]['ForceStandardise'][0]['Comment'] = str(self.page6.PlantPLCTable.item(2, 3).text())
         else:
-            print("passing by")
+            pass
         # AnalyserStatus Table dump to JSON
         it = self.page6.PlantPLCTable_2.item(0, 0)
         if it and it.text():
@@ -175,7 +181,7 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
             HomeWindow.reportdata['AnalyserStatus'][0]['SpectraStable'][0]['2RepAgo'] = str(self.page6.PlantPLCTable_2.item(3, 2).text())
             HomeWindow.reportdata['AnalyserStatus'][0]['SpectraStable'][0]['Comment'] = str(self.page6.PlantPLCTable_2.item(3, 3).text())
         else:
-            print("passing by")
+            pass
 
         # PLC Analyser Results Table dump to JSON
         it = self.page6.PlantPLCTable_3.item(0, 0)
@@ -196,7 +202,7 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
             HomeWindow.reportdata['PLCResults'][0]['SourceOn'][0]['2RepAgo'] = str(self.page6.PlantPLCTable_3.item(3, 2).text())
             HomeWindow.reportdata['PLCResults'][0]['SourceOn'][0]['Comment'] = str(self.page6.PlantPLCTable_3.item(3, 3).text())
         else:
-            print("passing by")
+            pass
 
         # Analyser Configuration Table dump to JSON
         it = self.page6.PlantPLCTable_4.item(0, 0)
@@ -214,7 +220,7 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
             HomeWindow.reportdata['AnalyserConfiguration'][0]['StandardisePeriod'][0]['2RepAgo'] = str(self.page6.PlantPLCTable_4.item(2, 2).text())
             HomeWindow.reportdata['AnalyserConfiguration'][0]['StandardisePeriod'][0]['Comment'] = str(self.page6.PlantPLCTable_4.item(2, 3).text())
         else:
-            print("passing by")
+            pass
 
         # Standardisation Table dump to JSON
         it = self.page6.PlantPLCTable_5.item(0, 0)
@@ -236,7 +242,7 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
             HomeWindow.reportdata['Standardisation'][0]['NumStdPeriodsThisMnth'][0]['2RepAgo'] = str(self.page6.PlantPLCTable_5.item(3, 2).text())
             HomeWindow.reportdata['Standardisation'][0]['NumStdPeriodsThisMnth'][0]['Comment'] = str(self.page6.PlantPLCTable_5.item(3, 3).text())
         else:
-            print("passing by")
+            pass
 
         # SSoftware Versions Table dump to JSON
         it = self.page6.PlantPLCTable_6.item(0, 0)
@@ -250,7 +256,7 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
             HomeWindow.reportdata['SoftwareVersions'][0]['CsSchedule'][0]['2RepAgo'] = str(self.page6.PlantPLCTable_6.item(1, 2).text())
             HomeWindow.reportdata['SoftwareVersions'][0]['CsSchedule'][0]['Comment'] = str(self.page6.PlantPLCTable_6.item(1, 3).text())
         else:
-            print("passing by")
+            pass
 
         it = self.page6.PlantPLCTable_7.item(0, 0)
         if it and it.text():
@@ -263,41 +269,42 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
             HomeWindow.reportdata['DiskSpaceMem'][0]['PercDiskSpace'][0]['2RepAgo'] = str(self.page6.PlantPLCTable_7.item(1, 2).text())
             HomeWindow.reportdata['DiskSpaceMem'][0]['PercDiskSpace'][0]['Comment'] = str(self.page6.PlantPLCTable_7.item(1, 3).text())
         else:
-            print("passing by")
+            pass
         with open(HomeWindow.fname, 'w') as file:
             json.dump(HomeWindow.reportdata, file, indent=1)
+        print("Report Data Updated")
 
     def DecodeFigs(self):
         # Decode Daily Tonnes plot data and produce image. This will be commented for testing and used in the Engineer version of the code
-        imgfile = HomeWindow.fname2 + "\\ResourcesEng\\Daily_Tonnes_output.png"
+        imgfile = HomeWindow.rootfile + "\\Daily_Tonnes_output.png"
         print(imgfile)
         imgdata = HomeWindow.reportdata['Plots'][0]['DailyTonsPlot']
         imgplot = open(imgfile, "wb")
         imgplot.write(base64.b64decode(imgdata))
         imgplot.close()
         # Decode Detector Stability plot data and produce image. This will be commented for testing and used in the Engineer version of the code
-        imgfile = HomeWindow.fname2 + "\\ResourcesEng\\Detector_Stability_output.png"
+        imgfile = HomeWindow.rootfile + "\\Detector_Stability_output.png"
         print(imgfile)
         imgdata = HomeWindow.reportdata['Plots'][0]['DetStabPlot']
         imgplot = open(imgfile, "wb")
         imgplot.write(base64.b64decode(imgdata))
         imgplot.close()
         # Decode Temperatures plot data and produce image. This will be commented for testing and used in the Engineer version of the code
-        imgfile = HomeWindow.fname2 + "\\ResourcesEng\\Temperatures_output.png"
+        imgfile = HomeWindow.rootfile + "\\Temperatures_output.png"
         print(imgfile)
         imgdata = HomeWindow.reportdata['Plots'][0]['TempPlot']
         imgplot = open(imgfile, "wb")
         imgplot.write(base64.b64decode(imgdata))
         imgplot.close()
         # Decode Results 1 plot data and produce image. This will be commented for testing and used in the Engineer version of the code
-        imgfile = HomeWindow.fname2 + "\\ResourcesEng\\Results1_output.png"
+        imgfile = HomeWindow.rootfile + "\\Results1_output.png"
         print(imgfile)
         imgdata = HomeWindow.reportdata['Plots'][0]['Results1Plot']
         imgplot = open(imgfile, "wb")
         imgplot.write(base64.b64decode(imgdata))
         imgplot.close()
         # Decode Results 2 plot data and produce image. This will be commented for testing and used in the Engineer version of the code
-        imgfile = HomeWindow.fname2 + "\\ResourcesEng\\Results2_output.png"
+        imgfile = HomeWindow.rootfile + "\\Results2_output.png"
         print(imgfile)
         imgdata = HomeWindow.reportdata['Plots'][0]['Results2Plot']
         imgplot = open(imgfile, "wb")
@@ -504,32 +511,26 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
 
     # used in Update report
     def UpdateFigs(self):
-        self.page2.label_3.setPixmap(QtGui.QPixmap(HomeWindow.fname2 + "\\ResourcesEng\\Detector_Stability_output.png"))
-        self.page3.Temps.setPixmap(QtGui.QPixmap(HomeWindow.fname2 + "\\ResourcesEng\\Temperatures_output.png"))
-        self.page3.label_4.setPixmap(QtGui.QPixmap(HomeWindow.fname2 + "\\ResourcesEng\\Daily_Tonnes_output.png"))
-        self.page4.Results1.setPixmap(QtGui.QPixmap(HomeWindow.fname2 + "\\ResourcesEng\\Results1_output.png"))
-        self.page5.Results2.setPixmap(QtGui.QPixmap(HomeWindow.fname2 + "\\ResourcesEng\\Results2_output.png"))
+        self.page2.label_3.setPixmap(QtGui.QPixmap(HomeWindow.rootfile + "\\Detector_Stability_output.png"))
+        self.page3.Temps.setPixmap(QtGui.QPixmap(HomeWindow.rootfile + "\\Temperatures_output.png"))
+        self.page3.label_4.setPixmap(QtGui.QPixmap(HomeWindow.rootfile + "\\Daily_Tonnes_output.png"))
+        self.page4.Results1.setPixmap(QtGui.QPixmap(HomeWindow.rootfile + "\\Results1_output.png"))
+        self.page5.Results2.setPixmap(QtGui.QPixmap(HomeWindow.rootfile + "\\Results2_output.png"))
 
     # used in Update report
     def UpdateDetStab(self):
-        print("Got to here 4.1")
         # calculate the number of detecotrs
-
         # clear the table each time the function is called.
         for i in range(16):
             self.page2.tableWidget.setItem(0, i, self.ClearTable())
             self.page2.tableWidget.setItem(1, i, self.ClearTable())
-        print("Got to here 4.2")
+
         for i in range(16):
-            print("Got to here 4.3."+str(i))
             # read in the detector disabled status from JSON
             detnum = str('Detector'+str(i+1))
-            print(detnum)
             disabled = HomeWindow.reportdata['DetectorStability'][0][detnum][0]['Enabled']
-            print("Disabled = "+ str(disabled))
             # read in the detector Stability status from JSON
             stability = HomeWindow.reportdata['DetectorStability'][0][detnum][0]['Stable']
-            print("Got to here 4.3." + str(i) + ".1")
             # Choose which colour and wording to update the Detector enabled row of detecotr stability table with
             if disabled == "Yes":
                 value = self.EnabledYes()
@@ -553,19 +554,14 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
 
     def StdDate(self):
         stddate = HomeWindow.reportdata['Standardisation'][0]['MostRecentStandard'][0]['Current']
-        print("Got to here 2.1")
         #stddate = stddate.to_string(index=False)   # setup dataframe as a date time series in the correct format
         stddate = datetime.datetime.strptime(stddate, "%a %y/%m/%d %H:%M")
-        print("Got to here 2.2")
         tdate = datetime.datetime.today()
-        print("Got to here 2.3")
         difference = (tdate.year - stddate.year)*12 + (tdate.month-stddate.month)
-        print("Got to here 2.4")
         if difference > 6:
             output = "No"
         else:
             output = "Yes"
-        print("Got to here 2.5")
         return output
 
     def DiskSpaceOK(self):
@@ -581,7 +577,7 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
 
     def Generate_PDF(self):
         print("Trying to generate a report")
-        genpdf.gen_pdf.generate_pdf(self, HomeWindow.fname2)
+        genpdf.gen_pdf.generate_pdf(self, HomeWindow.fname2, HomeWindow.rootfile)
         print("I managed to generate a report")
 
     def hide_pages(self):
