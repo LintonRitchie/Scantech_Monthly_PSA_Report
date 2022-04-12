@@ -399,8 +399,8 @@ class Ui_PSAPage2(object):
         PSAPage2.setStatusBar(self.statusbar)
 
         self.retranslateUi(PSAPage2)
-        self.DetTempStable.highlighted['QString'].connect(self.DetTempStable.setStyleSheet) # type: ignore
-        self.ElecCabTempStable.highlighted['QString'].connect(self.ElecCabTempStable.setStyleSheet) # type: ignore
+        self.DetTempStable.currentTextChanged['QString'].connect(self.DetTempStable.setStyleSheet) # type: ignore
+        self.ElecCabTempStable.currentTextChanged['QString'].connect(self.ElecCabTempStable.setStyleSheet) # type: ignore
         self.NextPage.released.connect(PSAPage2.hide) # type: ignore
         QtCore.QMetaObject.connectSlotsByName(PSAPage2)
 

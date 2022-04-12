@@ -636,14 +636,14 @@ class Ui_PSAPage1(object):
 
         self.retranslateUi(PSAPage1)
         self.NextPage.released.connect(PSAPage1.hide) # type: ignore
-        self.AnalOpCor.highlighted['QString'].connect(self.AnalOpCor.setStyleSheet) # type: ignore
-        self.EnableDetStable.highlighted['QString'].connect(self.EnableDetStable.setStyleSheet) # type: ignore
-        self.DetEncTempStable.highlighted['QString'].connect(self.DetEncTempStable.setStyleSheet) # type: ignore
-        self.ElecEncTempStable.highlighted['QString'].connect(self.ElecEncTempStable.setStyleSheet) # type: ignore
-        self.NextPSAMnth.highlighted['QString'].connect(self.NextPSAMnth.setStyleSheet) # type: ignore
-        self.TopUpMonth.highlighted['QString'].connect(self.TopUpMonth.setStyleSheet) # type: ignore
-        self.NextPSAYear.highlighted['QString'].connect(self.NextPSAYear.setStyleSheet) # type: ignore
-        self.TopUpYear.highlighted['QString'].connect(self.TopUpYear.setStyleSheet) # type: ignore
+        self.NextPSAMnth.currentTextChanged['QString'].connect(self.NextPSAMnth.setStyleSheet) # type: ignore
+        self.TopUpMonth.currentTextChanged['QString'].connect(self.TopUpMonth.setStyleSheet) # type: ignore
+        self.NextPSAYear.currentTextChanged['QString'].connect(self.NextPSAYear.setStyleSheet) # type: ignore
+        self.TopUpYear.currentTextChanged['QString'].connect(self.TopUpYear.setStyleSheet) # type: ignore
+        self.AnalOpCor.currentTextChanged['QString'].connect(self.AnalOpCor.setStyleSheet) # type: ignore
+        self.EnableDetStable.currentTextChanged['QString'].connect(self.EnableDetStable.setStyleSheet) # type: ignore
+        self.DetEncTempStable.currentTextChanged['QString'].connect(self.DetEncTempStable.setStyleSheet) # type: ignore
+        self.ElecEncTempStable.currentTextChanged['QString'].connect(self.ElecEncTempStable.setStyleSheet) # type: ignore
         QtCore.QMetaObject.connectSlotsByName(PSAPage1)
 
     def retranslateUi(self, PSAPage1):

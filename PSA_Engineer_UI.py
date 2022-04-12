@@ -22,7 +22,7 @@ from PyQt5 import (QtCore, QtGui)
 from PyQt5.QtCore import QDir
 import GeneratePSAReportPDF as genpdf
 
-regen_ui_eng()                  # Regenerate the UI. This is used to update the UI file after changes
+# regen_ui_eng()                  # Regenerate the UI. This is used to update the UI file after changes
 
 class HomeWindow(QMainWindow,Ui_PSAHome):
     reportdata = []                     # Class Variable for report data to be used throughout the report
@@ -38,7 +38,6 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
         self.page4 = PSA_pg4()
         self.page5 = PSA_pg5()
         self.page6 = PSA_pg6()
-        #self.genpdf = gen_pdf()
         self.connectSignalsSlots()
 
     def importReport(self):
@@ -71,7 +70,6 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
         self.PB_pg_4.released.connect(self.show_page_4)
         self.PB_pg_5.released.connect(self.show_page_5)
         self.PB_pg_6.released.connect(self.show_page_6)
-        #self.ImportReportPB.released.connect(ImportJSON.openReport)
         self.ImportReportPB.released.connect(self.importReport)
         self.page1.NextPage.released.connect(self.UpdateJSON)
         self.page2.NextPage.released.connect(self.UpdateJSON)

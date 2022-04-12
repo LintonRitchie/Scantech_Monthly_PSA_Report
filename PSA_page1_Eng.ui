@@ -1750,72 +1750,8 @@
    </hints>
   </connection>
   <connection>
-   <sender>AnalOpCor</sender>
-   <signal>highlighted(QString)</signal>
-   <receiver>AnalOpCor</receiver>
-   <slot>setStyleSheet(QString)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>359</x>
-     <y>474</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>360</x>
-     <y>474</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>EnableDetStable</sender>
-   <signal>highlighted(QString)</signal>
-   <receiver>EnableDetStable</receiver>
-   <slot>setStyleSheet(QString)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>323</x>
-     <y>494</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>324</x>
-     <y>509</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>DetEncTempStable</sender>
-   <signal>highlighted(QString)</signal>
-   <receiver>DetEncTempStable</receiver>
-   <slot>setStyleSheet(QString)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>284</x>
-     <y>523</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>285</x>
-     <y>531</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>ElecEncTempStable</sender>
-   <signal>highlighted(QString)</signal>
-   <receiver>ElecEncTempStable</receiver>
-   <slot>setStyleSheet(QString)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>334</x>
-     <y>555</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>337</x>
-     <y>554</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
    <sender>NextPSAMnth</sender>
-   <signal>highlighted(QString)</signal>
+   <signal>currentTextChanged(QString)</signal>
    <receiver>NextPSAMnth</receiver>
    <slot>setStyleSheet(QString)</slot>
    <hints>
@@ -1831,7 +1767,7 @@
   </connection>
   <connection>
    <sender>TopUpMonth</sender>
-   <signal>highlighted(QString)</signal>
+   <signal>currentTextChanged(QString)</signal>
    <receiver>TopUpMonth</receiver>
    <slot>setStyleSheet(QString)</slot>
    <hints>
@@ -1847,7 +1783,7 @@
   </connection>
   <connection>
    <sender>NextPSAYear</sender>
-   <signal>highlighted(QString)</signal>
+   <signal>currentTextChanged(QString)</signal>
    <receiver>NextPSAYear</receiver>
    <slot>setStyleSheet(QString)</slot>
    <hints>
@@ -1863,7 +1799,7 @@
   </connection>
   <connection>
    <sender>TopUpYear</sender>
-   <signal>highlighted(QString)</signal>
+   <signal>currentTextChanged(QString)</signal>
    <receiver>TopUpYear</receiver>
    <slot>setStyleSheet(QString)</slot>
    <hints>
@@ -1874,6 +1810,70 @@
     <hint type="destinationlabel">
      <x>526</x>
      <y>417</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>AnalOpCor</sender>
+   <signal>currentTextChanged(QString)</signal>
+   <receiver>AnalOpCor</receiver>
+   <slot>setStyleSheet(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>378</x>
+     <y>477</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>319</x>
+     <y>473</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>EnableDetStable</sender>
+   <signal>currentTextChanged(QString)</signal>
+   <receiver>EnableDetStable</receiver>
+   <slot>setStyleSheet(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>293</x>
+     <y>501</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>301</x>
+     <y>504</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>DetEncTempStable</sender>
+   <signal>currentTextChanged(QString)</signal>
+   <receiver>DetEncTempStable</receiver>
+   <slot>setStyleSheet(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>284</x>
+     <y>526</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>346</x>
+     <y>526</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>ElecEncTempStable</sender>
+   <signal>currentTextChanged(QString)</signal>
+   <receiver>ElecEncTempStable</receiver>
+   <slot>setStyleSheet(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>279</x>
+     <y>554</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>364</x>
+     <y>553</y>
     </hint>
    </hints>
   </connection>

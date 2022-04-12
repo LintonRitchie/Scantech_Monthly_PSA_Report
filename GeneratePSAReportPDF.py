@@ -2,8 +2,8 @@ from fpdf import FPDF
 import json
 
 
-def create_letterhead(pdf, WIDTH):
-    pdf.image(".\\ResourcesEng\\ScantechReportHeader.png", 0, 0, WIDTH)
+def create_letterhead(pdf, WIDTH, fname):
+    pdf.image(fname + "\\ResourcesEng\\ScantechReportHeader.png", 0, 0, WIDTH)
 
 
 def create_title(title, sitename, pdf, date, analyser, serveng, application, period, email, nextpsa, topup, TFS, SFS, GFS):
@@ -165,7 +165,7 @@ def create_action_required(pdf, SFS, GFS, reportdata):
     pdf.ln(10)
 
 
-def create_page_2(pdf, TFS, SFS, GFS, reportdata, title, sitename, analyser):
+def create_page_2(pdf, TFS, SFS, GFS, reportdata, title, sitename, analyser, fname):
     # Add main title
     pdf.set_font('Helvetica', 'b', TFS)
     pdf.ln(35)
@@ -247,7 +247,7 @@ def create_page_2(pdf, TFS, SFS, GFS, reportdata, title, sitename, analyser):
     for i in range(0, 16):
         det = "Detector" + str(i + 1)
         check = reportdata['DetectorStability'][0][det][0]['Enabled']
-        print(check)
+
         if check == "Yes":
             pdf.set_fill_color(0, 255, 0)
         elif check == "No":
@@ -265,7 +265,7 @@ def create_page_2(pdf, TFS, SFS, GFS, reportdata, title, sitename, analyser):
     for i in range(0, 16):
         det = "Detector" + str(i + 1)
         check = reportdata['DetectorStability'][0][det][0]['Stable']
-        print(check)
+
         if check == "Yes":
             pdf.set_fill_color(0, 255, 0)
         elif check == "No":
@@ -277,11 +277,11 @@ def create_page_2(pdf, TFS, SFS, GFS, reportdata, title, sitename, analyser):
         pdf.cell(10, 5, check, border=1, align='C', fill=True)
     pdf.ln(10)
 
-    pdf.image(".\\ResourcesEng\\Detector_Stability_output.png", x=20, w=170)
+    pdf.image(fname + "\\ResourcesEng\\Detector_Stability_output.png", x=20, w=170)
     pdf.ln(10)
 
 
-def create_page_3(pdf, TFS, SFS, title, sitename, analyser):
+def create_page_3(pdf, TFS, SFS, title, sitename, analyser, fname):
     # Add main title
     pdf.set_font('Helvetica', 'b', TFS)
     pdf.ln(35)
@@ -290,12 +290,12 @@ def create_page_3(pdf, TFS, SFS, title, sitename, analyser):
     # Add Subtitle
     pdf.set_font('Helvetica', 'b', SFS)
     pdf.multi_cell(0, 10, analyser + " at " + sitename, border=0, align='C')
-    pdf.image(".\\ResourcesEng\\Temperatures_output.png", x=5, w=200)
-    pdf.image(".\\ResourcesEng\\Daily_Tonnes_output.png", x=5, w=200, h=110)
+    pdf.image(fname + "\\ResourcesEng\\Temperatures_output.png", x=5, w=200)
+    pdf.image(fname + "\\ResourcesEng\\Daily_Tonnes_output.png", x=5, w=200, h=110)
     pdf.ln(1)
 
 
-def create_page_4(pdf, TFS, SFS, title, sitename, analyser):
+def create_page_4(pdf, TFS, SFS, title, sitename, analyser, fname):
     # Add main title
     pdf.set_font('Helvetica', 'b', TFS)
     pdf.ln(35)
@@ -304,10 +304,10 @@ def create_page_4(pdf, TFS, SFS, title, sitename, analyser):
     pdf.set_font('Helvetica', 'b', SFS)
     # Results 1 tables image
     pdf.multi_cell(0, 10, analyser + " at " + sitename, border=0, align='C')
-    pdf.image(".\\ResourcesEng\\Results1_output.png", x=20, w=170, h=210)
+    pdf.image(fname + "\\ResourcesEng\\Results1_output.png", x=20, w=170, h=210)
 
 
-def create_page_5(pdf, TFS, SFS, title, sitename, analyser):
+def create_page_5(pdf, TFS, SFS, title, sitename, analyser, fname):
     # Add main title
     pdf.set_font('Helvetica', 'b', TFS)
     pdf.ln(35)
@@ -316,7 +316,7 @@ def create_page_5(pdf, TFS, SFS, title, sitename, analyser):
     pdf.set_font('Helvetica', 'b', SFS)
     pdf.multi_cell(0, 10, analyser + " at " + sitename, border=0, align='C')
     # Results 2 tables image
-    pdf.image(".\\ResourcesEng\\Results2_output.png", x=20, w=170, h=210)
+    pdf.image(fname + "\\ResourcesEng\\Results2_output.png", x=20, w=170, h=210)
     pdf.ln(1)
 
 
@@ -614,64 +614,66 @@ class gen_pdf():
         pdf.add_page()
 
         # Add lettterhead and title
-        create_letterhead(pdf, WIDTH)
+        create_letterhead(pdf, WIDTH, fname)
         create_title(TITLE, SITENAME, pdf, DATE, ANALYSER, SERVENG, APPLICATION, PERIOD, EMAIL, NEXTPSA, TOPUP, TITLEFONTSIZE, SUBTITLEFONTSIZE, GENERALFONTSIZE)
         # Populate report page 1
         create_summary(pdf, SUBTITLEFONTSIZE, GENERALFONTSIZE, reportdata)
         create_action_taken(pdf, SUBTITLEFONTSIZE, GENERALFONTSIZE, reportdata)
         create_action_required(pdf, SUBTITLEFONTSIZE, GENERALFONTSIZE, reportdata)
-
+        print("Completed creation of page 1")
         '''
         Second Page of PDF
         '''
         # Add Page
         pdf.add_page()
         # Add lettterhead
-        create_letterhead(pdf, WIDTH)
+        create_letterhead(pdf, WIDTH, fname)
         # Populate Page 2
-        create_page_2(pdf, TITLEFONTSIZE, SUBTITLEFONTSIZE, GENERALFONTSIZE, reportdata, TITLE, SITENAME, ANALYSER)
-
+        create_page_2(pdf, TITLEFONTSIZE, SUBTITLEFONTSIZE, GENERALFONTSIZE, reportdata, TITLE, SITENAME, ANALYSER, fname)
+        print("Completed creation of page 2")
         '''
         Third Page of PDF
         '''
         # Add Page
         pdf.add_page()
         # Add lettterhead
-        create_letterhead(pdf, WIDTH)
+        create_letterhead(pdf, WIDTH, fname)
         # Populate Page 3
-        create_page_3(pdf, TITLEFONTSIZE, SUBTITLEFONTSIZE, TITLE, SITENAME, ANALYSER)
-
+        create_page_3(pdf, TITLEFONTSIZE, SUBTITLEFONTSIZE, TITLE, SITENAME, ANALYSER, fname)
+        print("Completed creation of page 3")
         '''
         Fourth Page of PDF
         '''
         # Add Page
         pdf.add_page()
         # Add lettterhead
-        create_letterhead(pdf, WIDTH)
+        create_letterhead(pdf, WIDTH, fname)
         # Populate Page 4
-        create_page_4(pdf, TITLEFONTSIZE, SUBTITLEFONTSIZE, TITLE, SITENAME, ANALYSER)
-
+        create_page_4(pdf, TITLEFONTSIZE, SUBTITLEFONTSIZE, TITLE, SITENAME, ANALYSER, fname)
+        print("Completed creation of page 4")
         '''
         Fifth Page of PDF
         '''
         # Add Page
         pdf.add_page()
         # Add lettterhead
-        create_letterhead(pdf, WIDTH)
+        create_letterhead(pdf, WIDTH, fname)
         # Populate Page 5
-        create_page_5(pdf, TITLEFONTSIZE, SUBTITLEFONTSIZE, TITLE, SITENAME, ANALYSER)
-
+        create_page_5(pdf, TITLEFONTSIZE, SUBTITLEFONTSIZE, TITLE, SITENAME, ANALYSER, fname)
+        print("Completed creation of page 5")
         '''
         Sixth Page of PDF
         '''
         # Add Page
         pdf.add_page()
         # Add lettterhead
-        create_letterhead(pdf, WIDTH)
+        create_letterhead(pdf, WIDTH, fname)
         # Populate Page 6
         create_page_6(pdf, TITLEFONTSIZE, SUBTITLEFONTSIZE, reportdata, TITLE, SITENAME, ANALYSER)
+        print("Completed creation of page 6")
 
         # Generate the PDF
+        print(fname)
         pdfname = fname + "\\" + ANALYSER + " PSA Report " + reportdata['Summary'][0]['Period'] + ".pdf"
         pdf.output(pdfname, 'F')
 
