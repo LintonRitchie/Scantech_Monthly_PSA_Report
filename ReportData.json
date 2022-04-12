@@ -2,48 +2,54 @@
  "Summary": [
   {
    "SiteName": "Assmang Beeshoek",
-   "ReportDate": "2022-04-05",
+   "ReportDate": "2022-04-11",
    "AnalyserNo": "C15-038",
    "ServEng": "Service Engineer:",
    "Application": "Iron Ore",
    "Period": "January 2022",
    "Email": "service.southafrica@scantech.com.au",
    "NextPSA": "January 2022",
-   "TopUpDue": "January 2022"
+   "TopUpDue": "January 2022",
+   "AnalyserOpCorrect": "Yes",
+   "AllDetStable": "Yes",
+   "DetTempStable": "Yes",
+   "ElecTempStable": "Yes",
+   "STDUpToDate": "No",
+   "EnoughDiskSpace": "Yes"
   }
  ],
  "ActionTaken": [
   {
    "Action1": [
     {
-     "Date": "1/4/2022",
-     "Time": "09:00",
-     "Action": "testing",
-     "Description": "help"
+     "Date": "Test 1",
+     "Time": "Test 2",
+     "Action": "Test 3",
+     "Description": "Test 4"
     }
    ],
    "Action2": [
     {
-     "Date": "23/3/2022",
-     "Time": "11:00",
-     "Action": "Test 2",
-     "Description": " This is a test 2"
+     "Date": "Test 5",
+     "Time": "Test 6",
+     "Action": "Test 7",
+     "Description": "Test 8"
     }
    ],
    "Action3": [
     {
-     "Date": "24/3/2022",
-     "Time": "12:00",
-     "Action": "Test 3",
-     "Description": "This is a test 3"
+     "Date": "Test 9",
+     "Time": "Test 10",
+     "Action": "Test 11",
+     "Description": "Test 12"
     }
    ],
    "Action4": [
     {
-     "Date": "25/3/2022",
-     "Time": "13:00",
-     "Action": "Test 4",
-     "Description": "This is a test 4"
+     "Date": "Test 13",
+     "Time": "Test 14",
+     "Action": "Test 15",
+     "Description": "Test 16"
     }
    ],
    "Action5": [
@@ -60,30 +66,30 @@
   {
    "ActionReq1": [
     {
-     "Action": "some dude",
-     "ByWhom": "sometime",
-     "ByWhen": "rays"
+     "Action": "Test 21",
+     "ByWhom": "Test 22",
+     "ByWhen": "Test 23"
     }
    ],
    "ActionReq2": [
     {
-     "Action": "",
-     "ByWhom": "",
-     "ByWhen": ""
+     "Action": "Test 24",
+     "ByWhom": "Test 25",
+     "ByWhen": "Test 26"
     }
    ],
    "ActionReq3": [
     {
-     "Action": "",
-     "ByWhom": "",
-     "ByWhen": ""
+     "Action": "Test 27",
+     "ByWhom": "Test 28",
+     "ByWhen": "Test 29"
     }
    ],
    "ActionReq4": [
     {
-     "Action": "",
-     "ByWhom": "",
-     "ByWhen": ""
+     "Action": "Test 30",
+     "ByWhom": "Test 31",
+     "ByWhen": "Test 32"
     }
    ],
    "ActionReq5": [
