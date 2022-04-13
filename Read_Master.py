@@ -13,38 +13,43 @@ def Read_Master(PSAMaster):
     df = pd.DataFrame(data, columns= data_required)
     return df
 
-def Read_AnalyserStatus(folder):
-    fname = glob.glob(folder + "\\*Report.xls")
+
+def Read_AnalyserStatus(inputfname):
+    fname = glob.glob(inputfname + "\\*Report.xls")
     fname=fname[0]
     StatusColumns = ["Result Name", "Value"]
     AnalyserStatus = pd.read_excel(open(fname,'rb'), sheet_name="Analyser Status")
     AnalyserStatusdf = pd.DataFrame(AnalyserStatus, columns= StatusColumns)
     return AnalyserStatusdf
 
-def Read_AnalyserIO(folder):
-    fname = folder + "\\PSAReport.xls"
+
+def Read_AnalyserIO(inputfname):
+    fname = inputfname + "\\PSAReport.xls"
     StatusColumns = ["Parameter Name", "Value"]
     AnalyserIO = pd.read_excel(open(fname,'rb'), sheet_name="Analyser I_O")
     AnalyserIOdf = pd.DataFrame(AnalyserIO, columns= StatusColumns)
     return AnalyserIOdf
 
-def Read_VersionNumbers(folder):
-    fname = folder + "\\PSAReport.xls"
+
+def Read_VersionNumbers(inputfname):
+    fname = inputfname + "\\PSAReport.xls"
     StatusColumns = ["Module", "Version"]
     VersionNumbers = pd.read_excel(open(fname,'rb'), sheet_name="Version Numbers")
     VersionNumbersdf = pd.DataFrame(VersionNumbers, columns= StatusColumns)
     return VersionNumbersdf
 
-def Read_PeakControl(folder):
-    fname = glob.glob(folder + "\\*Report.xls")
+
+def Read_PeakControl(inputfname):
+    fname = glob.glob(inputfname + "\\*Report.xls")
     fname=fname[0]
     PeakControl = pd.read_excel(open(fname,'rb'), sheet_name="Peak Control")
     PeakControldf = pd.DataFrame(PeakControl)
     return PeakControldf
 
-def Read_PeakExtract(folder):     #extracting the peak control data for determining detector stability
 
-    fname = folder + "\PeakExtract.csv"
+def Read_PeakExtract(inputfname, outputfname):     #extracting the peak control data for determining detector stability
+
+    fname = inputfname + "\PeakExtract.csv"
 
     # read the csv containing the data. Since the 1st row is stupidly setup with tab & comma seperators as well as incomplete headings, we have to ignore it.
     PeakExtract = pd.read_csv(open(fname,'rb'), skiprows=1,header=None)
@@ -121,12 +126,13 @@ def Read_PeakExtract(folder):     #extracting the peak control data for determin
     DetStab = PeakExtractdf.plot().get_figure()                         # plot the data
     plt.title("Detector Stability")                                     # add a title
     plt.xticks(rotation=90)                                             # rotate the X axis titles
-    DetStab.savefig("C:\\Users\\l.ritchie\\PycharmProjects\\Scantech_Monthly_PSA_Report\\Resources\\Detector_Stability.png")     # save the plot to file
+    DetStab.savefig(outputfname + "\\Detector_Stability.png")     # save the plot to file
 
     return PeakExtractdf
 
-def Read_TempExtract(folder):                                                 # extracting the temperature staibility data for the month
-    fname = folder + "\TempExtract.csv"
+
+def Read_TempExtract(inputfname, outputfname):                                                 # extracting the temperature staibility data for the month
+    fname = inputfname + "\TempExtract.csv"
     TempExtract = pd.read_csv(open(fname,'rb'), index_col=0)                              # read the csv containing the data
     # print(TempExtract)
     TempExtractdf = pd.DataFrame(TempExtract.iloc[:, [1,2,3]])          # extract the 3 columns of Temperature data.
@@ -141,12 +147,13 @@ def Read_TempExtract(folder):                                                 # 
     plt.grid(which='both', axis="y")                                    # display the axis ticks
     # plt.xticks(rotation=90)                                           # rotate the X axis titles
     #plt.show()                                                          # show the plot
-    TempStab.savefig("C:\\Users\\l.ritchie\\PycharmProjects\\Scantech_Monthly_PSA_Report\\Resources\\Temperatures.png")                      # save the plot to file
+    TempStab.savefig(outputfname + "\\Temperatures.png")                      # save the plot to file
     return TempExtractdf
 
-def Read_A_08_Analyse(folder):                                          # extracting the analysis results summary for the month
+
+def Read_A_08_Analyse(inputfname, outputfname):                                          # extracting the analysis results summary for the month
     # implments a wildcard search for analysis data. This can be A_01__Analyse or A_0X__Analyse or anything in between
-    fname = glob.glob(folder + "\A*Analyse.csv")
+    fname = glob.glob(inputfname + "\A*Analyse.csv")
     fname = QDir.toNativeSeparators(fname[0])           # esnure folder path in correct windows format
 
     AllExtract = pd.read_csv(open(fname,'r'),header=0, index_col=False)                              # read the csv containing the data. Index Col must = false to ensure the headings are not shifted
@@ -169,7 +176,7 @@ def Read_A_08_Analyse(folder):                                          # extrac
     plt.bar(TonsAnalysed.index,TonsAnalysed["S034"],0.4,bottom=TonsAnalysed["S029"],color = 'green', label='Tons Analysed',zorder=2)
     plt.legend(bbox_to_anchor=(0., 1.02, 1., .102), loc='lower left',
                ncol=2, mode="expand", borderaxespad=0)                  # places the legend above the plot
-    plt.savefig("C:\\Users\\l.ritchie\\PycharmProjects\\Scantech_Monthly_PSA_Report\\Resources\\Daily_Tonnes.png")
+    plt.savefig(outputfname + "\\Daily_Tonnes.png")
     plt.close()
 
     # Parameters for controlling Results plots
@@ -215,7 +222,7 @@ def Read_A_08_Analyse(folder):                                          # extrac
 
     plt.subplots_adjust(bottom=0.07,top=0.97, hspace=0.5)
 
-    plt.savefig("C:\\Users\\l.ritchie\\PycharmProjects\\Scantech_Monthly_PSA_Report\\Resources\\Results1.png")
+    plt.savefig(outputfname + "\\Results1.png")
     plt.close()
 
     fig = plt.figure(figsize=(figw,figh))
@@ -243,9 +250,17 @@ def Read_A_08_Analyse(folder):                                          # extrac
 
     plt.subplots_adjust(bottom=0.07,top=0.97, hspace=0.5)
 
-    plt.savefig("C:\\Users\\l.ritchie\\PycharmProjects\\Scantech_Monthly_PSA_Report\\Resources\\Results2.png")
+    plt.savefig(outputfname + "\\Results2.png")
     plt.close()
-    print("Read Master Complete")
 
 
-#Read_A_08_Analyse()
+def Read_A_17_Standard(inputfname):
+    # implments a search for the Standardisation data from the past month.
+    fname = glob.glob(inputfname + "\A_17_Standard.csv")
+    fname = QDir.toNativeSeparators(fname[0])           # esnure folder path in correct windows format
+
+    AllExtract = pd.read_csv(open(fname,'r'),header=0, index_col=False)                              # read the csv containing the data. Index Col must = false to ensure the headings are not shifted
+    stdcount = len(AllExtract.index)
+
+    return stdcount
+

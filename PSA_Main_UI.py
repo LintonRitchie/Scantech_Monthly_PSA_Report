@@ -1,16 +1,18 @@
 import os
 import sys
 import pandas as pd
+import codecs
+import win32com.client
 from Regen_UI import regen_ui               # Load the function which runs a batch to regen the UI each time code runs.
 # This is used for Development
 from Read_Master import (Read_Master, Read_AnalyserStatus, Read_PeakControl, Read_VersionNumbers, Read_AnalyserIO, Read_A_08_Analyse, Read_PeakExtract,
-                         Read_TempExtract)  # import the function which reads from the Master PSA file
+                         Read_TempExtract, Read_A_17_Standard)  # import the function which reads from the Master PSA file
 # from PyQt5.QtGui import (QPixmap)
 import datetime
 import json
 import base64
 import glob
-from PSA_Home import Ui_PSAHome
+from PSA_Home_Cal import Ui_PSAHome
 from PSA_Page1 import Ui_PSAPage1
 from PSA_Page2 import Ui_PSAPage2
 from PSA_Page3 import Ui_PSAPage3
@@ -29,19 +31,19 @@ import matplotlib.pyplot as plt
 
 # Define a function which reads in the data from the relevant files. This may be called in a few different places.
 # this function takes 1 folder location and uses the PSA Master default location
-class ReadInData:
-    PSAMaster = "C:\\Users\\l.ritchie\\PycharmProjects\\Scantech_Monthly_PSA_Report\\PSA_Master_List.xlsx"
-    defaultpath = "C:\\Users\\l.ritchie\\PycharmProjects\\Scantech_Monthly_PSA_Report\\"
-    resourcepath = "C:\\Users\\l.ritchie\\PycharmProjects\\Scantech_Monthly_PSA_Report\\Resources\\"
-    defaultanalyser = "OBA-040"
-    PSAMasterData = Read_Master(PSAMaster)                                          # Read in master file data from PSA Master file.
-    AnalyserStatus = Read_AnalyserStatus(defaultpath)                               # Read in PSA Report file data from PSA Report file.
-    PeakControl = Read_PeakControl(defaultpath)                                     # Read in Analyser Peak Control Data
-    VersionNumbers = Read_VersionNumbers(defaultpath)                               # Read in version numbers data
-    AnalyserIO = Read_AnalyserIO(defaultpath)                                       # Read in Analyser IO Data
-    AnalyserA08 = Read_A_08_Analyse(defaultpath)          # Read in Analysis Data
-    PeakExtract = Read_PeakExtract(defaultpath)                                     # Readi in Peak Stability Data
-    TempExtract = Read_TempExtract(defaultpath)                                     # Read in Temp Stability Data
+# class ReadInData:
+#     PSAMaster = "C:\\Users\\l.ritchie\\PycharmProjects\\Scantech_Monthly_PSA_Report\\PSA_Master_List.xlsx"
+#     defaultpath = "C:\\Users\\l.ritchie\\PycharmProjects\\Scantech_Monthly_PSA_Report\\"
+#     resourcepath = "C:\\Users\\l.ritchie\\PycharmProjects\\Scantech_Monthly_PSA_Report\\Resources\\"
+#     defaultanalyser = "OBA-040"
+#     PSAMasterData = Read_Master(PSAMaster)                                          # Read in master file data from PSA Master file.
+#     AnalyserStatus = Read_AnalyserStatus(defaultpath)                               # Read in PSA Report file data from PSA Report file.
+#     PeakControl = Read_PeakControl(defaultpath)                                     # Read in Analyser Peak Control Data
+#     VersionNumbers = Read_VersionNumbers(defaultpath)                               # Read in version numbers data
+#     AnalyserIO = Read_AnalyserIO(defaultpath)                                       # Read in Analyser IO Data
+#     AnalyserA08 = Read_A_08_Analyse(defaultpath)          # Read in Analysis Data
+#     PeakExtract = Read_PeakExtract(defaultpath)                                     # Readi in Peak Stability Data
+#     TempExtract = Read_TempExtract(defaultpath)                                     # Read in Temp Stability Data
     # print(" Initial Default Path: \n" + defaultpath)
     # print(" Initial PSA Master Data: \n" + str(PSAMasterData))
     # print(" Initial Analayser Status: \n" + str(AnalyserStatus))
@@ -53,7 +55,7 @@ class ReadInData:
     # print(" Initial Temp data: \n" + str(TempExtract))
 
 # Read in master file data from PSA Master file. This is run at the start of the program to ensure data is loaded prior to the UI starting up.
-ReadInData()
+# ReadInData()
 
 AnalyserToProcess = 0
 open_window = 0
@@ -61,14 +63,33 @@ open_window = 0
 # open the data interchange file as a global variable which can be accessed throughout the program.
 # This will be accessed multiple times by various functions within the functions.
 
-with open("ReportData.json") as f:
+with open("C:\\PSAGen\\ReportData.json") as f:
     reportdata = json.load(f)
 
 
 class HomeWindow(QMainWindow,Ui_PSAHome):
+    psadatafname = ""                                   # Filename of the folder where the PSA report data is
+    jsonin1fname = ""                                   # Filename of the previous Month's PSA Report JSON file
+    jsonin2fname = ""                                   # Filename of the PSA Report JSON file from 2 Month's ago
+    jsonoutfname = ""                                                                                   # Filename of the output JSON file
+    jsonname = ""
+    masterpsafname = "J:\\Client Analysers\\Analyser PSA Report\\Development\\00-Forms\\PSA_Master_List.xlsx"                 # Filename where the PSA Master list is kept.
+    PSAMasterData = ""                                                                                  # Master file data variable from PSA Master file.
+    AnalyserStatus = ""                                 # PSA Report file data from PSA Report file.
+    PeakControl = ""                                    # Analyser Peak Control Data
+    VersionNumbers = ""                                 # version numbers data
+    AnalyserIO = ""                                     # Analyser IO Data
+    AnalyserA17 = ""                                    # Analyser Monthly Standardisation Data.
+    AnalyserA08 = ""                                    # Read in Analysis Data
+    PeakExtract = ""                                    # Readi in Peak Stability Data
+    TempExtract = ""                                    # Read in Temp Stability Data
+    resourcepath = "C:\\PSAGen"
+    newanalyser = 0
+
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setupUi(self)
+        HomeWindow.PSAMasterData = Read_Master(HomeWindow.masterpsafname)  # Read in master file data from PSA Master file.
         self.page1 = PSA_pg1()
         self.page2 = PSA_pg2()
         self.page3 = PSA_pg3()
@@ -77,52 +98,87 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
         self.page6 = PSA_pg6()
         self.connectSignalsSlots()
         self.popanalysers()
+        self.psamasterloc.setText(HomeWindow.masterpsafname)    # Update PSA Master file location Label
+
 
     # Setup Signals and Slots for Pushbuttons
     def connectSignalsSlots(self):
-        self.NewReportPB.released.connect(self.show_page_1)
-        self.NewReportPB.clicked.connect(self.updateReport)
-        # self.NewReportPB.clicked.connect(self.RepEmail)
+        self.PreviewReportPB.released.connect(self.show_page_1)
+        self.PreviewReportPB.clicked.connect(self.updateReport)
+        self.ImportReportPB.released.connect(self.importPSAData)
+        self.ExportReportPB.released.connect(self.ExportReport)
         self.PB_pg.released.connect(self.show_page_1)
         self.PB_pg_2.released.connect(self.show_page_2)
         self.PB_pg_3.released.connect(self.show_page_3)
         self.PB_pg_4.released.connect(self.show_page_4)
         self.PB_pg_5.released.connect(self.show_page_5)
         self.PB_pg_6.released.connect(self.show_page_6)
-        self.OpenReportPB.released.connect(self.openReport)
-        self.CalibratorListComboBox.currentTextChanged.connect(self.updatehome)
-        # self.AnalyserListComboBox.currentTextChanged.connect(self.updatehome)
-        self.AnalyserListComboBox.activated.connect(self.GetFolder)
         self.page1.NextPage.released.connect(self.UpdateJSON)
         self.page2.NextPage.released.connect(self.UpdateJSON)
         self.page6.RepAgo1.released.connect(self.UpdatePg6_1RepAgo)
         self.page6.RepAgo2.released.connect(self.UpdatePg6_2RepAgo)
         self.page6.NextPage.released.connect(self.UpdateJSON)
+        self.NewAnalyser.stateChanged.connect(lambda: self.NewAnalyserToggle(self.NewAnalyser))
 
-    def updatereadindata(self):
-        ReadInData.AnalyserStatus = Read_AnalyserStatus(ReadInData.defaultpath)     # Read in PSA Report file data from PSA Report file.
-        ReadInData.PeakControl = Read_PeakControl(ReadInData.defaultpath)           # Read in Analyser Peak Control Data
-        ReadInData.VersionNumbers = Read_VersionNumbers(ReadInData.defaultpath)     # Read in version numbers data
-        ReadInData.AnalyserIO = Read_AnalyserIO(ReadInData.defaultpath)             # Read in Analyser IO Data
-        ReadInData.AnalyserA08 = Read_A_08_Analyse(ReadInData.defaultpath)          # Read in Analysis Data
-        ReadInData.PeakExtract = Read_PeakExtract(ReadInData.defaultpath)           # Readi in Peak Stability Data
-        ReadInData.TempExtract = Read_TempExtract(ReadInData.defaultpath)           # Read in Temp Stability Data
+    def importPSAData(self):
+        HomeWindow.psadatafname = self.GetFolder("Select Folder containing PSA Report Data")
+        # fname = QFileDialog.getExistingDirectory(self, "Open PSA File in PSA Folder")
+        #
+        # if fname:
+        #     fname = QDir.toNativeSeparators(fname)
+        #     fname2 = fname
+        #     fname = glob.glob(fname + "\\ReportData.json")
+        #     fname = fname[0]
+        # # if user presses cancel, return control to calling function
+        # if not fname:
+        #     return
+        HomeWindow.PSAMasterData = Read_Master(HomeWindow.masterpsafname)  # Read in master file data from PSA Master file.
+        print("Read Master Complete")
+        HomeWindow.AnalyserStatus = Read_AnalyserStatus(HomeWindow.psadatafname)  # Read in PSA Report file data from PSA Report file.
+        print("Read Analyser Status Complete")
+        HomeWindow.PeakControl = Read_PeakControl(HomeWindow.psadatafname)  # Read in Analyser Peak Control Data
+        print("Read Peak Control Complete")
+        HomeWindow.VersionNumbers = Read_VersionNumbers(HomeWindow.psadatafname)  # Read in version numbers data
+        print("Read Version Numbers Complete")
+        HomeWindow.AnalyserIO = Read_AnalyserIO(HomeWindow.psadatafname)  # Read in Analyser IO Data
+        print("Read Analyser IO Complete")
+        HomeWindow.AnalyserA17 = Read_A_17_Standard(HomeWindow.psadatafname)  # Read in Analyser Standardisation data
+        print("Read Analyser Std Data Complete")
+        HomeWindow.AnalyserA08 = Read_A_08_Analyse(HomeWindow.psadatafname, HomeWindow.resourcepath)  # Read in Analysis Data
+        print("Read Analyser A_XX Complete")
+        HomeWindow.PeakExtract = Read_PeakExtract(HomeWindow.psadatafname, HomeWindow.resourcepath)  # Readi in Peak Stability Data
+        print("Read Peak Extract Complete")
+        HomeWindow.TempExtract = Read_TempExtract(HomeWindow.psadatafname, HomeWindow.resourcepath)  # Read in Temp Stability Data
+        print("Read Temp Extract Complete")
+        self.PreviewReportPB.setEnabled(True)
+        self.psadataloc.setText(HomeWindow.psadatafname)
 
-    def GetFolder(self):
+
+    def NewAnalyserToggle(self,b):
+        # Toggles the new analyser flag
+        if b.isChecked() == True:
+            HomeWindow.newanalyser = 1
+            print(HomeWindow.newanalyser)
+        else:
+            HomeWindow.newanalyser = 0
+            print(HomeWindow.newanalyser)
+
+
+    def GetFolder(self, message):
         anal = self.AnalyserListComboBox.currentText()
         # Switches default folder based on which analyser is selected.
         if anal[0:3] == "C15":
-            fname = QFileDialog.getExistingDirectory(self,"Open PSA File in PSA Folder","J:\\Client Analysers\\NG-1500")
+            fname = QFileDialog.getExistingDirectory(self,message,"J:\\Client Analysers\\NG-1500")
         elif anal[0:3] == "C21":
-            fname = QFileDialog.getExistingDirectory(self, "Open PSA File in PSA Folder", "J:\\Client Analysers\\CS-2100")
+            fname = QFileDialog.getExistingDirectory(self, message, "J:\\Client Analysers\\CS-2100")
         elif anal[0:3] == "CMM":
-            fname = QFileDialog.getExistingDirectory(self, "Open PSA File in PSA Folder", "J:\\Client Analysers\\CMM-100")
+            fname = QFileDialog.getExistingDirectory(self, message, "J:\\Client Analysers\\CMM-100")
         elif anal[0:3] == "OBA":
-            fname = QFileDialog.getExistingDirectory(self, "Open PSA File in PSA Folder", "J:\\Client Analysers\\On Belt Analyser")
+            fname = QFileDialog.getExistingDirectory(self, message, "J:\\Client Analysers\\On Belt Analyser")
         elif anal[0:3] == "TBM":
-            fname = QFileDialog.getExistingDirectory(self, "Open PSA File in PSA Folder", "J:\\Client Analysers\\TBM-210")
+            fname = QFileDialog.getExistingDirectory(self, message, "J:\\Client Analysers\\TBM-210")
         else:
-            fname = QFileDialog.getExistingDirectory(self, "Open PSA File in PSA Folder", "J:\\Client Analysers\\TBM-230")
+            fname = QFileDialog.getExistingDirectory(self, message, "J:\\Client Analysers\\TBM-230")
 
         # ensures the file separators are correct for operating system
         if fname:
@@ -132,14 +188,34 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
         if not fname:
             return
 
+        return fname
         # Update the default path vairable in the ReadINData Class
-        ReadInData.defaultpath = fname
+        # HomeWindow.psadatafname = fname
 
-        # Update the data in the Data Variables in Use
-        self.updatereadindata()
+
+        # # Update the data in the Data Variables in Use
+        # self.updatereadindata()
+
+    def JSONFname(self):
+        # this function determines the filename of the output data file
+        dates = HomeWindow.AnalyserStatus.loc[HomeWindow.AnalyserStatus["Result Name"] == "LastPsaReportTime", "Value"] # get the date of the last psa report generation
+        dates = pd.to_datetime(dates,yearfirst=True)   #setup dataframe as a date time series in the correct format
+        mnth = dates.dt.month.to_string(index=False)
+        yr = dates.dt.year.to_string(index=False)
+        psafname = HomeWindow.psadatafname
+        anal = self.page1.rep_analyser_data.text()
+
+        if mnth == "10" or mnth == "11" or mnth == "12":
+            fname = str(anal) + " PSA Report " + str(yr[2:4]) + str(mnth) + ".json"  # setting the filename which will be used to output the JSON file
+        else:
+            fname = str(anal) + " PSA Report " + str(yr[2:4]) + "0" + str(mnth) + ".json"  # setting the filename which will be used to output the JSON file
+        HomeWindow.jsonname = fname
+        HomeWindow.jsonoutfname = psafname + "\\" + HomeWindow.jsonname
 
     def UpdateJSON(self):
-        print("Entering UpdateJSON")
+
+        self.JSONFname()    # Update Output JSON Filename
+        print(HomeWindow.jsonoutfname)
         # Update JSON File
         reportdata['Summary'][0]['SiteName'] = self.page1.site_name.text()
         reportdata['Summary'][0]['ReportDate'] = self.page1.rep_date_data.text()
@@ -150,45 +226,38 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
         reportdata['Summary'][0]['Email'] = self.page1.email_data.text()
         reportdata['Summary'][0]['NextPSA'] = str(self.page1.NextPSAMnth.currentText() + " " + self.page1.NextPSAYear.currentText())
         reportdata['Summary'][0]['TopUpDue'] = str(self.page1.TopUpMonth.currentText() + " " + self.page1.TopUpYear.currentText())
-        print("Entering Action taken section")
 
         # this loop populates the JSON by looking to see if any data exists in the first cell of the row. If not then it skips. If is does, the data is pulled into the JSON
         # pull the data from the Action Taken table row 1 to fill the JSON
-        for i in range(0,4):
-            print(i)
+        for i in range(0,5):
             it = self.page1.ActionTakenTable.item(i, 0)
             if it and it.text():
                 jsonid = "Action" + str(i+1)
-                print(jsonid)
                 reportdata['ActionTaken'][0][jsonid][0]['Date']=str(self.page1.ActionTakenTable.item(i, 0).text())
                 reportdata['ActionTaken'][0][jsonid][0]['Time'] = str(self.page1.ActionTakenTable.item(i, 1).text())
                 reportdata['ActionTaken'][0][jsonid][0]['Action'] = str(self.page1.ActionTakenTable.item(i, 2).text())
                 reportdata['ActionTaken'][0][jsonid][0]['Description'] = str(self.page1.ActionTakenTable.item(i, 3).text())
             else:
-                print("passing by")
+                pass
 
         # this loop populates the JSON by looking to see if any data exists in the first cell of the row. If not then it skips. If is does, the data is pulled into the JSON
         # Populating the Action required section of the JSON file
-        for i in range(0,4):
-            print(i)
+        for i in range(0,5):
             it = self.page1.ActionTakenTable.item(i, 0)
             if it and it.text():
                 jsonid = "ActionReq" + str(i+1)
-                print(jsonid)
                 reportdata['ActionRequired'][0][jsonid][0]['Action'] = str(self.page1.ActionRequiredTable.item(i, 0).text())
                 reportdata['ActionRequired'][0][jsonid][0]['ByWhom'] = str(self.page1.ActionRequiredTable.item(i, 1).text())
                 reportdata['ActionRequired'][0][jsonid][0]['ByWhen'] = str(self.page1.ActionRequiredTable.item(i, 2).text())
             else:
-                print("passing by")
+                pass
 
 
         # populating JSON with Detector stability info
-        for i in range(0,15):
-            print(i)
+        for i in range(0,16):
             it = self.page2.tableWidget.item(0, i)
             if it and it.text():
                 jsonid = "Detector" + str(i+1)
-                print(jsonid)
                 reportdata['DetectorStability'][0][jsonid][0]['Enabled'] = str(self.page2.tableWidget.item(0, i).text())
                 reportdata['DetectorStability'][0][jsonid][0]['Stable'] = str(self.page2.tableWidget.item(1, i).text())
 
@@ -213,7 +282,7 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
             reportdata['PLCStatus'][0]['ForceStandardise'][0]['2RepAgo'] = str(self.page6.PlantPLCTable.item(2, 2).text())
             reportdata['PLCStatus'][0]['ForceStandardise'][0]['Comment'] = str(self.page6.PlantPLCTable.item(2, 3).text())
         else:
-            print("passing by")
+            pass
 
         # AnalyserStatus Table dump to JSON
         it = self.page6.PlantPLCTable_2.item(0, 0)
@@ -235,7 +304,7 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
             reportdata['AnalyserStatus'][0]['SpectraStable'][0]['2RepAgo'] = str(self.page6.PlantPLCTable_2.item(3, 2).text())
             reportdata['AnalyserStatus'][0]['SpectraStable'][0]['Comment'] = str(self.page6.PlantPLCTable_2.item(3, 3).text())
         else:
-            print("passing by")
+            pass
 
         # PLC Analyser Results Table dump to JSON
         it = self.page6.PlantPLCTable_3.item(0, 0)
@@ -257,7 +326,7 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
             reportdata['PLCResults'][0]['SourceOn'][0]['2RepAgo'] = str(self.page6.PlantPLCTable_3.item(3, 2).text())
             reportdata['PLCResults'][0]['SourceOn'][0]['Comment'] = str(self.page6.PlantPLCTable_3.item(3, 3).text())
         else:
-            print("passing by")
+            pass
 
         # Analyser Configuration Table dump to JSON
         it = self.page6.PlantPLCTable_4.item(0, 0)
@@ -275,7 +344,7 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
             reportdata['AnalyserConfiguration'][0]['StandardisePeriod'][0]['2RepAgo'] = str(self.page6.PlantPLCTable_4.item(2, 2).text())
             reportdata['AnalyserConfiguration'][0]['StandardisePeriod'][0]['Comment'] = str(self.page6.PlantPLCTable_4.item(2, 3).text())
         else:
-            print("passing by")
+            pass
 
         # Standardisation Table dump to JSON
         it = self.page6.PlantPLCTable_5.item(0, 0)
@@ -297,7 +366,7 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
             reportdata['Standardisation'][0]['NumStdPeriodsThisMnth'][0]['2RepAgo'] = str(self.page6.PlantPLCTable_5.item(3, 2).text())
             reportdata['Standardisation'][0]['NumStdPeriodsThisMnth'][0]['Comment'] = str(self.page6.PlantPLCTable_5.item(3, 3).text())
         else:
-            print("passing by")
+            pass
 
         # SSoftware Versions Table dump to JSON
         it = self.page6.PlantPLCTable_6.item(0, 0)
@@ -311,7 +380,7 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
             reportdata['SoftwareVersions'][0]['CsSchedule'][0]['2RepAgo'] = str(self.page6.PlantPLCTable_6.item(1, 2).text())
             reportdata['SoftwareVersions'][0]['CsSchedule'][0]['Comment'] = str(self.page6.PlantPLCTable_6.item(1, 3).text())
         else:
-            print("passing by")
+            pass
 
         it = self.page6.PlantPLCTable_7.item(0, 0)
         if it and it.text():
@@ -324,107 +393,83 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
             reportdata['DiskSpaceMem'][0]['PercDiskSpace'][0]['2RepAgo'] = str(self.page6.PlantPLCTable_7.item(1, 2).text())
             reportdata['DiskSpaceMem'][0]['PercDiskSpace'][0]['Comment'] = str(self.page6.PlantPLCTable_7.item(1, 3).text())
         else:
-            print("passing by")
+            pass
 
         # This section encodes the plots into the JSON File for transmission to engineer
         # encode Temperature Plot for storage in JSON
-        with open(ReadInData.resourcepath + "\\Temperatures.png", mode="rb") as tf:
+        with open(HomeWindow.resourcepath + "\\Temperatures.png", mode="rb") as tf:
              data = base64.b64encode(tf.read()).decode("utf-8")
         reportdata['Plots'][0]['TempPlot'] = data
-        with open("ReportData.json",'w') as file:
+        with open(HomeWindow.jsonoutfname,'w') as file:
             json.dump(reportdata, file, indent=1)
-
-        # Decode Temperature plot data and produce image
-        imgfile = ReadInData.resourcepath + "\\Temperatures_output.png"
-        print(imgfile)
-        imgdata = reportdata['Plots'][0]['TempPlot']
-        imgplot = open(imgfile, "wb")
-        imgplot.write(base64.b64decode(imgdata))
-        imgplot.close()
 
         # encode Detector Stability Plot for storage in JSON
-        with open(ReadInData.resourcepath + "\\Detector_Stability.png", mode="rb") as tf:
+        with open(HomeWindow.resourcepath + "\\Detector_Stability.png", mode="rb") as tf:
             data = base64.b64encode(tf.read()).decode("utf-8")
         reportdata['Plots'][0]['DetStabPlot'] = data
-        with open("ReportData.json", 'w') as file:
+        with open(HomeWindow.jsonoutfname, 'w') as file:
             json.dump(reportdata, file, indent=1)
-
-        # Decode Detector Stability plot data and produce image. This will be commented for testing and used in the Engineer version of the code
-        imgfile = ReadInData.resourcepath + "\\Detector Stability_output.png"
-        print(imgfile)
-        imgdata = reportdata['Plots'][0]['DetStabPlot']
-        imgplot = open(imgfile, "wb")
-        imgplot.write(base64.b64decode(imgdata))
-        imgplot.close()
 
         # encode Daily Tonnes Plot for storage in JSON
-        with open(ReadInData.resourcepath + "\\Daily_Tonnes.png", mode="rb") as tf:
+        with open(HomeWindow.resourcepath + "\\Daily_Tonnes.png", mode="rb") as tf:
             data = base64.b64encode(tf.read()).decode("utf-8")
         reportdata['Plots'][0]['DailyTonsPlot'] = data
-        with open("ReportData.json", 'w') as file:
+        with open(HomeWindow.jsonoutfname, 'w') as file:
             json.dump(reportdata, file, indent=1)
-
-        # Decode Daily Tonnes plot data and produce image. This will be commented for testing and used in the Engineer version of the code
-        imgfile = ReadInData.resourcepath + "\\Daily_Tonnes_output.png"
-        print(imgfile)
-        imgdata = reportdata['Plots'][0]['DailyTonsPlot']
-        imgplot = open(imgfile, "wb")
-        imgplot.write(base64.b64decode(imgdata))
-        imgplot.close()
 
         # encode Results 1 Plot for storage in JSON
-        with open(ReadInData.resourcepath + "\\Results1.png", mode="rb") as tf:
+        with open(HomeWindow.resourcepath + "\\Results1.png", mode="rb") as tf:
             data = base64.b64encode(tf.read()).decode("utf-8")
         reportdata['Plots'][0]['Results1Plot'] = data
-        with open("ReportData.json", 'w') as file:
+        with open(HomeWindow.jsonoutfname, 'w') as file:
             json.dump(reportdata, file, indent=1)
-
-        # Decode Results 1 plot data and produce image. This will be commented for testing and used in the Engineer version of the code
-        imgfile = ReadInData.resourcepath + "\\Results1_output.png"
-        print(imgfile)
-        imgdata = reportdata['Plots'][0]['Results1Plot']
-        imgplot = open(imgfile, "wb")
-        imgplot.write(base64.b64decode(imgdata))
-        imgplot.close()
 
         # encode Results 2 Plot for storage in JSON
-        with open(ReadInData.resourcepath + "\\Results2.png", mode="rb") as tf:
+        with open(HomeWindow.resourcepath + "\\Results2.png", mode="rb") as tf:
             data = base64.b64encode(tf.read()).decode("utf-8")
         reportdata['Plots'][0]['Results2Plot'] = data
-        with open("ReportData.json", 'w') as file:
+        with open(HomeWindow.jsonoutfname, 'w') as file:
             json.dump(reportdata, file, indent=1)
 
-        # Decode Results 2 plot data and produce image. This will be commented for testing and used in the Engineer version of the code
-        imgfile = ReadInData.resourcepath + "\\Results2_output.png"
-        print(imgfile)
-        imgdata = reportdata['Plots'][0]['Results2Plot']
-        imgplot = open(imgfile, "wb")
-        imgplot.write(base64.b64decode(imgdata))
-        imgplot.close()
+        print("JSON Updated")
 
+    def ExportReport(self):
+        signature_path = os.path.join((os.environ['USERPROFILE']), 'AppData\Roaming\Microsoft\Signatures\Ext L Ritchie - Scantech Aus_python\\')  # Finds the path to Outlook signature files with signature name "Work"
+        html_doc = os.path.join((os.environ['USERPROFILE']), 'AppData\Roaming\Microsoft\Signatures\Ext L Ritchie - Scantech Aus_python.htm')  # Specifies the name of the HTML version of the stored signature
+        html_doc = html_doc.replace('\\\\', '\\')  # Removes escape backslashes from path string
 
+        html_file = codecs.open(html_doc, 'r', 'utf-8', errors='ignore')  # Opens HTML file and ignores errors
+        signature_code = html_file.read()  # Writes contents of HTML signature file to a string
+        signature_code = signature_code.replace('Work_files/', signature_path)  # Replaces local directory with full directory path
+        html_file.close()
 
-        print("Exit JSON")
+        outlook = win32com.client.Dispatch('outlook.application')
+        mail = outlook.CreateItem(0)  # This creates the email object. The 0 refers to the item type from the office documentation OlItemType. This can be others eg 1 for appointments, 2 for contacts etc.
+        mail.To = 'l.biggins@scantech.com.au'
+        mail.CC = 'l.balzan@scantech.com.au; m.kalicinski@scantech.com.au'
+        mail.Subject = 'This is a Test. dont freak out yet'
+        mail.BodyFormat = 2
+        mail.HTMLBody = "<html><body style=font-family:Calibri;> Hi Lucas <br><br> I hope this comes through. I am testing a few automated emailing options. Please let me know if you get this email. <br> There should be an attachment called " + str(HomeWindow.jsonname) + "<br><br> </body></html>" + signature_code
+        print(HomeWindow.jsonoutfname)
+        mail.Attachments.Add(HomeWindow.jsonoutfname)
+        mail.Send()
+        print("Exporting report to email")
 
-    def updatehome(self):
-        anal = self.AnalyserListComboBox.currentText()
-
-        # Updates labels on Home Screen
-        anallabel = 'Do you wish to process ' + str(anal) + "?"
-        self.AnalyserToBeProcessed.setText(anallabel)
-        calibrator = self.CalibratorListComboBox.currentText()
-        callabel = "Welcome " + calibrator
-        self.WelcomeText.setText(callabel)
-
-    # Only called when the New Report button Pressed
     def updateReport(self):
-        print ("Entering Update report")
+
+        self.ExportReportPB.setEnabled(True)
+        self.PB_pg.setEnabled(True)
+        self.PB_pg_2.setEnabled(True)
+        self.PB_pg_3.setEnabled(True)
+        self.PB_pg_4.setEnabled(True)
+        self.PB_pg_5.setEnabled(True)
+        self.PB_pg_6.setEnabled(True)
         # Update data accordingly
         anal = self.AnalyserListComboBox.currentText()
         repdate = str(datetime.date.today()) # egt todays date
-        serveng = ReadInData.PSAMasterData.loc[ReadInData.PSAMasterData["Analyser Number"] == anal, "Service Engineer"].to_string(index=False) #get the service engineer as a string without dataframe nonsense
-        application = ReadInData.PSAMasterData.loc[ReadInData.PSAMasterData["Analyser Number"] == anal, "Application"].to_string(index=False) #get the service engineer as a string without dataframe nonsense
-        customer = ReadInData.PSAMasterData.loc[ReadInData.PSAMasterData["Analyser Number"] == anal, "Customer Name"].to_string(index=False) #get the service engineer as a string without dataframe nonsense
+        serveng = HomeWindow.PSAMasterData.loc[HomeWindow.PSAMasterData["Analyser Number"] == anal, "Service Engineer"].to_string(index=False) #get the service engineer as a string without dataframe nonsense
+        application = HomeWindow.PSAMasterData.loc[HomeWindow.PSAMasterData["Analyser Number"] == anal, "Application"].to_string(index=False) #get the service engineer as a string without dataframe nonsense
+        customer = HomeWindow.PSAMasterData.loc[HomeWindow.PSAMasterData["Analyser Number"] == anal, "Customer Name"].to_string(index=False) #get the service engineer as a string without dataframe nonsense
 
         # Update UI
         self.page1.rep_analyser_data.setText(anal)
@@ -439,6 +484,7 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
         self.UpdateDetStab()
         self.UpdatePg6()
         self.UpdateFigs()
+        print("Report Updated")
 
     def EnabledYes(self):
         enabled = "Yes"
@@ -475,10 +521,23 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
 
     def UpdatePg6(self):
 
+        if HomeWindow.newanalyser == 0:
+            fname = self.GetFolder("Select Folder containing Last Month's PSA Report Data")
+            print(fname)
+            fname = glob.glob(fname + "\*.json")
+            print(fname)
+            fname = QDir.toNativeSeparators(fname[0])
+            print(fname)
+            with open(fname) as f:
+                reportdata = json.load(f)
+        else:
+            with open("C:\\PSAGen\\ReportData.json") as f:
+                reportdata = json.load(f)
+
         # Update PLC Status Table
-        BeltRunning = QTableWidgetItem(ReadInData.AnalyserIO.loc[ReadInData.AnalyserIO["Parameter Name"] == "BeltRunning","Value"].to_string(index=False))
-        ForceAnalyse = QTableWidgetItem(ReadInData.AnalyserIO.loc[ReadInData.AnalyserIO["Parameter Name"] == "ForceAnalyse", "Value"].to_string(index=False))
-        ForceStandardise = QTableWidgetItem(ReadInData.AnalyserIO.loc[ReadInData.AnalyserIO["Parameter Name"] == "ForceStandardise", "Value"].to_string(index=False))
+        BeltRunning = QTableWidgetItem(HomeWindow.AnalyserIO.loc[HomeWindow.AnalyserIO["Parameter Name"] == "BeltRunning","Value"].to_string(index=False))
+        ForceAnalyse = QTableWidgetItem(HomeWindow.AnalyserIO.loc[HomeWindow.AnalyserIO["Parameter Name"] == "ForceAnalyse", "Value"].to_string(index=False))
+        ForceStandardise = QTableWidgetItem(HomeWindow.AnalyserIO.loc[HomeWindow.AnalyserIO["Parameter Name"] == "ForceStandardise", "Value"].to_string(index=False))
 
         self.page6.PlantPLCTable.setItem(0, 0, BeltRunning)
         self.page6.PlantPLCTable.setItem(1, 0, ForceAnalyse)
@@ -494,10 +553,10 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
         self.page6.PlantPLCTable.setItem(1, 3, QTableWidgetItem(str(reportdata['PLCStatus'][0]['ForceAnalyse'][0]['Comment'])))
         self.page6.PlantPLCTable.setItem(2, 3, QTableWidgetItem(str(reportdata['PLCStatus'][0]['ForceStandardise'][0]['Comment'])))
         # Update Analyser Status Table
-        AnalyserOK = QTableWidgetItem(ReadInData.AnalyserStatus.loc[ReadInData.AnalyserStatus["Result Name"] == "AnalyserOK","Value"].to_string(index=False))
-        StandardsOK = QTableWidgetItem(ReadInData.AnalyserStatus.loc[ReadInData.AnalyserStatus["Result Name"] == "StandardsOK","Value"].to_string(index=False))
-        IOControlOK = QTableWidgetItem(ReadInData.AnalyserStatus.loc[ReadInData.AnalyserStatus["Result Name"] == "IOControlOK","Value"].to_string(index=False))
-        SpectraStable = QTableWidgetItem(ReadInData.AnalyserStatus.loc[ReadInData.AnalyserStatus["Result Name"] == "SpectraStable", "Value"].to_string(index=False))
+        AnalyserOK = QTableWidgetItem(HomeWindow.AnalyserStatus.loc[HomeWindow.AnalyserStatus["Result Name"] == "AnalyserOK","Value"].to_string(index=False))
+        StandardsOK = QTableWidgetItem(HomeWindow.AnalyserStatus.loc[HomeWindow.AnalyserStatus["Result Name"] == "StandardsOK","Value"].to_string(index=False))
+        IOControlOK = QTableWidgetItem(HomeWindow.AnalyserStatus.loc[HomeWindow.AnalyserStatus["Result Name"] == "IOControlOK","Value"].to_string(index=False))
+        SpectraStable = QTableWidgetItem(HomeWindow.AnalyserStatus.loc[HomeWindow.AnalyserStatus["Result Name"] == "SpectraStable", "Value"].to_string(index=False))
         self.page6.PlantPLCTable_2.setItem(0, 0, AnalyserOK)
         self.page6.PlantPLCTable_2.setItem(1, 0, StandardsOK)
         self.page6.PlantPLCTable_2.setItem(2, 0, IOControlOK)
@@ -517,13 +576,13 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
         self.page6.PlantPLCTable_2.setItem(3, 3, QTableWidgetItem(str(reportdata['AnalyserStatus'][0]['SpectraStable'][0]['Comment'])))
 
         # Update PLC Analyser Results
-        SystemOK = QTableWidgetItem(ReadInData.AnalyserIO.loc[ReadInData.AnalyserIO["Parameter Name"] == "SystemRunning","Value"].to_string(index=False))
-        if ReadInData.AnalyserIO.loc[ReadInData.AnalyserIO["Parameter Name"] == "SourceControlFault", "Value"].to_string(index=False) == "   OK\nFALSE":
+        SystemOK = QTableWidgetItem(HomeWindow.AnalyserIO.loc[HomeWindow.AnalyserIO["Parameter Name"] == "SystemRunning","Value"].to_string(index=False))
+        if HomeWindow.AnalyserIO.loc[HomeWindow.AnalyserIO["Parameter Name"] == "SourceControlFault", "Value"].to_string(index=False) == "   OK\nFALSE":
             SourceControlFault = QTableWidgetItem("FALSE")
         else:
             SourceControlFault = QTableWidgetItem("TRUE")
-        SourceOff = QTableWidgetItem(ReadInData.AnalyserIO.loc[ReadInData.AnalyserIO["Parameter Name"] == "SourceOffProx", "Value"].to_string(index=False))
-        SourceOn = QTableWidgetItem(ReadInData.AnalyserIO.loc[ReadInData.AnalyserIO["Parameter Name"] == "SourceOnProx", "Value"].to_string(index=False))
+        SourceOff = QTableWidgetItem(HomeWindow.AnalyserIO.loc[HomeWindow.AnalyserIO["Parameter Name"] == "SourceOffProx", "Value"].to_string(index=False))
+        SourceOn = QTableWidgetItem(HomeWindow.AnalyserIO.loc[HomeWindow.AnalyserIO["Parameter Name"] == "SourceOnProx", "Value"].to_string(index=False))
         self.page6.PlantPLCTable_3.setItem(0, 0, SystemOK)
         self.page6.PlantPLCTable_3.setItem(1, 0, SourceControlFault)
         self.page6.PlantPLCTable_3.setItem(2, 0, SourceOff)
@@ -543,9 +602,9 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
         self.page6.PlantPLCTable_3.setItem(3, 3, QTableWidgetItem(str(reportdata['PLCResults'][0]['SourceOn'][0]['Comment'])))
 
         # Update Analyser Config Table
-        AnalysisPeriod = QTableWidgetItem(ReadInData.AnalyserStatus.loc[ReadInData.AnalyserStatus["Result Name"] == "AnalysisPeriod","Value"].to_string(index=False))
-        AnalMinLoadLimit = QTableWidgetItem(ReadInData.AnalyserStatus.loc[ReadInData.AnalyserStatus["Result Name"] == "AnalMinLoadLimit","Value"].to_string(index=False))
-        StandardisePeriod = QTableWidgetItem(ReadInData.AnalyserStatus.loc[ReadInData.AnalyserStatus["Result Name"] == "StandardisePeriod","Value"].to_string(index=False))
+        AnalysisPeriod = QTableWidgetItem(HomeWindow.AnalyserStatus.loc[HomeWindow.AnalyserStatus["Result Name"] == "AnalysisPeriod","Value"].to_string(index=False))
+        AnalMinLoadLimit = QTableWidgetItem(HomeWindow.AnalyserStatus.loc[HomeWindow.AnalyserStatus["Result Name"] == "AnalMinLoadLimit","Value"].to_string(index=False))
+        StandardisePeriod = QTableWidgetItem(HomeWindow.AnalyserStatus.loc[HomeWindow.AnalyserStatus["Result Name"] == "StandardisePeriod","Value"].to_string(index=False))
         self.page6.PlantPLCTable_4.setItem(0, 0, AnalysisPeriod)
         self.page6.PlantPLCTable_4.setItem(1, 0, AnalMinLoadLimit)
         self.page6.PlantPLCTable_4.setItem(2, 0, StandardisePeriod)
@@ -561,10 +620,10 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
         self.page6.PlantPLCTable_4.setItem(2, 3, QTableWidgetItem(str(reportdata['AnalyserConfiguration'][0]['StandardisePeriod'][0]['Comment'])))
 
         # Update Standardisation Table
-        FirstStandard = QTableWidgetItem(ReadInData.AnalyserStatus.loc[ReadInData.AnalyserStatus["Result Name"] == "FirstStandardTime","Value"].to_string(index=False))
-        LastStandard = QTableWidgetItem(ReadInData.AnalyserStatus.loc[ReadInData.AnalyserStatus["Result Name"] == "LastStandardiseTime","Value"].to_string(index=False))
-        NumStandard = QTableWidgetItem(ReadInData.AnalyserStatus.loc[ReadInData.AnalyserStatus["Result Name"] == "PeriodCount","Value"].to_string(index=False))
-        NumStandardMonth = QTableWidgetItem("PlaceHolder")
+        FirstStandard = QTableWidgetItem(HomeWindow.AnalyserStatus.loc[HomeWindow.AnalyserStatus["Result Name"] == "FirstStandardTime","Value"].to_string(index=False))
+        LastStandard = QTableWidgetItem(HomeWindow.AnalyserStatus.loc[HomeWindow.AnalyserStatus["Result Name"] == "LastStandardiseTime","Value"].to_string(index=False))
+        NumStandard = QTableWidgetItem(HomeWindow.AnalyserStatus.loc[HomeWindow.AnalyserStatus["Result Name"] == "PeriodCount","Value"].to_string(index=False))
+        NumStandardMonth = QTableWidgetItem(str(HomeWindow.AnalyserA17))
         self.page6.PlantPLCTable_5.setItem(0, 0, FirstStandard)
         self.page6.PlantPLCTable_5.setItem(1, 0, LastStandard)
         self.page6.PlantPLCTable_5.setItem(2, 0, NumStandard)
@@ -585,8 +644,8 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
 
 
         # Update Software Versions Table
-        Product = QTableWidgetItem(ReadInData.VersionNumbers.loc[ReadInData.VersionNumbers["Module"] == "Product","Version"].to_string(index=False))
-        CsSchedule = QTableWidgetItem(ReadInData.VersionNumbers.loc[ReadInData.VersionNumbers["Module"] == "CsSchedule","Version"].to_string(index=False))
+        Product = QTableWidgetItem(HomeWindow.VersionNumbers.loc[HomeWindow.VersionNumbers["Module"] == "Product","Version"].to_string(index=False))
+        CsSchedule = QTableWidgetItem(HomeWindow.VersionNumbers.loc[HomeWindow.VersionNumbers["Module"] == "CsSchedule","Version"].to_string(index=False))
         self.page6.PlantPLCTable_6.setItem(0, 0, Product)
         self.page6.PlantPLCTable_6.setItem(1, 0, CsSchedule)
         # Creating the comment item and populating with Blanks
@@ -599,8 +658,8 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
 
 
         # Update Disk Space Table
-        DiskSpace = QTableWidgetItem(ReadInData.VersionNumbers.loc[ReadInData.VersionNumbers["Module"] == "DiskSpace","Version"].to_string(index=False))
-        PercDiskSpace = QTableWidgetItem(ReadInData.VersionNumbers.loc[ReadInData.VersionNumbers["Module"] == "%DiskSpace","Version"].to_string(index=False))
+        DiskSpace = QTableWidgetItem(HomeWindow.VersionNumbers.loc[HomeWindow.VersionNumbers["Module"] == "DiskSpace","Version"].to_string(index=False))
+        PercDiskSpace = QTableWidgetItem(HomeWindow.VersionNumbers.loc[HomeWindow.VersionNumbers["Module"] == "%DiskSpace","Version"].to_string(index=False))
         self.page6.PlantPLCTable_7.setItem(0, 0, DiskSpace)
         self.page6.PlantPLCTable_7.setItem(1, 0, PercDiskSpace)
         # Creating the comment item and populating with Blanks
@@ -633,7 +692,9 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
         # ensures the file separators are correct for operating system
         if fname:
             fname = QDir.toNativeSeparators(fname)
+            fname2 = glob.glob(fname)
             fname = glob.glob(fname + "\\*Report.xls")
+            fname2 = fname2[0]
             fname = fname[0]
 
         # if user presses cancel, return control to calling function
@@ -658,6 +719,7 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
         StatusColumns1RA = ["Module", "Version"]
         VersionNumbers1RA = pd.read_excel(open(fname, 'rb'), sheet_name="Version Numbers")
         VersionNumbersdf1RA = pd.DataFrame(VersionNumbers1RA, columns=StatusColumns1RA)
+        StdThisMnth = Read_A_17_Standard(fname2)
 
         # **************************************************************************************************************************************************
         # This section updates the 1 Report ago section of the Page 6 status tables using the dataframes defined earlier
@@ -707,7 +769,7 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
         FirstStandard = QTableWidgetItem(AnalyserStatusdf1RA.loc[AnalyserStatusdf1RA["Result Name"] == "FirstStandardTime", "Value"].to_string(index=False))
         LastStandard = QTableWidgetItem(AnalyserStatusdf1RA.loc[AnalyserStatusdf1RA["Result Name"] == "LastStandardiseTime", "Value"].to_string(index=False))
         NumStandard = QTableWidgetItem(AnalyserStatusdf1RA.loc[AnalyserStatusdf1RA["Result Name"] == "PeriodCount", "Value"].to_string(index=False))
-        NumStandardMonth = QTableWidgetItem("PlaceHolder")
+        NumStandardMonth = QTableWidgetItem(StdThisMnth)
         self.page6.PlantPLCTable_5.setItem(0, 1, FirstStandard)
         self.page6.PlantPLCTable_5.setItem(1, 1, LastStandard)
         self.page6.PlantPLCTable_5.setItem(2, 1, NumStandard)
@@ -747,7 +809,9 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
         # ensures the file separators are correct for operating system
         if fname:
             fname = QDir.toNativeSeparators(fname)
+            fname2 = glob.glob(fname)
             fname = glob.glob(fname + "\\*Report.xls")
+            fname2 = fname2[0]
             fname = fname[0]
 
         # if user presses cancel, return control to calling function
@@ -772,6 +836,7 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
         StatusColumns2RA = ["Module", "Version"]
         VersionNumbers2RA = pd.read_excel(open(fname, 'rb'), sheet_name="Version Numbers")
         VersionNumbersdf2RA = pd.DataFrame(VersionNumbers2RA, columns=StatusColumns2RA)
+        StdThisMnth = Read_A_17_Standard(fname2)
 
         # **************************************************************************************************************************************************
         # This section updates the 1 Report ago section of the Page 6 status tables using the dataframes defined earlier
@@ -821,7 +886,7 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
         FirstStandard = QTableWidgetItem(AnalyserStatusdf2RA.loc[AnalyserStatusdf2RA["Result Name"] == "FirstStandardTime", "Value"].to_string(index=False))
         LastStandard = QTableWidgetItem(AnalyserStatusdf2RA.loc[AnalyserStatusdf2RA["Result Name"] == "LastStandardiseTime", "Value"].to_string(index=False))
         NumStandard = QTableWidgetItem(AnalyserStatusdf2RA.loc[AnalyserStatusdf2RA["Result Name"] == "PeriodCount", "Value"].to_string(index=False))
-        NumStandardMonth = QTableWidgetItem("PlaceHolder")
+        NumStandardMonth = QTableWidgetItem(StdThisMnth)
         self.page6.PlantPLCTable_5.setItem(0, 2, FirstStandard)
         self.page6.PlantPLCTable_5.setItem(1, 2, LastStandard)
         self.page6.PlantPLCTable_5.setItem(2, 2, NumStandard)
@@ -841,16 +906,16 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
 
     # used in Update report
     def UpdateFigs(self):
-        self.page2.label_3.setPixmap(QtGui.QPixmap(ReadInData.resourcepath + "\\Detector_Stability.png"))
-        self.page3.Temps.setPixmap(QtGui.QPixmap(ReadInData.resourcepath + "\\Temperatures.png"))
-        self.page3.label_4.setPixmap(QtGui.QPixmap(ReadInData.resourcepath + "\\Daily_Tonnes.png"))
-        self.page4.Results1.setPixmap(QtGui.QPixmap(ReadInData.resourcepath + "\\Results1.png"))
-        self.page5.Results2.setPixmap(QtGui.QPixmap(ReadInData.resourcepath + "\\Results2.png"))
+        self.page2.label_3.setPixmap(QtGui.QPixmap(HomeWindow.resourcepath + "\\Detector_Stability.png"))
+        self.page3.Temps.setPixmap(QtGui.QPixmap(HomeWindow.resourcepath + "\\Temperatures.png"))
+        self.page3.label_4.setPixmap(QtGui.QPixmap(HomeWindow.resourcepath + "\\Daily_Tonnes.png"))
+        self.page4.Results1.setPixmap(QtGui.QPixmap(HomeWindow.resourcepath + "\\Results1.png"))
+        self.page5.Results2.setPixmap(QtGui.QPixmap(HomeWindow.resourcepath + "\\Results2.png"))
 
     # used in Update report
     def UpdateDetStab(self):
         # calculate the number of detecotrs
-        Dets = ReadInData.PeakControl.shape[1]-2
+        Dets = HomeWindow.PeakControl.shape[1]-2
 
         # clear the table each time the function is called.
         for i in range(16):
@@ -861,9 +926,9 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
         # update the detecotr status table based on the totoal number of detectors.
         while x < Dets:
             # read in the detector disabled status
-            disabled = ReadInData.PeakControl.loc[ReadInData.PeakControl["Result Name"] == "DetectorDisabled", "Detector "+str(x+1)].to_string(index=False)
+            disabled = HomeWindow.PeakControl.loc[HomeWindow.PeakControl["Result Name"] == "DetectorDisabled", "Detector "+str(x+1)].to_string(index=False)
             # read in the detector Stability status
-            stablity = ReadInData.PeakControl.iloc[21, x+1]
+            stablity = HomeWindow.PeakControl.iloc[21, x+1]
 
             # Choose which colour and wording to update the Detector enabled row of detecotr stability table with
             if disabled == "FALSE":
@@ -885,14 +950,14 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
 
 
     def RepPeriod(self):
-        dates = ReadInData.AnalyserStatus.loc[ReadInData.AnalyserStatus["Result Name"] == "LastPsaReportTime", "Value"] # get the date of the last psa report generation
+        dates = HomeWindow.AnalyserStatus.loc[HomeWindow.AnalyserStatus["Result Name"] == "LastPsaReportTime", "Value"] # get the date of the last psa report generation
         dates1 = pd.to_datetime(dates,yearfirst=True)   #setup dataframe as a date time series in the correct format
         Period = dates1.dt.month_name().to_string(index=False) + " " + dates1.dt.year.to_string(index=False) #concatenate the month name and year integer into a string called period using the to_string method to eliminate indexs
         return Period   #return Period to main
 
     def RepEmail(self):
         anal = self.AnalyserListComboBox.currentText()
-        region = ReadInData.PSAMasterData.loc[ReadInData.PSAMasterData["Analyser Number"] == anal, "Region"].to_string(index=False) #get the service engineer as a string without dataframe nonsense
+        region = HomeWindow.PSAMasterData.loc[HomeWindow.PSAMasterData["Analyser Number"] == anal, "Region"].to_string(index=False) #get the service engineer as a string without dataframe nonsense
         if region == "Asia":
             email = "service.asia@scantech.com.au"
         elif region == "Australia":
@@ -921,7 +986,7 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
         return email
 
     def StdDate(self):
-        stddate = ReadInData.AnalyserStatus.loc[ReadInData.AnalyserStatus["Result Name"] == "LastStandardiseTime", "Value"] # get the date of the last psa report generation
+        stddate = HomeWindow.AnalyserStatus.loc[HomeWindow.AnalyserStatus["Result Name"] == "LastStandardiseTime", "Value"] # get the date of the last psa report generation
         stddate = stddate.to_string(index=False)   #setup dataframe as a date time series in the correct format
         stddate = datetime.datetime.strptime(stddate, "%a %y/%m/%d %H:%M")
         tdate = datetime.datetime.today()
@@ -934,7 +999,7 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
         return output
 
     def DiskSpaceOK(self):
-        diskspace = ReadInData.VersionNumbers.loc[ReadInData.VersionNumbers["Module"] == "%DiskSpace", "Version"]
+        diskspace = HomeWindow.VersionNumbers.loc[HomeWindow.VersionNumbers["Module"] == "%DiskSpace", "Version"]
         diskspace = diskspace.to_string(index=False)
         diskspace = float(diskspace.replace("%",""))
         if diskspace > 10.00 :
@@ -952,7 +1017,7 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
         print (fileName)
 
     def popanalysers(self):
-        analysers = ReadInData.PSAMasterData["Analyser Number"]
+        analysers = HomeWindow.PSAMasterData["Analyser Number"]
         analysers.dropna(inplace=True)
         #print(analysers)
         for x in analysers:

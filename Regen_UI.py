@@ -6,4 +6,4 @@ def regen_ui():
 def regen_ui_eng():
     subprocess.call([r"C:\\Users\\l.ritchie\\PycharmProjects\\Scantech_Monthly_PSA_Report\\Regen_UI_eng.bat"])
 
-regen_ui_eng()
+regen_ui()
