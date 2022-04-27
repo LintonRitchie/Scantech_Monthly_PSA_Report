@@ -7,11 +7,11 @@ from Regen_UI import regen_ui               # Load the function which runs a bat
 # This is used for Development
 from Read_Master import (Read_Master, Read_AnalyserStatus, Read_PeakControl, Read_VersionNumbers, Read_AnalyserIO, Read_A_08_Analyse, Read_PeakExtract,
                          Read_TempExtract, Read_A_17_Standard)  # import the function which reads from the Master PSA file
-# from PyQt5.QtGui import (QPixmap)
 import datetime
 import json
 import base64
 import glob
+import openpyxl
 from PSA_Home_Cal import Ui_PSAHome
 from PSA_Page1 import Ui_PSAPage1
 from PSA_Page2 import Ui_PSAPage2
@@ -23,9 +23,6 @@ from PyQt5.QtWidgets import (QApplication, QMainWindow, QFileDialog, QTableWidge
 from PyQt5 import (QtCore, QtGui)
 from PyQt5.QtCore import QDir
 
-
-
-import matplotlib.pyplot as plt
 
 # regen_ui()                  # Regenerate the UI. This is used to update the UI file after changes
 
@@ -85,6 +82,7 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
     TempExtract = ""                                    # Read in Temp Stability Data
     resourcepath = "C:\\PSAGen"
     newanalyser = 0
+    autosend = 0
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -119,6 +117,9 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
         self.page6.RepAgo2.released.connect(self.UpdatePg6_2RepAgo)
         self.page6.NextPage.released.connect(self.UpdateJSON)
         self.NewAnalyser.stateChanged.connect(lambda: self.NewAnalyserToggle(self.NewAnalyser))
+        self.AutoSendReport.stateChanged.connect(lambda: self.AutoSendToggle(self.AutoSendReport))
+        self.AnalyserListComboBox.currentTextChanged.connect(self.AnalyserChanged)
+        self.UpdateChecklistPB.released.connect(self.UpdatePSAChecklist)
 
     def importPSAData(self):
         HomeWindow.psadatafname = self.GetFolder("Select Folder containing PSA Report Data")
@@ -153,6 +154,25 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
         self.PreviewReportPB.setEnabled(True)
         self.psadataloc.setText(HomeWindow.psadatafname)
 
+    def AutoSendToggle(self,b):
+        # Toggles Auto Send Report Flag
+        if b.isChecked() == True:
+            HomeWindow.autosend = 1
+            print(HomeWindow.newanalyser)
+        else:
+            HomeWindow.autosend = 0
+            print(HomeWindow.newanalyser)
+
+    def AnalyserChanged(self):
+        self.PreviewReportPB.setEnabled(False)
+        self.ExportReportPB.setEnabled(False)
+        self.UpdateChecklistPB.setEnabled(False)
+        self.PB_pg.setEnabled(False)
+        self.PB_pg_2.setEnabled(False)
+        self.PB_pg_3.setEnabled(False)
+        self.PB_pg_4.setEnabled(False)
+        self.PB_pg_5.setEnabled(False)
+        self.PB_pg_6.setEnabled(False)
 
     def NewAnalyserToggle(self,b):
         # Toggles the new analyser flag
@@ -162,7 +182,6 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
         else:
             HomeWindow.newanalyser = 0
             print(HomeWindow.newanalyser)
-
 
     def GetFolder(self, message):
         anal = self.AnalyserListComboBox.currentText()
@@ -432,6 +451,7 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
             json.dump(reportdata, file, indent=1)
 
         print("JSON Updated")
+        self.ExportReportPB.setEnabled(True)
 
     def ExportReport(self):
         signature_path = os.path.join((os.environ['USERPROFILE']), 'AppData\Roaming\Microsoft\Signatures\Ext L Ritchie - Scantech Aus_python\\')  # Finds the path to Outlook signature files with signature name "Work"
@@ -452,12 +472,16 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
         mail.HTMLBody = "<html><body style=font-family:Calibri;> Hi Lucas <br><br> I hope this comes through. I am testing a few automated emailing options. Please let me know if you get this email. <br> There should be an attachment called " + str(HomeWindow.jsonname) + "<br><br> </body></html>" + signature_code
         print(HomeWindow.jsonoutfname)
         mail.Attachments.Add(HomeWindow.jsonoutfname)
-        mail.Send()
+        if HomeWindow.autosend == 0:
+            mail.Display()
+        elif HomeWindow.autosend == 1:
+            mail.Send()
         print("Exporting report to email")
+        self.UpdateChecklistPB.setEnabled(True)
 
     def updateReport(self):
 
-        self.ExportReportPB.setEnabled(True)
+        self.ExportReportPB.setEnabled(False)
         self.PB_pg.setEnabled(True)
         self.PB_pg_2.setEnabled(True)
         self.PB_pg_3.setEnabled(True)
@@ -522,15 +546,22 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
     def UpdatePg6(self):
 
         if HomeWindow.newanalyser == 0:
-            fname = self.GetFolder("Select Folder containing Last Month's PSA Report Data")
+            fname1 = self.GetFolder("Select Folder containing Last Month's PSA Report Data") # gets the filename of the JSON file containing last months
+            print(fname1)
+            fname = glob.glob(fname1 + "\*.json")
             print(fname)
-            fname = glob.glob(fname + "\*.json")
-            print(fname)
-            fname = QDir.toNativeSeparators(fname[0])
-            print(fname)
+            if fname:
+                fname = QDir.toNativeSeparators(fname[0])
+                print(fname)
+            else:
+                print("JSON not available in " + fname1)
+                print("Using default JSON in C:\\PSAGen")
+                fname = "C:\\PSAGen\\ReportData.json"
+
             with open(fname) as f:
                 reportdata = json.load(f)
         else:
+            print("Insufficient History Available, so using default in C:\\PSAGen instead, which should be blank")
             with open("C:\\PSAGen\\ReportData.json") as f:
                 reportdata = json.load(f)
 
@@ -952,7 +983,7 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
         dates = HomeWindow.AnalyserStatus.loc[HomeWindow.AnalyserStatus["Result Name"] == "LastPsaReportTime", "Value"] # get the date of the last psa report generation
         dates1 = pd.to_datetime(dates,yearfirst=True)   #setup dataframe as a date time series in the correct format
         Period = dates1.dt.month_name().to_string(index=False) + " " + dates1.dt.year.to_string(index=False) #concatenate the month name and year integer into a string called period using the to_string method to eliminate indexs
-        return Period   #return Period to main
+        return Period   # return Period to main
 
     def RepEmail(self):
         anal = self.AnalyserListComboBox.currentText()
@@ -1027,8 +1058,58 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
             else:
                 self.AnalyserListComboBox.addItem(str(x))
 
-    def UpdatePSAChecklist(self):
-        pass
+    def UpdatePSAChecklist(self):       # this must only be called after the JSON has been updated since this function uses that JSON to update the PSA Checklist
+        dates = HomeWindow.AnalyserStatus.loc[HomeWindow.AnalyserStatus["Result Name"] == "LastPsaReportTime", "Value"]  # get the date of the last psa report generation. This gives the period of the report.
+        dates1 = pd.to_datetime(dates, yearfirst=True)  # setup dataframe as a date time series in the correct format
+        year = dates1.dt.year.to_string(index=False)
+        period = dates1.dt.month_name().to_string(index=False) + " " + year
+        checklistfname = "C:\\PSAGen\\PSA Report Checklist " + year + ".xlsx"   # generates the checklist filename based on the year of the period of the report being produced. This will deal with the January / december issue
+        checklist = openpyxl.load_workbook(checklistfname)
+        psachecklist = checklist["PSA Checklist"]
+        with open(HomeWindow.jsonoutfname) as f:
+            jsondata = json.load(f)
+        analyser = jsondata["Summary"][0]["AnalyserNo"]
+        analyser = analyser.replace("-","")
+
+        for row in range(1, psachecklist.max_row + 1):
+            job = "{}{}".format(1, row) # this sets up the cell reference in the PSA Checklist Excel document that we are going to search through.
+            if psachecklist[job].value == analyser:
+                if period == "January " + year:
+                    psachecklist["{}{}".format(5, row)].value = jsondata["Summary"][0]["ReportDate"]
+                    psachecklist["{}{}".format(6, row)].value = jsondata["Summary"][0]["ReportDate"]
+                elif period == "February " + year:
+                    psachecklist["{}{}".format(10, row)].value = jsondata["Summary"][0]["ReportDate"]
+                    psachecklist["{}{}".format(11, row)].value = jsondata["Summary"][0]["ReportDate"]
+                elif period == "March " + year:
+                    psachecklist["{}{}".format(15, row)].value = jsondata["Summary"][0]["ReportDate"]
+                    psachecklist["{}{}".format(16, row)].value = jsondata["Summary"][0]["ReportDate"]
+                elif period == "April " + year:
+                    psachecklist["{}{}".format(20, row)].value = jsondata["Summary"][0]["ReportDate"]
+                    psachecklist["{}{}".format(11, row)].value = jsondata["Summary"][0]["ReportDate"]
+                elif period == "May " + year:
+                    psachecklist["{}{}".format(25, row)].value = jsondata["Summary"][0]["ReportDate"]
+                    psachecklist["{}{}".format(26, row)].value = jsondata["Summary"][0]["ReportDate"]
+                elif period == "June " + year:
+                    psachecklist["{}{}".format(30, row)].value = jsondata["Summary"][0]["ReportDate"]
+                    psachecklist["{}{}".format(31, row)].value = jsondata["Summary"][0]["ReportDate"]
+                elif period == "July " + year:
+                    psachecklist["{}{}".format(35, row)].value = jsondata["Summary"][0]["ReportDate"]
+                    psachecklist["{}{}".format(36, row)].value = jsondata["Summary"][0]["ReportDate"]
+                elif period == "August " + year:
+                    psachecklist["{}{}".format(40, row)].value = jsondata["Summary"][0]["ReportDate"]
+                    psachecklist["{}{}".format(41, row)].value = jsondata["Summary"][0]["ReportDate"]
+                elif period == "September " + year:
+                    psachecklist["{}{}".format(45, row)].value = jsondata["Summary"][0]["ReportDate"]
+                    psachecklist["{}{}".format(46, row)].value = jsondata["Summary"][0]["ReportDate"]
+                elif period == "October " + year:
+                    psachecklist["{}{}".format(50, row)].value = jsondata["Summary"][0]["ReportDate"]
+                    psachecklist["{}{}".format(51, row)].value = jsondata["Summary"][0]["ReportDate"]
+                elif period == "November " + year:
+                    psachecklist["{}{}".format(55, row)].value = jsondata["Summary"][0]["ReportDate"]
+                    psachecklist["{}{}".format(56, row)].value = jsondata["Summary"][0]["ReportDate"]
+                elif period == "December " + year:
+                    psachecklist["{}{}".format(60, row)].value = jsondata["Summary"][0]["ReportDate"]
+                    psachecklist["{}{}".format(61, row)].value = jsondata["Summary"][0]["ReportDate"]
 
     def hide_pages(self):
         self.page1.hide()
