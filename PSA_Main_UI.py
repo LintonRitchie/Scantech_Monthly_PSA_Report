@@ -948,7 +948,6 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
             # incrment the loop counter
             x += 1
 
-
     def RepPeriod(self):
         dates = HomeWindow.AnalyserStatus.loc[HomeWindow.AnalyserStatus["Result Name"] == "LastPsaReportTime", "Value"] # get the date of the last psa report generation
         dates1 = pd.to_datetime(dates,yearfirst=True)   #setup dataframe as a date time series in the correct format
@@ -1027,6 +1026,9 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
                 pass
             else:
                 self.AnalyserListComboBox.addItem(str(x))
+
+    def UpdatePSAChecklist(self):
+        pass
 
     def hide_pages(self):
         self.page1.hide()
