@@ -98,7 +98,6 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
         self.popanalysers()
         self.psamasterloc.setText(HomeWindow.masterpsafname)    # Update PSA Master file location Label
 
-
     # Setup Signals and Slots for Pushbuttons
     def connectSignalsSlots(self):
         self.PreviewReportPB.released.connect(self.show_page_1)
@@ -454,22 +453,13 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
         self.ExportReportPB.setEnabled(True)
 
     def ExportReport(self):
-        signature_path = os.path.join((os.environ['USERPROFILE']), 'AppData\Roaming\Microsoft\Signatures\Ext L Ritchie - Scantech Aus_python\\')  # Finds the path to Outlook signature files with signature name "Work"
-        html_doc = os.path.join((os.environ['USERPROFILE']), 'AppData\Roaming\Microsoft\Signatures\Ext L Ritchie - Scantech Aus_python.htm')  # Specifies the name of the HTML version of the stored signature
-        html_doc = html_doc.replace('\\\\', '\\')  # Removes escape backslashes from path string
-
-        html_file = codecs.open(html_doc, 'r', 'utf-8', errors='ignore')  # Opens HTML file and ignores errors
-        signature_code = html_file.read()  # Writes contents of HTML signature file to a string
-        signature_code = signature_code.replace('Work_files/', signature_path)  # Replaces local directory with full directory path
-        html_file.close()
-
         outlook = win32com.client.Dispatch('outlook.application')
         mail = outlook.CreateItem(0)  # This creates the email object. The 0 refers to the item type from the office documentation OlItemType. This can be others eg 1 for appointments, 2 for contacts etc.
         mail.To = 'l.biggins@scantech.com.au'
         mail.CC = 'l.balzan@scantech.com.au; m.kalicinski@scantech.com.au'
         mail.Subject = 'This is a Test. dont freak out yet'
         mail.BodyFormat = 2
-        mail.HTMLBody = "<html><body style=font-family:Calibri;> Hi Lucas <br><br> I hope this comes through. I am testing a few automated emailing options. Please let me know if you get this email. <br> There should be an attachment called " + str(HomeWindow.jsonname) + "<br><br> </body></html>" + signature_code
+        mail.HTMLBody = "<html><body style=font-family:Calibri;> Hi Lucas <br><br> I hope this comes through. I am testing a few automated emailing options. Please let me know if you get this email. <br> There should be an attachment called " + str(HomeWindow.jsonname) + "<br><br> </body></html>"
         print(HomeWindow.jsonoutfname)
         mail.Attachments.Add(HomeWindow.jsonoutfname)
         if HomeWindow.autosend == 0:
@@ -1059,57 +1049,105 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
                 self.AnalyserListComboBox.addItem(str(x))
 
     def UpdatePSAChecklist(self):       # this must only be called after the JSON has been updated since this function uses that JSON to update the PSA Checklist
-        dates = HomeWindow.AnalyserStatus.loc[HomeWindow.AnalyserStatus["Result Name"] == "LastPsaReportTime", "Value"]  # get the date of the last psa report generation. This gives the period of the report.
-        dates1 = pd.to_datetime(dates, yearfirst=True)  # setup dataframe as a date time series in the correct format
-        year = dates1.dt.year.to_string(index=False)
-        period = dates1.dt.month_name().to_string(index=False) + " " + year
-        checklistfname = "C:\\PSAGen\\PSA Report Checklist " + year + ".xlsx"   # generates the checklist filename based on the year of the period of the report being produced. This will deal with the January / december issue
-        checklist = openpyxl.load_workbook(checklistfname)
-        psachecklist = checklist["PSA Checklist"]
         with open(HomeWindow.jsonoutfname) as f:
             jsondata = json.load(f)
+
+        dates = HomeWindow.AnalyserStatus.loc[HomeWindow.AnalyserStatus["Result Name"] == "LastPsaReportTime", "Value"]  # get the date of the last psa report generation. This gives the period of the report.
+        print("The Report Date is " + str(dates))
+        dates1 = pd.to_datetime(dates,yearfirst=True)   # setup dataframe as a date time series in the correct format
+        print("dates1 = " + str(dates1))
+        print(type(dates1))
+        year = dates1.dt.year.to_string(index=False)
+        print("year = " + str(year))
+        period = dates1.dt.month_name().to_string(index=False) + " " + dates1.dt.year.to_string(index=False) #concatenate the month name and year integer into a string called period using the to_string method to eliminate indexs
+
+        checklistfname = "C:\\PSAGen\\PSA Report Checklist " + year + ".xlsx"   # generates the checklist filename based on the year of the period of the report being produced. This will deal with the January / december issue
+        print("The Checklist file name = " + str(checklistfname))
+        checklist = openpyxl.load_workbook(checklistfname)
+        psachecklist = checklist["PSA Checklist"]
+        print(psachecklist)
+
         analyser = jsondata["Summary"][0]["AnalyserNo"]
         analyser = analyser.replace("-","")
-
-        for row in range(1, psachecklist.max_row + 1):
-            job = "{}{}".format(1, row) # this sets up the cell reference in the PSA Checklist Excel document that we are going to search through.
-            if psachecklist[job].value == analyser:
+        print("analyser = " + str(analyser))
+        maxrow = psachecklist.max_row
+        print("Number of rows = " + str(maxrow))
+        for row in range(1, maxrow + 1):
+            job = "{}{}".format("A", row) # this sets up the cell reference in the PSA Checklist Excel document that we are going to search through.
+            print(" Job = " + str(job))
+            x = psachecklist[job].value
+            print("x = " + str(x))
+            print("Period = " + str(period))
+            if x == analyser:
                 if period == "January " + year:
-                    psachecklist["{}{}".format(5, row)].value = jsondata["Summary"][0]["ReportDate"]
-                    psachecklist["{}{}".format(6, row)].value = jsondata["Summary"][0]["ReportDate"]
+                    c1 = "{}{}".format("E", row)
+                    c2 = "{}{}".format("F", row)
+                    print("C1 = " + str(c1) + " and C2 = " + str(c2))
+
                 elif period == "February " + year:
-                    psachecklist["{}{}".format(10, row)].value = jsondata["Summary"][0]["ReportDate"]
-                    psachecklist["{}{}".format(11, row)].value = jsondata["Summary"][0]["ReportDate"]
+                    c1 = "{}{}".format("J", row)
+                    c2 = "{}{}".format("K", row)
+                    print("C1 = " + str(c1) + " and C2 = " + str(c2))
                 elif period == "March " + year:
-                    psachecklist["{}{}".format(15, row)].value = jsondata["Summary"][0]["ReportDate"]
-                    psachecklist["{}{}".format(16, row)].value = jsondata["Summary"][0]["ReportDate"]
+                    c1 = "{}{}".format("O", row)
+                    c2 = "{}{}".format("P", row)
+                    print("C1 = " + str(c1) + " and C2 = " + str(c2))
+
                 elif period == "April " + year:
-                    psachecklist["{}{}".format(20, row)].value = jsondata["Summary"][0]["ReportDate"]
-                    psachecklist["{}{}".format(11, row)].value = jsondata["Summary"][0]["ReportDate"]
+                    c1 = "{}{}".format("T", row)
+                    c2 = "{}{}".format("U", row)
+                    print("C1 = " + str(c1) + " and C2 = " + str(c2))
+
                 elif period == "May " + year:
-                    psachecklist["{}{}".format(25, row)].value = jsondata["Summary"][0]["ReportDate"]
-                    psachecklist["{}{}".format(26, row)].value = jsondata["Summary"][0]["ReportDate"]
+                    c1 = "{}{}".format("Y", row)
+                    c2 = "{}{}".format("Z", row)
+                    print("C1 = " + str(c1) + " and C2 = " + str(c2))
+
                 elif period == "June " + year:
-                    psachecklist["{}{}".format(30, row)].value = jsondata["Summary"][0]["ReportDate"]
-                    psachecklist["{}{}".format(31, row)].value = jsondata["Summary"][0]["ReportDate"]
+                    c1 = "{}{}".format("AD", row)
+                    c2 = "{}{}".format("AE", row)
+                    print("C1 = " + str(c1) + " and C2 = " + str(c2))
+
                 elif period == "July " + year:
-                    psachecklist["{}{}".format(35, row)].value = jsondata["Summary"][0]["ReportDate"]
-                    psachecklist["{}{}".format(36, row)].value = jsondata["Summary"][0]["ReportDate"]
+                    c1 = "{}{}".format("AI", row)
+                    c2 = "{}{}".format("AJ", row)
+                    print("C1 = " + str(c1) + " and C2 = " + str(c2))
+
                 elif period == "August " + year:
-                    psachecklist["{}{}".format(40, row)].value = jsondata["Summary"][0]["ReportDate"]
-                    psachecklist["{}{}".format(41, row)].value = jsondata["Summary"][0]["ReportDate"]
+                    c1 = "{}{}".format("AN", row)
+                    c2 = "{}{}".format("AO", row)
+                    print("C1 = " + str(c1) + " and C2 = " + str(c2))
+
                 elif period == "September " + year:
-                    psachecklist["{}{}".format(45, row)].value = jsondata["Summary"][0]["ReportDate"]
-                    psachecklist["{}{}".format(46, row)].value = jsondata["Summary"][0]["ReportDate"]
+                    c1 = "{}{}".format("AS", row)
+                    c2 = "{}{}".format("AT", row)
+                    print("C1 = " + str(c1) + " and C2 = " + str(c2))
+
                 elif period == "October " + year:
-                    psachecklist["{}{}".format(50, row)].value = jsondata["Summary"][0]["ReportDate"]
-                    psachecklist["{}{}".format(51, row)].value = jsondata["Summary"][0]["ReportDate"]
+                    c1 = "{}{}".format("AX", row)
+                    c2 = "{}{}".format("AY", row)
+                    print("C1 = " + str(c1) + " and C2 = " + str(c2))
+
                 elif period == "November " + year:
-                    psachecklist["{}{}".format(55, row)].value = jsondata["Summary"][0]["ReportDate"]
-                    psachecklist["{}{}".format(56, row)].value = jsondata["Summary"][0]["ReportDate"]
-                elif period == "December " + year:
-                    psachecklist["{}{}".format(60, row)].value = jsondata["Summary"][0]["ReportDate"]
-                    psachecklist["{}{}".format(61, row)].value = jsondata["Summary"][0]["ReportDate"]
+                    c1 = "{}{}".format("BC", row)
+                    c2 = "{}{}".format("BD", row)
+                    print("C1 = " + str(c1) + " and C2 = " + str(c2))
+
+                else:
+                    c1 = "{}{}".format("BH", row)
+                    c2 = "{}{}".format("BI", row)
+                    print("C1 = " + str(c1) + " and C2 = " + str(c2))
+
+                print(psachecklist[c1].value)
+                print(psachecklist[c2].value)
+                psachecklist[c1].value = jsondata["Summary"][0]["ReportDate"]
+                psachecklist[c2].value = jsondata["Summary"][0]["ReportDate"]
+                break
+            else:
+                print("Checking Next Line")
+
+        openpyxl.Workbook.save(checklist,checklistfname)
+        print("PSA Checklist Updated")
 
     def hide_pages(self):
         self.page1.hide()
