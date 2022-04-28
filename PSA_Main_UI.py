@@ -1,9 +1,7 @@
-import os
 import sys
 import pandas as pd
-import codecs
 import win32com.client
-from Regen_UI import regen_ui               # Load the function which runs a batch to regen the UI each time code runs.
+# from Regen_UI import regen_ui               # Load the function which runs a batch to regen the UI each time code runs.
 # This is used for Development
 from Read_Master import (Read_Master, Read_AnalyserStatus, Read_PeakControl, Read_VersionNumbers, Read_AnalyserIO, Read_A_08_Analyse, Read_PeakExtract,
                          Read_TempExtract, Read_A_17_Standard)  # import the function which reads from the Master PSA file
@@ -26,33 +24,6 @@ from PyQt5.QtCore import QDir
 
 # regen_ui()                  # Regenerate the UI. This is used to update the UI file after changes
 
-# Define a function which reads in the data from the relevant files. This may be called in a few different places.
-# this function takes 1 folder location and uses the PSA Master default location
-# class ReadInData:
-#     PSAMaster = "C:\\Users\\l.ritchie\\PycharmProjects\\Scantech_Monthly_PSA_Report\\PSA_Master_List.xlsx"
-#     defaultpath = "C:\\Users\\l.ritchie\\PycharmProjects\\Scantech_Monthly_PSA_Report\\"
-#     resourcepath = "C:\\Users\\l.ritchie\\PycharmProjects\\Scantech_Monthly_PSA_Report\\Resources\\"
-#     defaultanalyser = "OBA-040"
-#     PSAMasterData = Read_Master(PSAMaster)                                          # Read in master file data from PSA Master file.
-#     AnalyserStatus = Read_AnalyserStatus(defaultpath)                               # Read in PSA Report file data from PSA Report file.
-#     PeakControl = Read_PeakControl(defaultpath)                                     # Read in Analyser Peak Control Data
-#     VersionNumbers = Read_VersionNumbers(defaultpath)                               # Read in version numbers data
-#     AnalyserIO = Read_AnalyserIO(defaultpath)                                       # Read in Analyser IO Data
-#     AnalyserA08 = Read_A_08_Analyse(defaultpath)          # Read in Analysis Data
-#     PeakExtract = Read_PeakExtract(defaultpath)                                     # Readi in Peak Stability Data
-#     TempExtract = Read_TempExtract(defaultpath)                                     # Read in Temp Stability Data
-    # print(" Initial Default Path: \n" + defaultpath)
-    # print(" Initial PSA Master Data: \n" + str(PSAMasterData))
-    # print(" Initial Analayser Status: \n" + str(AnalyserStatus))
-    # print(" Initial Peak Control: \n" + str(PeakControl))
-    # print(" Initial Version Number: \n" + str(VersionNumbers))
-    # print(" Initial Analyser IO: \n" + str(AnalyserIO))
-    # print(" Initial Analsyer Results: \n" + str(AnalyserA08))
-    # print(" Initial Peak Satbility: \n" + str(PeakExtract))
-    # print(" Initial Temp data: \n" + str(TempExtract))
-
-# Read in master file data from PSA Master file. This is run at the start of the program to ensure data is loaded prior to the UI starting up.
-# ReadInData()
 
 AnalyserToProcess = 0
 open_window = 0
@@ -453,21 +424,38 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
         self.ExportReportPB.setEnabled(True)
 
     def ExportReport(self):
-        outlook = win32com.client.Dispatch('outlook.application')
-        mail = outlook.CreateItem(0)  # This creates the email object. The 0 refers to the item type from the office documentation OlItemType. This can be others eg 1 for appointments, 2 for contacts etc.
-        mail.To = 'l.biggins@scantech.com.au'
-        mail.CC = 'l.balzan@scantech.com.au; m.kalicinski@scantech.com.au'
-        mail.Subject = 'This is a Test. dont freak out yet'
+        with open(HomeWindow.jsonoutfname) as f:
+            jsondata = json.load(f)
+        configdatafname = "C:\\PSAGen\\PSA Report Config data.xlsx"   # generates the checklist filename based on the year of the period of the report being produced. This will deal with the January / december issue
+        configdata = openpyxl.load_workbook(configdatafname)            # Load config data from Config Data spreadsheet
+        engineers = configdata["Engineers"]                             # Select Engineers sheet
+        serveng = jsondata["Summary"][0]["ServEng"]                     # load relevant service engineers from JSON
+        maxrow = engineers.max_row                                      # Determine max row of document
+
+        for row in range(1, maxrow + 1):                                # For loop for searching through the engineers sheet to determine the email address
+            engcol = "{}{}".format("A", row)                            # this sets up the cell reference in the PSA report Config Excel document that we are going to search through.
+            emailcol = "{}{}".format("B", row)                          # this sets up the cell reference in the PSA report Config Excel document that we are going to find the email address.
+            engnamecol = "{}{}".format("C", row)                           # this sets up the cell reference in the PSA report Config Excel document that we are going to find the engineer's preferred name.
+            x = engineers[engcol].value                                 # Load the engineers name into a variable for checking
+
+            if x == serveng:                                            # if statement that triggers when the engineers name is found.
+                engemail = engineers[emailcol].value                    # put the engineers email address into the engemail variable which is used later for setting the engineers email address in the email
+                engname = engineers[engnamecol].value                   # put the engineer's preferred name in the variable engname
+                break
+        outlook = win32com.client.Dispatch('outlook.application')       # invoke outlook to automatically generate the email
+        mail = outlook.CreateItem(0)                                    # This creates the email object. The 0 refers to the item type from the office documentation OlItemType. This can be others eg 1 for appointments, 2 for contacts etc.
+        mail.To = engemail                                              # insert the relevant engineer's email address
+        mail.CC = 'l.biggins@scantech.com.au; i.nerush@scantech.com.au; d.rossouw@scantech.com.au; l.balzan@scantech.com.au; m.kalicinski@scantech.com.au'
+        mail.Subject = str(jsondata["Summary"][0]["AnalyserNo"]) + " Monthly PSA Report data for " + str(jsondata["Summary"][0]["Period"])   # Build the subject line automatically.
         mail.BodyFormat = 2
-        mail.HTMLBody = "<html><body style=font-family:Calibri;> Hi Lucas <br><br> I hope this comes through. I am testing a few automated emailing options. Please let me know if you get this email. <br> There should be an attachment called " + str(HomeWindow.jsonname) + "<br><br> </body></html>"
-        print(HomeWindow.jsonoutfname)
-        mail.Attachments.Add(HomeWindow.jsonoutfname)
-        if HomeWindow.autosend == 0:
+        mail.HTMLBody = "<html><body style=font-family:Calibri;> Hi " + str(engname) + " <br><br> I hope this comes through. I am testing a few automated emailing options. Please let me know if you get this email. <br> There should be an attachment called " + str(HomeWindow.jsonname) + "<br><br> </body></html>"
+        mail.Attachments.Add(HomeWindow.jsonoutfname)                   # add the json file as an attachment
+        if HomeWindow.autosend == 0:                                    # if statement to determine if the email should be sent directly or displayed for manual sending.
             mail.Display()
         elif HomeWindow.autosend == 1:
             mail.Send()
         print("Exporting report to email")
-        self.UpdateChecklistPB.setEnabled(True)
+        self.UpdateChecklistPB.setEnabled(True)                         # activate the update checklist pushbutton which will allow the PSA report checklist to be updated.
 
     def updateReport(self):
 
@@ -1048,105 +1036,68 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
             else:
                 self.AnalyserListComboBox.addItem(str(x))
 
-    def UpdatePSAChecklist(self):       # this must only be called after the JSON has been updated since this function uses that JSON to update the PSA Checklist
-        with open(HomeWindow.jsonoutfname) as f:
+    def UpdatePSAChecklist(self):                                              # this must only be called after the JSON has been updated since this function uses that JSON to update the PSA Checklist
+        with open(HomeWindow.jsonoutfname) as f:                               # reload the json file to use in the function
             jsondata = json.load(f)
 
         dates = HomeWindow.AnalyserStatus.loc[HomeWindow.AnalyserStatus["Result Name"] == "LastPsaReportTime", "Value"]  # get the date of the last psa report generation. This gives the period of the report.
-        print("The Report Date is " + str(dates))
-        dates1 = pd.to_datetime(dates,yearfirst=True)   # setup dataframe as a date time series in the correct format
-        print("dates1 = " + str(dates1))
-        print(type(dates1))
-        year = dates1.dt.year.to_string(index=False)
-        print("year = " + str(year))
-        period = dates1.dt.month_name().to_string(index=False) + " " + dates1.dt.year.to_string(index=False) #concatenate the month name and year integer into a string called period using the to_string method to eliminate indexs
-
+        dates1 = pd.to_datetime(dates,yearfirst=True)                           # setup dataframe as a date time series in the correct format
+        year = dates1.dt.year.to_string(index=False)                            # get the year of the report
+        period = dates1.dt.month_name().to_string(index=False) + " " + dates1.dt.year.to_string(index=False)    # concatenate the month name and year integer into a string called period using the to_string method to eliminate indexs
         checklistfname = "C:\\PSAGen\\PSA Report Checklist " + year + ".xlsx"   # generates the checklist filename based on the year of the period of the report being produced. This will deal with the January / december issue
-        print("The Checklist file name = " + str(checklistfname))
-        checklist = openpyxl.load_workbook(checklistfname)
-        psachecklist = checklist["PSA Checklist"]
-        print(psachecklist)
-
-        analyser = jsondata["Summary"][0]["AnalyserNo"]
-        analyser = analyser.replace("-","")
-        print("analyser = " + str(analyser))
-        maxrow = psachecklist.max_row
-        print("Number of rows = " + str(maxrow))
-        for row in range(1, maxrow + 1):
-            job = "{}{}".format("A", row) # this sets up the cell reference in the PSA Checklist Excel document that we are going to search through.
-            print(" Job = " + str(job))
-            x = psachecklist[job].value
-            print("x = " + str(x))
-            print("Period = " + str(period))
-            if x == analyser:
+        checklist = openpyxl.load_workbook(checklistfname)                      # load the relevant checklist
+        psachecklist = checklist["PSA Checklist"]                               # load the relevant sheet from the checklist
+        analyser = jsondata["Summary"][0]["AnalyserNo"]                         # pull the analyser in question from the json
+        analyser = analyser.replace("-","")                                     # remove the hyphens from the analyser name
+        maxrow = psachecklist.max_row                                           # calculate the max number of rows in the checklist
+        for row in range(1, maxrow + 1):                                        # For loop to search for the relevant analyser to update in the checklist
+            job = "{}{}".format("A", row)                                       # this sets up the cell reference in the PSA Checklist Excel document that we are going to search through.
+            x = psachecklist[job].value                                         # pull the relevant analyser from the checklist
+            if x == analyser:                                                   # if statement which generates the correct cell references for the function to update.
                 if period == "January " + year:
                     c1 = "{}{}".format("E", row)
                     c2 = "{}{}".format("F", row)
-                    print("C1 = " + str(c1) + " and C2 = " + str(c2))
-
                 elif period == "February " + year:
                     c1 = "{}{}".format("J", row)
                     c2 = "{}{}".format("K", row)
-                    print("C1 = " + str(c1) + " and C2 = " + str(c2))
                 elif period == "March " + year:
                     c1 = "{}{}".format("O", row)
                     c2 = "{}{}".format("P", row)
-                    print("C1 = " + str(c1) + " and C2 = " + str(c2))
-
                 elif period == "April " + year:
                     c1 = "{}{}".format("T", row)
                     c2 = "{}{}".format("U", row)
-                    print("C1 = " + str(c1) + " and C2 = " + str(c2))
-
                 elif period == "May " + year:
                     c1 = "{}{}".format("Y", row)
                     c2 = "{}{}".format("Z", row)
-                    print("C1 = " + str(c1) + " and C2 = " + str(c2))
-
                 elif period == "June " + year:
                     c1 = "{}{}".format("AD", row)
                     c2 = "{}{}".format("AE", row)
-                    print("C1 = " + str(c1) + " and C2 = " + str(c2))
-
                 elif period == "July " + year:
                     c1 = "{}{}".format("AI", row)
                     c2 = "{}{}".format("AJ", row)
-                    print("C1 = " + str(c1) + " and C2 = " + str(c2))
-
                 elif period == "August " + year:
                     c1 = "{}{}".format("AN", row)
                     c2 = "{}{}".format("AO", row)
-                    print("C1 = " + str(c1) + " and C2 = " + str(c2))
-
                 elif period == "September " + year:
                     c1 = "{}{}".format("AS", row)
                     c2 = "{}{}".format("AT", row)
-                    print("C1 = " + str(c1) + " and C2 = " + str(c2))
-
                 elif period == "October " + year:
                     c1 = "{}{}".format("AX", row)
                     c2 = "{}{}".format("AY", row)
-                    print("C1 = " + str(c1) + " and C2 = " + str(c2))
-
                 elif period == "November " + year:
                     c1 = "{}{}".format("BC", row)
                     c2 = "{}{}".format("BD", row)
-                    print("C1 = " + str(c1) + " and C2 = " + str(c2))
-
                 else:
                     c1 = "{}{}".format("BH", row)
                     c2 = "{}{}".format("BI", row)
-                    print("C1 = " + str(c1) + " and C2 = " + str(c2))
 
-                print(psachecklist[c1].value)
-                print(psachecklist[c2].value)
                 psachecklist[c1].value = jsondata["Summary"][0]["ReportDate"]
                 psachecklist[c2].value = jsondata["Summary"][0]["ReportDate"]
                 break
             else:
                 print("Checking Next Line")
 
-        openpyxl.Workbook.save(checklist,checklistfname)
+        openpyxl.Workbook.save(checklist,checklistfname)                        # save and overwrite the updated checklist
         print("PSA Checklist Updated")
 
     def hide_pages(self):
