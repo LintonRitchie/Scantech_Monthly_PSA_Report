@@ -399,7 +399,7 @@
     <property name="geometry">
      <rect>
       <x>380</x>
-      <y>225</y>
+      <y>115</y>
       <width>200</width>
       <height>40</height>
      </rect>
@@ -415,14 +415,14 @@
     </property>
     <property name="text">
      <string>Is this a New Analyser?
-(Less than 2 months of history)</string>
+(Less than 2 reports produced)</string>
     </property>
    </widget>
    <widget class="QCheckBox" name="AutoSendReport">
     <property name="geometry">
      <rect>
       <x>380</x>
-      <y>290</y>
+      <y>285</y>
       <width>200</width>
       <height>40</height>
      </rect>
@@ -439,6 +439,31 @@
     <property name="text">
      <string>Automatically send report to 
 engineer?</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="IncLastMonth">
+    <property name="geometry">
+     <rect>
+      <x>380</x>
+      <y>245</y>
+      <width>200</width>
+      <height>40</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Calibri</family>
+      <pointsize>10</pointsize>
+     </font>
+    </property>
+    <property name="layoutDirection">
+     <enum>Qt::LeftToRight</enum>
+    </property>
+    <property name="text">
+     <string>Include Last Report's Comments?</string>
+    </property>
+    <property name="checked">
+     <bool>true</bool>
     </property>
    </widget>
   </widget>
@@ -518,7 +543,7 @@ engineer?</string>
    <hints>
     <hint type="sourcelabel">
      <x>189</x>
-     <y>218</y>
+     <y>231</y>
     </hint>
     <hint type="destinationlabel">
      <x>281</x>

@@ -71,8 +71,7 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
 
     # Setup Signals and Slots for Pushbuttons
     def connectSignalsSlots(self):
-        self.PreviewReportPB.released.connect(self.show_page_1)
-        self.PreviewReportPB.clicked.connect(self.updateReport)
+        self.PreviewReportPB.released.connect(self.updateReport)
         self.ImportReportPB.released.connect(self.importPSAData)
         self.ExportReportPB.released.connect(self.ExportReport)
         self.PB_pg.released.connect(self.show_page_1)
@@ -83,57 +82,57 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
         self.PB_pg_6.released.connect(self.show_page_6)
         self.page1.NextPage.released.connect(self.UpdateJSON)
         self.page2.NextPage.released.connect(self.UpdateJSON)
-        self.page6.RepAgo1.released.connect(self.UpdatePg6_1RepAgo)
-        self.page6.RepAgo2.released.connect(self.UpdatePg6_2RepAgo)
+        self.page6.RepAgo1.released.connect(self.NewAnUpdatePg6_1RepAgo)
+        self.page6.RepAgo2.released.connect(self.NewAnUpdatePg6_2RepAgo)
         self.page6.NextPage.released.connect(self.UpdateJSON)
-        self.NewAnalyser.stateChanged.connect(lambda: self.NewAnalyserToggle(self.NewAnalyser))
+        self.NewAnalyser.stateChanged.connect(lambda: self.EnableUpdateHistData(self.NewAnalyser))
         self.AutoSendReport.stateChanged.connect(lambda: self.AutoSendToggle(self.AutoSendReport))
         self.AnalyserListComboBox.currentTextChanged.connect(self.AnalyserChanged)
         self.UpdateChecklistPB.released.connect(self.UpdatePSAChecklist)
 
     def importPSAData(self):
         HomeWindow.psadatafname = self.GetFolder("Select Folder containing PSA Report Data")
-        # fname = QFileDialog.getExistingDirectory(self, "Open PSA File in PSA Folder")
-        #
-        # if fname:
-        #     fname = QDir.toNativeSeparators(fname)
-        #     fname2 = fname
-        #     fname = glob.glob(fname + "\\ReportData.json")
-        #     fname = fname[0]
-        # # if user presses cancel, return control to calling function
-        # if not fname:
-        #     return
-        HomeWindow.PSAMasterData = Read_Master(HomeWindow.masterpsafname)  # Read in master file data from PSA Master file.
-        print("Read Master Complete")
-        HomeWindow.AnalyserStatus = Read_AnalyserStatus(HomeWindow.psadatafname)  # Read in PSA Report file data from PSA Report file.
-        print("Read Analyser Status Complete")
-        HomeWindow.PeakControl = Read_PeakControl(HomeWindow.psadatafname)  # Read in Analyser Peak Control Data
-        print("Read Peak Control Complete")
-        HomeWindow.VersionNumbers = Read_VersionNumbers(HomeWindow.psadatafname)  # Read in version numbers data
-        print("Read Version Numbers Complete")
-        HomeWindow.AnalyserIO = Read_AnalyserIO(HomeWindow.psadatafname)  # Read in Analyser IO Data
-        print("Read Analyser IO Complete")
-        HomeWindow.AnalyserA17 = Read_A_17_Standard(HomeWindow.psadatafname)  # Read in Analyser Standardisation data
-        print("Read Analyser Std Data Complete")
-        HomeWindow.AnalyserA08 = Read_A_08_Analyse(HomeWindow.psadatafname, HomeWindow.resourcepath)  # Read in Analysis Data
-        print("Read Analyser A_XX Complete")
-        HomeWindow.PeakExtract = Read_PeakExtract(HomeWindow.psadatafname, HomeWindow.resourcepath)  # Readi in Peak Stability Data
-        print("Read Peak Extract Complete")
-        HomeWindow.TempExtract = Read_TempExtract(HomeWindow.psadatafname, HomeWindow.resourcepath)  # Read in Temp Stability Data
-        print("Read Temp Extract Complete")
-        self.PreviewReportPB.setEnabled(True)
-        self.psadataloc.setText(HomeWindow.psadatafname)
+        if HomeWindow.psadatafname:
+            HomeWindow.PSAMasterData = Read_Master(HomeWindow.masterpsafname)  # Read in master file data from PSA Master file.
+            print("Read Master Complete")
+            HomeWindow.AnalyserStatus = Read_AnalyserStatus(HomeWindow.psadatafname)  # Read in PSA Report file data from PSA Report file.
+            print("Read Analyser Status Complete")
+            HomeWindow.PeakControl = Read_PeakControl(HomeWindow.psadatafname)  # Read in Analyser Peak Control Data
+            print("Read Peak Control Complete")
+            HomeWindow.VersionNumbers = Read_VersionNumbers(HomeWindow.psadatafname)  # Read in version numbers data
+            print("Read Version Numbers Complete")
+            HomeWindow.AnalyserIO = Read_AnalyserIO(HomeWindow.psadatafname)  # Read in Analyser IO Data
+            print("Read Analyser IO Complete")
+            HomeWindow.AnalyserA17 = Read_A_17_Standard(HomeWindow.psadatafname)  # Read in Analyser Standardisation data
+            print("Read Analyser Std Data Complete")
+            HomeWindow.AnalyserA08 = Read_A_08_Analyse(HomeWindow.psadatafname, HomeWindow.resourcepath)  # Read in Analysis Data
+            print("Read Analyser A_XX Complete")
+            HomeWindow.PeakExtract = Read_PeakExtract(HomeWindow.psadatafname, HomeWindow.resourcepath)  # Readi in Peak Stability Data
+            print("Read Peak Extract Complete")
+            HomeWindow.TempExtract = Read_TempExtract(HomeWindow.psadatafname, HomeWindow.resourcepath)  # Read in Temp Stability Data
+            print("Read Temp Extract Complete")
+            self.PreviewReportPB.setEnabled(True)
+            self.psadataloc.setText(HomeWindow.psadatafname)
+        if not HomeWindow.psadatafname:
+            return
 
-    def AutoSendToggle(self,b):
+    def AutoSendToggle(self, b):
         # Toggles Auto Send Report Flag
-        if b.isChecked() == True:
+        if b.isChecked():
             HomeWindow.autosend = 1
-            print(HomeWindow.newanalyser)
+
         else:
             HomeWindow.autosend = 0
-            print(HomeWindow.newanalyser)
 
-    def AnalyserChanged(self):
+    def EnableUpdateHistData(self, b):
+        if b.isChecked():
+            self.page6.RepAgo1.setEnabled(True)  # activate the import from 1 report Ago button pushbutton which will allow the data from 1 report ago to be updated.
+            self.page6.RepAgo2.setEnabled(True)  # activate the import from 2 reports Ago button pushbutton which will allow the data from 2 reports ago to be updated.
+        else:
+            self.page6.RepAgo1.setEnabled(False)  # deactivate the import from 1 report Ago button pushbutton.
+            self.page6.RepAgo2.setEnabled(False)  # deactivate the import from 2 reports Ago button pushbutton.
+
+    def AnalyserChanged(self):              # determines if the Selected analyser has changed and if so disables the buttons
         self.PreviewReportPB.setEnabled(False)
         self.ExportReportPB.setEnabled(False)
         self.UpdateChecklistPB.setEnabled(False)
@@ -143,15 +142,6 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
         self.PB_pg_4.setEnabled(False)
         self.PB_pg_5.setEnabled(False)
         self.PB_pg_6.setEnabled(False)
-
-    def NewAnalyserToggle(self,b):
-        # Toggles the new analyser flag
-        if b.isChecked() == True:
-            HomeWindow.newanalyser = 1
-            print(HomeWindow.newanalyser)
-        else:
-            HomeWindow.newanalyser = 0
-            print(HomeWindow.newanalyser)
 
     def GetFolder(self, message):
         anal = self.AnalyserListComboBox.currentText()
@@ -468,10 +458,10 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
         self.PB_pg_6.setEnabled(True)
         # Update data accordingly
         anal = self.AnalyserListComboBox.currentText()
-        repdate = str(datetime.date.today()) # egt todays date
-        serveng = HomeWindow.PSAMasterData.loc[HomeWindow.PSAMasterData["Analyser Number"] == anal, "Service Engineer"].to_string(index=False) #get the service engineer as a string without dataframe nonsense
-        application = HomeWindow.PSAMasterData.loc[HomeWindow.PSAMasterData["Analyser Number"] == anal, "Application"].to_string(index=False) #get the service engineer as a string without dataframe nonsense
-        customer = HomeWindow.PSAMasterData.loc[HomeWindow.PSAMasterData["Analyser Number"] == anal, "Customer Name"].to_string(index=False) #get the service engineer as a string without dataframe nonsense
+        repdate = str(datetime.date.today())                                # get today's date
+        serveng = HomeWindow.PSAMasterData.loc[HomeWindow.PSAMasterData["Analyser Number"] == anal, "Service Engineer"].to_string(index=False)  # get the service engineer as a string without dataframe nonsense
+        application = HomeWindow.PSAMasterData.loc[HomeWindow.PSAMasterData["Analyser Number"] == anal, "Application"].to_string(index=False)   # get the service engineer as a string without dataframe nonsense
+        customer = HomeWindow.PSAMasterData.loc[HomeWindow.PSAMasterData["Analyser Number"] == anal, "Customer Name"].to_string(index=False)    # get the service engineer as a string without dataframe nonsense
 
         # Update UI
         self.page1.rep_analyser_data.setText(anal)
@@ -485,7 +475,9 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
         self.page1.disp_endiskspc.setText(self.DiskSpaceOK())
         self.UpdateDetStab()
         self.UpdatePg6()
+        self.UpdatePg1()
         self.UpdateFigs()
+        self.show_page_1()
         print("Report Updated")
 
     def EnabledYes(self):
@@ -521,26 +513,71 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
         enableditem.setForeground(brush)
         return enableditem
 
+    def UpdatePg1(self):
+        fname = HomeWindow.jsonin1fname
+        with open(fname) as f:                          # open json using filename generated earlier.
+            reportdata = json.load(f)
+        # Update the Action Taken Table on Page 1
+        self.page1.ActionTakenTable.setItem(0, 0, QTableWidgetItem(str(reportdata['ActionTaken'][0]['Action1'][0]['Date'])))
+        self.page1.ActionTakenTable.setItem(0, 1, QTableWidgetItem(str(reportdata['ActionTaken'][0]['Action1'][0]['Time'])))
+        self.page1.ActionTakenTable.setItem(0, 2, QTableWidgetItem(str(reportdata['ActionTaken'][0]['Action1'][0]['Action'])))
+        self.page1.ActionTakenTable.setItem(0, 3, QTableWidgetItem(str(reportdata['ActionTaken'][0]['Action1'][0]['Description'])))
+        self.page1.ActionTakenTable.setItem(1, 0, QTableWidgetItem(str(reportdata['ActionTaken'][0]['Action2'][0]['Date'])))
+        self.page1.ActionTakenTable.setItem(1, 1, QTableWidgetItem(str(reportdata['ActionTaken'][0]['Action2'][0]['Time'])))
+        self.page1.ActionTakenTable.setItem(1, 2, QTableWidgetItem(str(reportdata['ActionTaken'][0]['Action2'][0]['Action'])))
+        self.page1.ActionTakenTable.setItem(1, 3, QTableWidgetItem(str(reportdata['ActionTaken'][0]['Action2'][0]['Description'])))
+        self.page1.ActionTakenTable.setItem(2, 0, QTableWidgetItem(str(reportdata['ActionTaken'][0]['Action3'][0]['Date'])))
+        self.page1.ActionTakenTable.setItem(2, 1, QTableWidgetItem(str(reportdata['ActionTaken'][0]['Action3'][0]['Time'])))
+        self.page1.ActionTakenTable.setItem(2, 2, QTableWidgetItem(str(reportdata['ActionTaken'][0]['Action3'][0]['Action'])))
+        self.page1.ActionTakenTable.setItem(2, 3, QTableWidgetItem(str(reportdata['ActionTaken'][0]['Action3'][0]['Description'])))
+        self.page1.ActionTakenTable.setItem(3, 0, QTableWidgetItem(str(reportdata['ActionTaken'][0]['Action4'][0]['Date'])))
+        self.page1.ActionTakenTable.setItem(3, 1, QTableWidgetItem(str(reportdata['ActionTaken'][0]['Action4'][0]['Time'])))
+        self.page1.ActionTakenTable.setItem(3, 2, QTableWidgetItem(str(reportdata['ActionTaken'][0]['Action4'][0]['Action'])))
+        self.page1.ActionTakenTable.setItem(3, 3, QTableWidgetItem(str(reportdata['ActionTaken'][0]['Action4'][0]['Description'])))
+        self.page1.ActionTakenTable.setItem(4, 0, QTableWidgetItem(str(reportdata['ActionTaken'][0]['Action5'][0]['Date'])))
+        self.page1.ActionTakenTable.setItem(4, 1, QTableWidgetItem(str(reportdata['ActionTaken'][0]['Action5'][0]['Time'])))
+        self.page1.ActionTakenTable.setItem(4, 2, QTableWidgetItem(str(reportdata['ActionTaken'][0]['Action5'][0]['Action'])))
+        self.page1.ActionTakenTable.setItem(4, 3, QTableWidgetItem(str(reportdata['ActionTaken'][0]['Action5'][0]['Description'])))
+        # Update the Action required table on page 1
+        self.page1.ActionRequiredTable.setItem(0, 0, QTableWidgetItem(str(reportdata['ActionRequired'][0]['ActionReq1'][0]['Action'])))
+        self.page1.ActionRequiredTable.setItem(0, 1, QTableWidgetItem(str(reportdata['ActionRequired'][0]['ActionReq1'][0]['ByWhom'])))
+        self.page1.ActionRequiredTable.setItem(0, 2, QTableWidgetItem(str(reportdata['ActionRequired'][0]['ActionReq1'][0]['ByWhen'])))
+        self.page1.ActionRequiredTable.setItem(1, 0, QTableWidgetItem(str(reportdata['ActionRequired'][0]['ActionReq2'][0]['Action'])))
+        self.page1.ActionRequiredTable.setItem(1, 1, QTableWidgetItem(str(reportdata['ActionRequired'][0]['ActionReq2'][0]['ByWhom'])))
+        self.page1.ActionRequiredTable.setItem(1, 2, QTableWidgetItem(str(reportdata['ActionRequired'][0]['ActionReq2'][0]['ByWhen'])))
+        self.page1.ActionRequiredTable.setItem(2, 0, QTableWidgetItem(str(reportdata['ActionRequired'][0]['ActionReq3'][0]['Action'])))
+        self.page1.ActionRequiredTable.setItem(2, 1, QTableWidgetItem(str(reportdata['ActionRequired'][0]['ActionReq3'][0]['ByWhom'])))
+        self.page1.ActionRequiredTable.setItem(2, 2, QTableWidgetItem(str(reportdata['ActionRequired'][0]['ActionReq3'][0]['ByWhen'])))
+        self.page1.ActionRequiredTable.setItem(3, 0, QTableWidgetItem(str(reportdata['ActionRequired'][0]['ActionReq4'][0]['Action'])))
+        self.page1.ActionRequiredTable.setItem(3, 1, QTableWidgetItem(str(reportdata['ActionRequired'][0]['ActionReq4'][0]['ByWhom'])))
+        self.page1.ActionRequiredTable.setItem(3, 2, QTableWidgetItem(str(reportdata['ActionRequired'][0]['ActionReq4'][0]['ByWhen'])))
+        self.page1.ActionRequiredTable.setItem(4, 0, QTableWidgetItem(str(reportdata['ActionRequired'][0]['ActionReq5'][0]['Action'])))
+        self.page1.ActionRequiredTable.setItem(4, 1, QTableWidgetItem(str(reportdata['ActionRequired'][0]['ActionReq5'][0]['ByWhom'])))
+        self.page1.ActionRequiredTable.setItem(4, 2, QTableWidgetItem(str(reportdata['ActionRequired'][0]['ActionReq5'][0]['ByWhen'])))
+
     def UpdatePg6(self):
 
-        if HomeWindow.newanalyser == 0:
-            fname1 = self.GetFolder("Select Folder containing Last Month's PSA Report Data") # gets the filename of the JSON file containing last months
-            print(fname1)
-            fname = glob.glob(fname1 + "\*.json")
-            print(fname)
-            if fname:
-                fname = QDir.toNativeSeparators(fname[0])
-                print(fname)
-            else:
-                print("JSON not available in " + fname1)
-                print("Using default JSON in C:\\PSAGen")
+        if self.IncLastMonth.isChecked():                                   # If statement that checks the status of the include last month checkbox. If checked will ask user for folder where last report's json is else uses default.
+            fname1 = self.GetFolder("Select Folder containing Last Month's PSA Report Data")    # gets the filename of the JSON file containing last month's data
+            if fname1:                                                      # if statement to execute default file load in the event the user cancels the previous report load
+                fname = glob.glob(fname1 + "\*.json")                       # if the user has selected a folder, we then need to check if a json file exists in that folder
+                if fname:                                                   # if the json exists in the folder then generate the correct file name to allow it to be opened
+                    fname = QDir.toNativeSeparators(fname[0])
+                    HomeWindow.jsonin1fname = fname
+                else:                                                       # if the json doesn't exist in this folder, print json not available and use default
+                    print("JSON not available in " + fname1)
+                    print("Using blank default JSON in C:\\PSAGen")
+                    fname = "C:\\PSAGen\\ReportData.json"
+            if not fname1:                                                  # if user cancels, no file name will be produced so print error and use default.
+                print("Last report folder not selected, using default instead")
+                print("Using blank default JSON in C:\\PSAGen")
                 fname = "C:\\PSAGen\\ReportData.json"
 
-            with open(fname) as f:
+            with open(fname) as f:                                          # open json using filename generated earlier.
                 reportdata = json.load(f)
         else:
-            print("Insufficient History Available, so using default in C:\\PSAGen instead, which should be blank")
-            with open("C:\\PSAGen\\ReportData.json") as f:
+            print("Excluding last report, so using blank defaults in C:\\PSAGen instead")
+            with open("C:\\PSAGen\\ReportData.json") as f:                  # force default in event include last month is unchecked.
                 reportdata = json.load(f)
 
         # Update PLC Status Table
@@ -552,12 +589,12 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
         self.page6.PlantPLCTable.setItem(1, 0, ForceAnalyse)
         self.page6.PlantPLCTable.setItem(2, 0, ForceStandardise)
         # Creating the comment item and populating with Blanks
-        self.page6.PlantPLCTable.setItem(0, 1, QTableWidgetItem(str(reportdata['PLCStatus'][0]['BeltRunning'][0]['1RepAgo'])))
-        self.page6.PlantPLCTable.setItem(1, 1, QTableWidgetItem(str(reportdata['PLCStatus'][0]['ForceAnalyse'][0]['1RepAgo'])))
-        self.page6.PlantPLCTable.setItem(2, 1, QTableWidgetItem(str(reportdata['PLCStatus'][0]['ForceStandardise'][0]['1RepAgo'])))
-        self.page6.PlantPLCTable.setItem(0, 2, QTableWidgetItem(str(reportdata['PLCStatus'][0]['BeltRunning'][0]['2RepAgo'])))
-        self.page6.PlantPLCTable.setItem(1, 2, QTableWidgetItem(str(reportdata['PLCStatus'][0]['ForceAnalyse'][0]['2RepAgo'])))
-        self.page6.PlantPLCTable.setItem(2, 2, QTableWidgetItem(str(reportdata['PLCStatus'][0]['ForceStandardise'][0]['2RepAgo'])))
+        self.page6.PlantPLCTable.setItem(0, 1, QTableWidgetItem(str(reportdata['PLCStatus'][0]['BeltRunning'][0]['Current'])))
+        self.page6.PlantPLCTable.setItem(1, 1, QTableWidgetItem(str(reportdata['PLCStatus'][0]['ForceAnalyse'][0]['Current'])))
+        self.page6.PlantPLCTable.setItem(2, 1, QTableWidgetItem(str(reportdata['PLCStatus'][0]['ForceStandardise'][0]['Current'])))
+        self.page6.PlantPLCTable.setItem(0, 2, QTableWidgetItem(str(reportdata['PLCStatus'][0]['BeltRunning'][0]['1RepAgo'])))
+        self.page6.PlantPLCTable.setItem(1, 2, QTableWidgetItem(str(reportdata['PLCStatus'][0]['ForceAnalyse'][0]['1RepAgo'])))
+        self.page6.PlantPLCTable.setItem(2, 2, QTableWidgetItem(str(reportdata['PLCStatus'][0]['ForceStandardise'][0]['1RepAgo'])))
         self.page6.PlantPLCTable.setItem(0, 3, QTableWidgetItem(str(reportdata['PLCStatus'][0]['BeltRunning'][0]['Comment'])))
         self.page6.PlantPLCTable.setItem(1, 3, QTableWidgetItem(str(reportdata['PLCStatus'][0]['ForceAnalyse'][0]['Comment'])))
         self.page6.PlantPLCTable.setItem(2, 3, QTableWidgetItem(str(reportdata['PLCStatus'][0]['ForceStandardise'][0]['Comment'])))
@@ -571,14 +608,14 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
         self.page6.PlantPLCTable_2.setItem(2, 0, IOControlOK)
         self.page6.PlantPLCTable_2.setItem(3, 0, SpectraStable)
         # Creating the comment item and populating with Blanks
-        self.page6.PlantPLCTable_2.setItem(0, 1, QTableWidgetItem(str(reportdata['AnalyserStatus'][0]['AnalyserOK'][0]['1RepAgo'])))
-        self.page6.PlantPLCTable_2.setItem(1, 1, QTableWidgetItem(str(reportdata['AnalyserStatus'][0]['StandardsOK'][0]['1RepAgo'])))
-        self.page6.PlantPLCTable_2.setItem(2, 1, QTableWidgetItem(str(reportdata['AnalyserStatus'][0]['IOControlOK'][0]['1RepAgo'])))
-        self.page6.PlantPLCTable_2.setItem(3, 1, QTableWidgetItem(str(reportdata['AnalyserStatus'][0]['SpectraStable'][0]['1RepAgo'])))
-        self.page6.PlantPLCTable_2.setItem(0, 2, QTableWidgetItem(str(reportdata['AnalyserStatus'][0]['AnalyserOK'][0]['2RepAgo'])))
-        self.page6.PlantPLCTable_2.setItem(1, 2, QTableWidgetItem(str(reportdata['AnalyserStatus'][0]['StandardsOK'][0]['2RepAgo'])))
-        self.page6.PlantPLCTable_2.setItem(2, 2, QTableWidgetItem(str(reportdata['AnalyserStatus'][0]['IOControlOK'][0]['2RepAgo'])))
-        self.page6.PlantPLCTable_2.setItem(3, 2, QTableWidgetItem(str(reportdata['AnalyserStatus'][0]['SpectraStable'][0]['2RepAgo'])))
+        self.page6.PlantPLCTable_2.setItem(0, 1, QTableWidgetItem(str(reportdata['AnalyserStatus'][0]['AnalyserOK'][0]['Current'])))
+        self.page6.PlantPLCTable_2.setItem(1, 1, QTableWidgetItem(str(reportdata['AnalyserStatus'][0]['StandardsOK'][0]['Current'])))
+        self.page6.PlantPLCTable_2.setItem(2, 1, QTableWidgetItem(str(reportdata['AnalyserStatus'][0]['IOControlOK'][0]['Current'])))
+        self.page6.PlantPLCTable_2.setItem(3, 1, QTableWidgetItem(str(reportdata['AnalyserStatus'][0]['SpectraStable'][0]['Current'])))
+        self.page6.PlantPLCTable_2.setItem(0, 2, QTableWidgetItem(str(reportdata['AnalyserStatus'][0]['AnalyserOK'][0]['1RepAgo'])))
+        self.page6.PlantPLCTable_2.setItem(1, 2, QTableWidgetItem(str(reportdata['AnalyserStatus'][0]['StandardsOK'][0]['1RepAgo'])))
+        self.page6.PlantPLCTable_2.setItem(2, 2, QTableWidgetItem(str(reportdata['AnalyserStatus'][0]['IOControlOK'][0]['1RepAgo'])))
+        self.page6.PlantPLCTable_2.setItem(3, 2, QTableWidgetItem(str(reportdata['AnalyserStatus'][0]['SpectraStable'][0]['1RepAgo'])))
         self.page6.PlantPLCTable_2.setItem(0, 3, QTableWidgetItem(str(reportdata['AnalyserStatus'][0]['AnalyserOK'][0]['Comment'])))
         self.page6.PlantPLCTable_2.setItem(1, 3, QTableWidgetItem(str(reportdata['AnalyserStatus'][0]['StandardsOK'][0]['Comment'])))
         self.page6.PlantPLCTable_2.setItem(2, 3, QTableWidgetItem(str(reportdata['AnalyserStatus'][0]['IOControlOK'][0]['Comment'])))
@@ -597,14 +634,14 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
         self.page6.PlantPLCTable_3.setItem(2, 0, SourceOff)
         self.page6.PlantPLCTable_3.setItem(3, 0, SourceOn)
         # Creating the comment item and populating with Blanks
-        self.page6.PlantPLCTable_3.setItem(0, 1, QTableWidgetItem(str(reportdata['PLCResults'][0]['SystemOK'][0]['1RepAgo'])))
-        self.page6.PlantPLCTable_3.setItem(1, 1, QTableWidgetItem(str(reportdata['PLCResults'][0]['SourceControlFault'][0]['1RepAgo'])))
-        self.page6.PlantPLCTable_3.setItem(2, 1, QTableWidgetItem(str(reportdata['PLCResults'][0]['SourceOff'][0]['1RepAgo'])))
-        self.page6.PlantPLCTable_3.setItem(3, 1, QTableWidgetItem(str(reportdata['PLCResults'][0]['SourceOn'][0]['1RepAgo'])))
-        self.page6.PlantPLCTable_3.setItem(0, 2, QTableWidgetItem(str(reportdata['PLCResults'][0]['SystemOK'][0]['2RepAgo'])))
-        self.page6.PlantPLCTable_3.setItem(1, 2, QTableWidgetItem(str(reportdata['PLCResults'][0]['SourceControlFault'][0]['2RepAgo'])))
-        self.page6.PlantPLCTable_3.setItem(2, 2, QTableWidgetItem(str(reportdata['PLCResults'][0]['SourceOff'][0]['2RepAgo'])))
-        self.page6.PlantPLCTable_3.setItem(3, 2, QTableWidgetItem(str(reportdata['PLCResults'][0]['SourceOn'][0]['2RepAgo'])))
+        self.page6.PlantPLCTable_3.setItem(0, 1, QTableWidgetItem(str(reportdata['PLCResults'][0]['SystemOK'][0]['Current'])))
+        self.page6.PlantPLCTable_3.setItem(1, 1, QTableWidgetItem(str(reportdata['PLCResults'][0]['SourceControlFault'][0]['Current'])))
+        self.page6.PlantPLCTable_3.setItem(2, 1, QTableWidgetItem(str(reportdata['PLCResults'][0]['SourceOff'][0]['Current'])))
+        self.page6.PlantPLCTable_3.setItem(3, 1, QTableWidgetItem(str(reportdata['PLCResults'][0]['SourceOn'][0]['Current'])))
+        self.page6.PlantPLCTable_3.setItem(0, 2, QTableWidgetItem(str(reportdata['PLCResults'][0]['SystemOK'][0]['1RepAgo'])))
+        self.page6.PlantPLCTable_3.setItem(1, 2, QTableWidgetItem(str(reportdata['PLCResults'][0]['SourceControlFault'][0]['1RepAgo'])))
+        self.page6.PlantPLCTable_3.setItem(2, 2, QTableWidgetItem(str(reportdata['PLCResults'][0]['SourceOff'][0]['1RepAgo'])))
+        self.page6.PlantPLCTable_3.setItem(3, 2, QTableWidgetItem(str(reportdata['PLCResults'][0]['SourceOn'][0]['1RepAgo'])))
         self.page6.PlantPLCTable_3.setItem(0, 3, QTableWidgetItem(str(reportdata['PLCResults'][0]['SystemOK'][0]['Comment'])))
         self.page6.PlantPLCTable_3.setItem(1, 3, QTableWidgetItem(str(reportdata['PLCResults'][0]['SourceControlFault'][0]['Comment'])))
         self.page6.PlantPLCTable_3.setItem(2, 3, QTableWidgetItem(str(reportdata['PLCResults'][0]['SourceOff'][0]['Comment'])))
@@ -618,12 +655,12 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
         self.page6.PlantPLCTable_4.setItem(1, 0, AnalMinLoadLimit)
         self.page6.PlantPLCTable_4.setItem(2, 0, StandardisePeriod)
         # Creating the comment item and populating with Blanks
-        self.page6.PlantPLCTable_4.setItem(0, 1, QTableWidgetItem(str(reportdata['AnalyserConfiguration'][0]['AnalysisPeriod'][0]['1RepAgo'])))
-        self.page6.PlantPLCTable_4.setItem(1, 1, QTableWidgetItem(str(reportdata['AnalyserConfiguration'][0]['AnalMinLoadLimit'][0]['1RepAgo'])))
-        self.page6.PlantPLCTable_4.setItem(2, 1, QTableWidgetItem(str(reportdata['AnalyserConfiguration'][0]['StandardisePeriod'][0]['1RepAgo'])))
-        self.page6.PlantPLCTable_4.setItem(0, 2, QTableWidgetItem(str(reportdata['AnalyserConfiguration'][0]['AnalysisPeriod'][0]['2RepAgo'])))
-        self.page6.PlantPLCTable_4.setItem(1, 2, QTableWidgetItem(str(reportdata['AnalyserConfiguration'][0]['AnalMinLoadLimit'][0]['2RepAgo'])))
-        self.page6.PlantPLCTable_4.setItem(2, 2, QTableWidgetItem(str(reportdata['AnalyserConfiguration'][0]['StandardisePeriod'][0]['2RepAgo'])))
+        self.page6.PlantPLCTable_4.setItem(0, 1, QTableWidgetItem(str(reportdata['AnalyserConfiguration'][0]['AnalysisPeriod'][0]['Current'])))
+        self.page6.PlantPLCTable_4.setItem(1, 1, QTableWidgetItem(str(reportdata['AnalyserConfiguration'][0]['AnalMinLoadLimit'][0]['Current'])))
+        self.page6.PlantPLCTable_4.setItem(2, 1, QTableWidgetItem(str(reportdata['AnalyserConfiguration'][0]['StandardisePeriod'][0]['Current'])))
+        self.page6.PlantPLCTable_4.setItem(0, 2, QTableWidgetItem(str(reportdata['AnalyserConfiguration'][0]['AnalysisPeriod'][0]['1RepAgo'])))
+        self.page6.PlantPLCTable_4.setItem(1, 2, QTableWidgetItem(str(reportdata['AnalyserConfiguration'][0]['AnalMinLoadLimit'][0]['1RepAgo'])))
+        self.page6.PlantPLCTable_4.setItem(2, 2, QTableWidgetItem(str(reportdata['AnalyserConfiguration'][0]['StandardisePeriod'][0]['1RepAgo'])))
         self.page6.PlantPLCTable_4.setItem(0, 3, QTableWidgetItem(str(reportdata['AnalyserConfiguration'][0]['AnalysisPeriod'][0]['Comment'])))
         self.page6.PlantPLCTable_4.setItem(1, 3, QTableWidgetItem(str(reportdata['AnalyserConfiguration'][0]['AnalMinLoadLimit'][0]['Comment'])))
         self.page6.PlantPLCTable_4.setItem(2, 3, QTableWidgetItem(str(reportdata['AnalyserConfiguration'][0]['StandardisePeriod'][0]['Comment'])))
@@ -638,19 +675,18 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
         self.page6.PlantPLCTable_5.setItem(2, 0, NumStandard)
         self.page6.PlantPLCTable_5.setItem(3, 0, NumStandardMonth)
         # Creating the comment item and populating with Blanks
-        self.page6.PlantPLCTable_5.setItem(0, 1, QTableWidgetItem(str(reportdata['Standardisation'][0]['FirstStandardTime'][0]['1RepAgo'])))
-        self.page6.PlantPLCTable_5.setItem(1, 1, QTableWidgetItem(str(reportdata['Standardisation'][0]['MostRecentStandard'][0]['1RepAgo'])))
-        self.page6.PlantPLCTable_5.setItem(2, 1, QTableWidgetItem(str(reportdata['Standardisation'][0]['NumStdPeriodsSinceClear'][0]['1RepAgo'])))
-        self.page6.PlantPLCTable_5.setItem(3, 1, QTableWidgetItem(str(reportdata['Standardisation'][0]['NumStdPeriodsThisMnth'][0]['1RepAgo'])))
-        self.page6.PlantPLCTable_5.setItem(0, 2, QTableWidgetItem(str(reportdata['Standardisation'][0]['FirstStandardTime'][0]['2RepAgo'])))
-        self.page6.PlantPLCTable_5.setItem(1, 2, QTableWidgetItem(str(reportdata['Standardisation'][0]['MostRecentStandard'][0]['2RepAgo'])))
-        self.page6.PlantPLCTable_5.setItem(2, 2, QTableWidgetItem(str(reportdata['Standardisation'][0]['NumStdPeriodsSinceClear'][0]['2RepAgo'])))
-        self.page6.PlantPLCTable_5.setItem(3, 2, QTableWidgetItem(str(reportdata['Standardisation'][0]['NumStdPeriodsThisMnth'][0]['2RepAgo'])))
+        self.page6.PlantPLCTable_5.setItem(0, 1, QTableWidgetItem(str(reportdata['Standardisation'][0]['FirstStandardTime'][0]['Current'])))
+        self.page6.PlantPLCTable_5.setItem(1, 1, QTableWidgetItem(str(reportdata['Standardisation'][0]['MostRecentStandard'][0]['Current'])))
+        self.page6.PlantPLCTable_5.setItem(2, 1, QTableWidgetItem(str(reportdata['Standardisation'][0]['NumStdPeriodsSinceClear'][0]['Current'])))
+        self.page6.PlantPLCTable_5.setItem(3, 1, QTableWidgetItem(str(reportdata['Standardisation'][0]['NumStdPeriodsThisMnth'][0]['Current'])))
+        self.page6.PlantPLCTable_5.setItem(0, 2, QTableWidgetItem(str(reportdata['Standardisation'][0]['FirstStandardTime'][0]['1RepAgo'])))
+        self.page6.PlantPLCTable_5.setItem(1, 2, QTableWidgetItem(str(reportdata['Standardisation'][0]['MostRecentStandard'][0]['1RepAgo'])))
+        self.page6.PlantPLCTable_5.setItem(2, 2, QTableWidgetItem(str(reportdata['Standardisation'][0]['NumStdPeriodsSinceClear'][0]['1RepAgo'])))
+        self.page6.PlantPLCTable_5.setItem(3, 2, QTableWidgetItem(str(reportdata['Standardisation'][0]['NumStdPeriodsThisMnth'][0]['1RepAgo'])))
         self.page6.PlantPLCTable_5.setItem(0, 3, QTableWidgetItem(str(reportdata['Standardisation'][0]['FirstStandardTime'][0]['Comment'])))
         self.page6.PlantPLCTable_5.setItem(1, 3, QTableWidgetItem(str(reportdata['Standardisation'][0]['MostRecentStandard'][0]['Comment'])))
         self.page6.PlantPLCTable_5.setItem(2, 3, QTableWidgetItem(str(reportdata['Standardisation'][0]['NumStdPeriodsSinceClear'][0]['Comment'])))
         self.page6.PlantPLCTable_5.setItem(3, 3, QTableWidgetItem(str(reportdata['Standardisation'][0]['NumStdPeriodsThisMnth'][0]['Comment'])))
-
 
         # Update Software Versions Table
         Product = QTableWidgetItem(HomeWindow.VersionNumbers.loc[HomeWindow.VersionNumbers["Module"] == "Product","Version"].to_string(index=False))
@@ -658,13 +694,12 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
         self.page6.PlantPLCTable_6.setItem(0, 0, Product)
         self.page6.PlantPLCTable_6.setItem(1, 0, CsSchedule)
         # Creating the comment item and populating with Blanks
-        self.page6.PlantPLCTable_6.setItem(0, 1, QTableWidgetItem(str(reportdata['SoftwareVersions'][0]['Product'][0]['1RepAgo'])))
-        self.page6.PlantPLCTable_6.setItem(1, 1, QTableWidgetItem(str(reportdata['SoftwareVersions'][0]['CsSchedule'][0]['1RepAgo'])))
-        self.page6.PlantPLCTable_6.setItem(0, 2, QTableWidgetItem(str(reportdata['SoftwareVersions'][0]['Product'][0]['2RepAgo'])))
-        self.page6.PlantPLCTable_6.setItem(1, 2, QTableWidgetItem(str(reportdata['SoftwareVersions'][0]['CsSchedule'][0]['2RepAgo'])))
+        self.page6.PlantPLCTable_6.setItem(0, 1, QTableWidgetItem(str(reportdata['SoftwareVersions'][0]['Product'][0]['Current'])))
+        self.page6.PlantPLCTable_6.setItem(1, 1, QTableWidgetItem(str(reportdata['SoftwareVersions'][0]['CsSchedule'][0]['Current'])))
+        self.page6.PlantPLCTable_6.setItem(0, 2, QTableWidgetItem(str(reportdata['SoftwareVersions'][0]['Product'][0]['1RepAgo'])))
+        self.page6.PlantPLCTable_6.setItem(1, 2, QTableWidgetItem(str(reportdata['SoftwareVersions'][0]['CsSchedule'][0]['1RepAgo'])))
         self.page6.PlantPLCTable_6.setItem(0, 3, QTableWidgetItem(str(reportdata['SoftwareVersions'][0]['Product'][0]['Comment'])))
         self.page6.PlantPLCTable_6.setItem(1, 3, QTableWidgetItem(str(reportdata['SoftwareVersions'][0]['CsSchedule'][0]['Comment'])))
-
 
         # Update Disk Space Table
         DiskSpace = QTableWidgetItem(HomeWindow.VersionNumbers.loc[HomeWindow.VersionNumbers["Module"] == "DiskSpace","Version"].to_string(index=False))
@@ -672,14 +707,14 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
         self.page6.PlantPLCTable_7.setItem(0, 0, DiskSpace)
         self.page6.PlantPLCTable_7.setItem(1, 0, PercDiskSpace)
         # Creating the comment item and populating with Blanks
-        self.page6.PlantPLCTable_7.setItem(0, 1, QTableWidgetItem(str(reportdata['DiskSpaceMem'][0]['DiskSpace'][0]['1RepAgo'])))
-        self.page6.PlantPLCTable_7.setItem(1, 1, QTableWidgetItem(str(reportdata['DiskSpaceMem'][0]['PercDiskSpace'][0]['1RepAgo'])))
-        self.page6.PlantPLCTable_7.setItem(0, 2, QTableWidgetItem(str(reportdata['DiskSpaceMem'][0]['DiskSpace'][0]['2RepAgo'])))
-        self.page6.PlantPLCTable_7.setItem(1, 2, QTableWidgetItem(str(reportdata['DiskSpaceMem'][0]['PercDiskSpace'][0]['2RepAgo'])))
+        self.page6.PlantPLCTable_7.setItem(0, 1, QTableWidgetItem(str(reportdata['DiskSpaceMem'][0]['DiskSpace'][0]['Current'])))
+        self.page6.PlantPLCTable_7.setItem(1, 1, QTableWidgetItem(str(reportdata['DiskSpaceMem'][0]['PercDiskSpace'][0]['Current'])))
+        self.page6.PlantPLCTable_7.setItem(0, 2, QTableWidgetItem(str(reportdata['DiskSpaceMem'][0]['DiskSpace'][0]['1RepAgo'])))
+        self.page6.PlantPLCTable_7.setItem(1, 2, QTableWidgetItem(str(reportdata['DiskSpaceMem'][0]['PercDiskSpace'][0]['1RepAgo'])))
         self.page6.PlantPLCTable_7.setItem(0, 3, QTableWidgetItem(str(reportdata['DiskSpaceMem'][0]['DiskSpace'][0]['Comment'])))
         self.page6.PlantPLCTable_7.setItem(1, 3, QTableWidgetItem(str(reportdata['DiskSpaceMem'][0]['PercDiskSpace'][0]['Comment'])))
 
-    def UpdatePg6_1RepAgo(self):
+    def NewAnUpdatePg6_1RepAgo(self):
         # **********************************************************************************************************************************************
         # This section defines the filename where we need to pull the relevant PSAreport.xls file from in order to update the 1 Report Ago data
         # **********************************************************************************************************************************************
@@ -796,7 +831,7 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
         self.page6.PlantPLCTable_7.setItem(0, 1, DiskSpace)
         self.page6.PlantPLCTable_7.setItem(1, 1, PercDiskSpace)
 
-    def UpdatePg6_2RepAgo(self):
+    def NewAnUpdatePg6_2RepAgo(self):
         # **********************************************************************************************************************************************
         # This section defines the filename where we need to pull the relevant PSAreport.xls file from in order to update the 1 Report Ago data
         # **********************************************************************************************************************************************

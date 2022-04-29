@@ -1044,6 +1044,9 @@
      <set>Qt::AlignCenter</set>
     </property>
     <widget class="QPushButton" name="RepAgo1">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <property name="geometry">
       <rect>
        <x>20</x>
@@ -1057,6 +1060,9 @@
      </property>
     </widget>
     <widget class="QPushButton" name="RepAgo2">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <property name="geometry">
       <rect>
        <x>20</x>
