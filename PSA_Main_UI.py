@@ -105,7 +105,7 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
             print("Read Analyser IO Complete")
             HomeWindow.AnalyserA17 = Read_A_17_Standard(HomeWindow.psadatafname)  # Read in Analyser Standardisation data
             print("Read Analyser Std Data Complete")
-            HomeWindow.AnalyserA08 = Read_A_08_Analyse(HomeWindow.psadatafname, HomeWindow.resourcepath)  # Read in Analysis Data
+            HomeWindow.AnalyserA08 = Read_A_08_Analyse(HomeWindow.psadatafname, HomeWindow.resourcepath, self.AnalyserListComboBox.currentText())  # Read in Analysis Data
             print("Read Analyser A_XX Complete")
             HomeWindow.PeakExtract = Read_PeakExtract(HomeWindow.psadatafname, HomeWindow.resourcepath)  # Readi in Peak Stability Data
             print("Read Peak Extract Complete")
@@ -416,7 +416,7 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
     def ExportReport(self):
         with open(HomeWindow.jsonoutfname) as f:
             jsondata = json.load(f)
-        configdatafname = "C:\\PSAGen\\PSA Report Config data.xlsx"   # generates the checklist filename based on the year of the period of the report being produced. This will deal with the January / december issue
+        configdatafname = "J:\\Client Analysers\\Analyser PSA Report\\PSA Report Config data.xlsx"   # generates the checklist filename based on the year of the period of the report being produced. This will deal with the January / december issue
         configdata = openpyxl.load_workbook(configdatafname)            # Load config data from Config Data spreadsheet
         engineers = configdata["Engineers"]                             # Select Engineers sheet
         serveng = jsondata["Summary"][0]["ServEng"]                     # load relevant service engineers from JSON
@@ -1060,16 +1060,20 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
         print (fileName)
 
     def popanalysers(self):
-        analysers = HomeWindow.PSAMasterData["Analyser Number"]
-        analysers.dropna(inplace=True)
-        #print(analysers)
-        for x in analysers:
-            if x == "NaN":
-                pass
-            elif x == "Template":
-                pass
-            else:
+        configdatafname = "J:\\Client Analysers\\Analyser PSA Report\\PSA Report Config data.xlsx"     # generates the checklist filename based on the year of the period of the report being produced. This will deal with the January / december issue
+        configdata = openpyxl.load_workbook(configdatafname)            # Load config data from Config Data spreadsheet
+        andetails = configdata["AnalyserDetails"]                       # Select Analyser Details sheet
+        maxrow = andetails.max_row                                      # Determine max row of document
+        for row in range(1, maxrow + 1):                                # For loop for searching through the Analyser Details sheet to determine the elemental result names to be plotted.
+            ancol = "{}{}".format("A", row)                             # this sets up the analyser cell reference to be used.
+            reqcol = "{}{}".format("G", row)                            # this sets up the psa report required reference cell
+            repreq = andetails[reqcol].value
+            if repreq == "Yes":
+                x = andetails[ancol].value
                 self.AnalyserListComboBox.addItem(str(x))
+            else:
+                pass
+
 
     def UpdatePSAChecklist(self):                                              # this must only be called after the JSON has been updated since this function uses that JSON to update the PSA Checklist
         with open(HomeWindow.jsonoutfname) as f:                               # reload the json file to use in the function

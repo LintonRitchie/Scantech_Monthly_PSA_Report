@@ -3,6 +3,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 import glob
+import openpyxl
 from PyQt5.QtCore import QDir
 
 
@@ -151,10 +152,10 @@ def Read_TempExtract(inputfname, outputfname):                                  
     return TempExtractdf
 
 
-def Read_A_08_Analyse(inputfname, outputfname):                                          # extracting the analysis results summary for the month
-    # implments a wildcard search for analysis data. This can be A_01__Analyse or A_0X__Analyse or anything in between
-    fname = glob.glob(inputfname + "\A*Analyse.csv")
-    fname = QDir.toNativeSeparators(fname[0])           # esnure folder path in correct windows format
+def Read_A_08_Analyse(inputfname, outputfname, analyser):                                 # extracting the analysis results summary for the month
+
+    fname = glob.glob(inputfname + "\A*Analyse.csv")                            # implements a wildcard search for analysis data. This can be A_01__Analyse or A_0X__Analyse or anything in between
+    fname = QDir.toNativeSeparators(fname[0])                                   # ensure folder path in correct windows format
 
     AllExtract = pd.read_csv(open(fname,'r'),header=0, index_col=False)                              # read the csv containing the data. Index Col must = false to ensure the headings are not shifted
 
@@ -167,7 +168,7 @@ def Read_A_08_Analyse(inputfname, outputfname):                                 
     else:
         TonsAnalysed = pd.DataFrame(columns=["S034","S029"])                    # else produce blank array
 
-    # Plot Daily tonns as a stacked histograme of Tons Analsyed and TOns not analysed
+    # Plot Daily tonnes as a stacked histogram of Tons Analysed and Tons not analysed
     plt.figure(figsize=(10,6))
     plt.tick_params(axis='x', which='both',labelsize=5,labelrotation=45,grid_color='grey', grid_alpha=0.8)
     plt.title("Total Daily Tonnes", pad=30)
@@ -195,6 +196,29 @@ def Read_A_08_Analyse(inputfname, outputfname):                                 
 
     # Plot First 3 results for report as a single figure with 3 subplots
     Results = df.groupby('Date').mean()
+    # Open the Master Configuration sheet to find the Element names to be used in the plots
+    configdatafname = "J:\\Client Analysers\\Analyser PSA Report\\PSA Report Config data.xlsx"         # generates the checklist filename based on the year of the period of the report being produced. This will deal with the January / december issue
+    configdata = openpyxl.load_workbook(configdatafname)                # Load config data from Config Data spreadsheet
+    andetails = configdata["AnalyserDetails"]                           # Select Analyser Details sheet
+    maxrow = andetails.max_row                                          # Determine max row of document
+    for row in range(1, maxrow + 1):                                    # For loop for searching through the Analyser Details sheet to determine the elemental result names to be plotted.
+        ancol = "{}{}".format("A", row)                                 # this sets up the analyser cell reference to be used.
+        res1col = "{}{}".format("J", row)                               # this sets up the result 1 cell reference to be used.
+        res2col = "{}{}".format("L", row)                               # this sets up the result 2 cell reference to be used.
+        res3col = "{}{}".format("N", row)                               # this sets up the result 3 cell reference to be used.
+        res4col = "{}{}".format("P", row)                               # this sets up the result 4 cell reference to be used.
+        res5col = "{}{}".format("R", row)                               # this sets up the result 5 cell reference to be used.
+        res6col = "{}{}".format("T", row)                               # this sets up the result 6 cell reference to be used.
+        x = andetails[ancol].value                                      # Load the engineers name into a variable for checking
+
+        if x == analyser:                                               # if statement that triggers when the analyser name is found.
+            res1name = andetails[res1col].value                         # Put the element name for result 1 into the variable
+            res2name = andetails[res2col].value                         # Put the element name for result 2 into the variable
+            res3name = andetails[res3col].value                         # Put the element name for result 3 into the variable
+            res4name = andetails[res4col].value                         # Put the element name for result 4 into the variable
+            res5name = andetails[res5col].value                         # Put the element name for result 5 into the variable
+            res6name = andetails[res6col].value                         # Put the element name for result 6 into the variable
+            break
 
     # Setup the figure to be the size defined earlier
     fig = plt.figure(figsize=(figw,figh))
@@ -203,24 +227,24 @@ def Read_A_08_Analyse(inputfname, outputfname):                                 
     ax1 = fig.add_subplot(311)
     ax1.plot(Results.iloc[:,0])
     plt.tick_params(axis='x', which='both', labelsize=lsize, labelrotation=lrot, grid_color=gcol, grid_alpha=galpha)
-    plt.title(str(Results.columns[0]), pad=tpad)
+    plt.title(str(res1name), pad=tpad)
     plt.grid(which='both', axis='y')
 
     # Plot Second Result
     ax2 = fig.add_subplot(312)
     ax2.plot(Results.iloc[:,1])
     plt.tick_params(axis='x', which='both', labelsize=lsize, labelrotation=lrot, grid_color=gcol, grid_alpha=galpha)
-    plt.title(str(Results.columns[1]), pad=tpad)
+    plt.title(str(res2name), pad=tpad)
     plt.grid(which='both', axis='y')
 
     # Plot Third Result
     ax3 = fig.add_subplot(313)
     ax3.plot(Results.iloc[:,2])
     plt.tick_params(axis='x', which='both', labelsize=lsize, labelrotation=lrot, grid_color=gcol, grid_alpha=galpha)
-    plt.title(str(Results.columns[2]), pad=tpad)
+    plt.title(str(res3name), pad=tpad)
     plt.grid(which='both', axis='y')
 
-    plt.subplots_adjust(bottom=0.07,top=0.97, hspace=0.5)
+    plt.subplots_adjust(bottom=0.07,top=0.97, hspace=0.3)
 
     plt.savefig(outputfname + "\\Results1.png")
     plt.close()
@@ -231,21 +255,21 @@ def Read_A_08_Analyse(inputfname, outputfname):                                 
     ax1 = fig.add_subplot(311)
     ax1.plot(Results.iloc[:,3])
     plt.tick_params(axis='x', which='both', labelsize=lsize, labelrotation=lrot, grid_color=gcol, grid_alpha=galpha)
-    plt.title(str(Results.columns[3]), pad=tpad)
+    plt.title(str(res4name), pad=tpad)
     plt.grid(which='both', axis='y')
 
     # Plot Second Result
     ax2 = fig.add_subplot(312)
     ax2.plot(Results.iloc[:,4])
     plt.tick_params(axis='x', which='both', labelsize=lsize, labelrotation=lrot, grid_color=gcol, grid_alpha=galpha)
-    plt.title(str(Results.columns[4]), pad=tpad)
+    plt.title(str(res5name), pad=tpad)
     plt.grid(which='both', axis='y')
 
     # Plot Third Result
     ax3 = fig.add_subplot(313)
     ax3.plot(Results.iloc[:,5])
     plt.tick_params(axis='x', which='both', labelsize=lsize, labelrotation=lrot, grid_color=gcol, grid_alpha=galpha)
-    plt.title(str(Results.columns[5]), pad=tpad)
+    plt.title(str(res6name), pad=tpad)
     plt.grid(which='both', axis='y')
 
     plt.subplots_adjust(bottom=0.07,top=0.97, hspace=0.5)

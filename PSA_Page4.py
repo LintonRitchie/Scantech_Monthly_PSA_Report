@@ -50,7 +50,7 @@ class Ui_PSAPage4(object):
         self.psa_report_title_2.setAlignment(QtCore.Qt.AlignCenter)
         self.psa_report_title_2.setObjectName("psa_report_title_2")
         self.Results1 = QtWidgets.QLabel(self.centralwidget)
-        self.Results1.setGeometry(QtCore.QRect(100, 225, 600, 725))
+        self.Results1.setGeometry(QtCore.QRect(150, 225, 500, 725))
         self.Results1.setText("")
         self.Results1.setPixmap(QtGui.QPixmap(":/Resources/Results1.png"))
         self.Results1.setScaledContents(True)
