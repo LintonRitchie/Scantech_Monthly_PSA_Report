@@ -20,7 +20,7 @@ from PSA_Page6 import Ui_PSAPage6
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QFileDialog, QTableWidgetItem)
 from PyQt5 import (QtCore, QtGui)
 from PyQt5.QtCore import QDir
-
+import pyi_splash # this is just here for the packaging to allow the splash screen to close. It will always throw an error since the library cannot be installed.
 
 # regen_ui()                  # Regenerate the UI. This is used to update the UI file after changes
 
@@ -54,6 +54,7 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
     resourcepath = "C:\\PSAGen"
     newanalyser = 0
     autosend = 0
+    pyi_splash.close()
 
     def __init__(self, parent=None):
         super().__init__(parent)
