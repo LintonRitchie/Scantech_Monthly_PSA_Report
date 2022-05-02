@@ -20,6 +20,7 @@ from PSA_Page6 import Ui_PSAPage6
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QFileDialog, QTableWidgetItem)
 from PyQt5 import (QtCore, QtGui)
 from PyQt5.QtCore import QDir
+from dateutil.relativedelta import relativedelta
 # import pyi_splash # this is just here for the packaging to allow the splash screen to close. It will always throw an error since the library cannot be installed.
 
 # regen_ui()                  # Regenerate the UI. This is used to update the UI file after changes
@@ -54,6 +55,7 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
     resourcepath = "C:\\PSAGen"
     newanalyser = 0
     autosend = 0
+    blankrep = 0
     # pyi_splash.close()
 
     def __init__(self, parent=None):
@@ -144,6 +146,7 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
         self.PB_pg_4.setEnabled(False)
         self.PB_pg_5.setEnabled(False)
         self.PB_pg_6.setEnabled(False)
+        HomeWindow.blankrep = 0
 
     def GetFolder(self, message):
         anal = self.AnalyserListComboBox.currentText()
@@ -438,9 +441,23 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
         mail = outlook.CreateItem(0)                                    # This creates the email object. The 0 refers to the item type from the office documentation OlItemType. This can be others eg 1 for appointments, 2 for contacts etc.
         mail.To = engemail                                              # insert the relevant engineer's email address
         mail.CC = 'l.biggins@scantech.com.au; i.nerush@scantech.com.au; d.rossouw@scantech.com.au; l.balzan@scantech.com.au; m.kalicinski@scantech.com.au'
-        mail.Subject = str(jsondata["Summary"][0]["AnalyserNo"]) + " Monthly PSA Report data for " + str(jsondata["Summary"][0]["Period"])   # Build the subject line automatically.
+        if HomeWindow.blankrep == 1:
+            subjectline = str(jsondata["Summary"][0]["AnalyserNo"]) + " Blank Monthly PSA Report data for " + str(jsondata["Summary"][0]["Period"])
+            emailbody = "<html><body style=font-family:Calibri;> Hi " + str(engname) + " <br><br> Attached is the monthly report data " \
+                        "for " + str(jsondata["Summary"][0]["AnalyserNo"]) + ".<br>No PSA data was received this month. This was due " \
+                        "to either the analyser or the remote connection being offline.<br>Please look into the issue and see if it can be " \
+                        "resolved for next month's report. <br><br>Even though this report is blank, there should be an attachment " \
+                        "called " + str(HomeWindow.jsonname) + " which contains the blank report information you will need to generate the blank " \
+                        "pdf report. <br><br> </body></html>"
+        else:
+            subjectline = str(jsondata["Summary"][0]["AnalyserNo"]) + " Monthly PSA Report data for " + str(jsondata["Summary"][0]["Period"])
+            emailbody = "<html><body style=font-family:Calibri;> Hi " + str(engname) + " <br><br> Attached is the monthly report data " \
+                        "for " + str(jsondata["Summary"][0]["AnalyserNo"]) + ". <br>You will need this JSON file to generate your PDF report." \
+                        "<br>Please remember to CC Igor, Lucas & Daniel when sending your PDF report and upload the PDF and JSON, overwriting" \
+                        " the old JSON, to the server once sent to the customer."
+        mail.Subject = subjectline   # Build the subject line automatically.
         mail.BodyFormat = 2
-        mail.HTMLBody = "<html><body style=font-family:Calibri;> Hi " + str(engname) + " <br><br> I hope this comes through. I am testing a few automated emailing options. Please let me know if you get this email. <br> There should be an attachment called " + str(HomeWindow.jsonname) + "<br><br> </body></html>"
+        mail.HTMLBody = emailbody
         mail.Attachments.Add(HomeWindow.jsonoutfname)                   # add the json file as an attachment
         if HomeWindow.autosend == 0:                                    # if statement to determine if the email should be sent directly or displayed for manual sending.
             mail.Display()
@@ -464,7 +481,7 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
         serveng = HomeWindow.PSAMasterData.loc[HomeWindow.PSAMasterData["Analyser Number"] == anal, "Service Engineer"].to_string(index=False)  # get the service engineer as a string without dataframe nonsense
         application = HomeWindow.PSAMasterData.loc[HomeWindow.PSAMasterData["Analyser Number"] == anal, "Application"].to_string(index=False)   # get the service engineer as a string without dataframe nonsense
         customer = HomeWindow.PSAMasterData.loc[HomeWindow.PSAMasterData["Analyser Number"] == anal, "Customer Name"].to_string(index=False)    # get the service engineer as a string without dataframe nonsense
-
+        region = HomeWindow.PSAMasterData.loc[HomeWindow.PSAMasterData["Analyser Number"] == anal, "Region"].to_string(index=False)  # get the service engineer as a string without dataframe nonsense
         # Update UI
         self.page1.rep_analyser_data.setText(anal)
         self.page1.rep_date_data.setText(repdate)
@@ -472,7 +489,7 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
         self.page1.rep_app_data.setText(application)
         self.page1.site_name.setText(customer)
         self.page1.period_data.setText(self.RepPeriod())
-        self.page1.email_data.setText(self.RepEmail())
+        self.page1.email_data.setText(self.RepEmail(region))
         self.page1.disp_stduptodate.setText(self.StdDate())
         self.page1.disp_endiskspc.setText(self.DiskSpaceOK())
         self.UpdateDetStab()
@@ -1000,9 +1017,8 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
         Period = dates1.dt.month_name().to_string(index=False) + " " + dates1.dt.year.to_string(index=False) #concatenate the month name and year integer into a string called period using the to_string method to eliminate indexs
         return Period   # return Period to main
 
-    def RepEmail(self):
-        anal = self.AnalyserListComboBox.currentText()
-        region = HomeWindow.PSAMasterData.loc[HomeWindow.PSAMasterData["Analyser Number"] == anal, "Region"].to_string(index=False) #get the service engineer as a string without dataframe nonsense
+    def RepEmail(self, region):
+
         if region == "Asia":
             email = "service.asia@scantech.com.au"
         elif region == "Australia":
@@ -1142,9 +1158,54 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
 
     def IssueBlank(self):
         # This function generates a blank PSA report when required.
-        self.ImportReportPB.setEnabled(False)
-        self.ExportReportPB.setEnabled(True)
-
+        self.ImportReportPB.setEnabled(False)                               # Disable Import Report Pushbutton
+        HomeWindow.blankrep = 1                                             # Set the Blank report flag
+        configdatafname = "J:\\Client Analysers\\Analyser PSA Report\\PSA Report Config data.xlsx"     # generates the checklist filename based on the year of the period of the report being produced. This will deal with the January / december issue
+        configdata = openpyxl.load_workbook(configdatafname)                # Load config data from Config Data spreadsheet
+        andetails = configdata["AnalyserDetails"]                           # Select Analyser Details sheet
+        maxrow = andetails.max_row                                          # Determine max row of document
+        analyser = self.AnalyserListComboBox.currentText()                  # get the relevant analyser from the GUI Combobox
+        for row in range(1, maxrow + 1):                                    # For loop for searching through the Analyser Details sheet to determine the elemental result names to be plotted.
+            ancol = "{}{}".format("A", row)                                 # this sets up the analyser cell reference to be used.
+            appcol = "{}{}".format("D", row)                                # this sets up the application reference cell
+            engcol = "{}{}".format("C", row)                                # this sets up the service engineer reference cell
+            regcol = "{}{}".format("F", row)                                # this sets up the service engineer reference cell
+            custcol = "{}{}".format("B", row)                               # this sets up the service engineer reference cell
+            blankanal = andetails[ancol].value                              # this puts the analyser which is getting a blank report into a variable
+            if blankanal == analyser:                                       # if statement to fine the correct analyser in the list
+                app = andetails[appcol].value                               # determine the application fo the variable
+                serveng = andetails[engcol].value                           # determine the relevant service engineer
+                region = andetails[regcol].value                            # determine the relevant region
+                regemail = self.RepEmail(region)                            # determine the relevant regional email address
+                repdate = datetime.date.today().strftime("%d %B %Y")        # get Today's date and convert to a string
+                period = datetime.date.today() + relativedelta(months=-1)   # Subtract a month from today's date as the report is for the previous month
+                peroidm = period.strftime("%B")                             # Report Period string - Month
+                periody= period.strftime("%Y")                              # Report Period string - Year
+                period = period.strftime("%B %Y")                           # Report Period string - Month & Year
+                cust = andetails[custcol].value                             # get customer details
+                reportdata['Summary'][0]['SiteName'] = cust                 # populate the
+                reportdata['Summary'][0]['ReportDate'] = repdate
+                reportdata['Summary'][0]['AnalyserNo'] = analyser
+                reportdata['Summary'][0]['ServEng'] = serveng
+                reportdata['Summary'][0]['Application'] = app
+                reportdata['Summary'][0]['Period'] = period
+                reportdata['Summary'][0]['Email'] = regemail
+                reportdata['Summary'][0]['AnalyserOpCorrect'] = "Blank"
+                reportdata['ActionTaken'][0]['Action1'][0]['Date'] = repdate
+                reportdata['ActionTaken'][0]['Action1'][0]['Action'] = "Unsuccessful attempt to compile report"
+                reportdata['ActionTaken'][0]['Action1'][0]['Description'] = "No PSA Data Available due to no remote connection or analyser offline"
+                reportdata['ActionRequired'][0]['ActionReq1'][0]['Action'] = "Attempt to resolve why analyser or remote connection is offline"
+                reportdata['ActionRequired'][0]['ActionReq1'][0]['ByWhom'] = "Site\\Scantech"
+                reportdata['ActionRequired'][0]['ActionReq1'][0]['ByWhen'] = "As Soon As Possible"
+                HomeWindow.psadatafname = self.GetFolder("Select Folder to save blank JSON")                # Get the filename of the folder where the JSON will be dumped.
+                HomeWindow.jsonname = str(analyser) + " PSA Report " + periody + peroidm + " - Blank.json"  # setting the filename which will be used to output the JSON file
+                HomeWindow.jsonoutfname = HomeWindow.psadatafname + "\\" + HomeWindow.jsonname
+                with open(HomeWindow.jsonoutfname, 'w') as file:
+                    json.dump(reportdata, file, indent=1)
+                break
+            else:
+                pass
+        self.ExportReportPB.setEnabled(True)                                # Enable the export JSON pushbutton.
 
     def hide_pages(self):
         self.page1.hide()
