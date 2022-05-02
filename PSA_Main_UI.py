@@ -20,7 +20,7 @@ from PSA_Page6 import Ui_PSAPage6
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QFileDialog, QTableWidgetItem)
 from PyQt5 import (QtCore, QtGui)
 from PyQt5.QtCore import QDir
-import pyi_splash # this is just here for the packaging to allow the splash screen to close. It will always throw an error since the library cannot be installed.
+# import pyi_splash # this is just here for the packaging to allow the splash screen to close. It will always throw an error since the library cannot be installed.
 
 # regen_ui()                  # Regenerate the UI. This is used to update the UI file after changes
 
@@ -54,7 +54,7 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
     resourcepath = "C:\\PSAGen"
     newanalyser = 0
     autosend = 0
-    pyi_splash.close()
+    # pyi_splash.close()
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -113,6 +113,7 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
             HomeWindow.TempExtract = Read_TempExtract(HomeWindow.psadatafname, HomeWindow.resourcepath)  # Read in Temp Stability Data
             print("Read Temp Extract Complete")
             self.PreviewReportPB.setEnabled(True)
+            self.IssueBlank.setEnabled(False)
             self.psadataloc.setText(HomeWindow.psadatafname)
         if not HomeWindow.psadatafname:
             return
@@ -1075,7 +1076,6 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
             else:
                 pass
 
-
     def UpdatePSAChecklist(self):                                              # this must only be called after the JSON has been updated since this function uses that JSON to update the PSA Checklist
         with open(HomeWindow.jsonoutfname) as f:                               # reload the json file to use in the function
             jsondata = json.load(f)
@@ -1139,6 +1139,12 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
 
         openpyxl.Workbook.save(checklist,checklistfname)                        # save and overwrite the updated checklist
         print("PSA Checklist Updated")
+
+    def IssueBlank(self):
+        # This function generates a blank PSA report when required.
+        self.ImportReportPB.setEnabled(False)
+        self.ExportReportPB.setEnabled(True)
+
 
     def hide_pages(self):
         self.page1.hide()
