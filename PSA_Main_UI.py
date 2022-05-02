@@ -21,6 +21,7 @@ from PyQt5.QtWidgets import (QApplication, QMainWindow, QFileDialog, QTableWidge
 from PyQt5 import (QtCore, QtGui)
 from PyQt5.QtCore import QDir
 from dateutil.relativedelta import relativedelta
+
 # import pyi_splash # this is just here for the packaging to allow the splash screen to close. It will always throw an error since the library cannot be installed.
 
 # regen_ui()                  # Regenerate the UI. This is used to update the UI file after changes
@@ -33,30 +34,31 @@ open_window = 0
 # This will be accessed multiple times by various functions within the functions.
 
 with open("C:\\PSAGen\\ReportData.json") as f:
-    reportdata = json.load(f)
+    reportdata = json.load(f)                                                                   # Open a Blank JSON File
 
 
-class HomeWindow(QMainWindow,Ui_PSAHome):
-    psadatafname = ""                                   # Filename of the folder where the PSA report data is
-    jsonin1fname = ""                                   # Filename of the previous Month's PSA Report JSON file
-    jsonin2fname = ""                                   # Filename of the PSA Report JSON file from 2 Month's ago
-    jsonoutfname = ""                                                                                   # Filename of the output JSON file
-    jsonname = ""
-    masterpsafname = "J:\\Client Analysers\\Analyser PSA Report\\Development\\00-Forms\\PSA_Master_List.xlsx"                 # Filename where the PSA Master list is kept.
-    PSAMasterData = ""                                                                                  # Master file data variable from PSA Master file.
-    AnalyserStatus = ""                                 # PSA Report file data from PSA Report file.
-    PeakControl = ""                                    # Analyser Peak Control Data
-    VersionNumbers = ""                                 # version numbers data
-    AnalyserIO = ""                                     # Analyser IO Data
-    AnalyserA17 = ""                                    # Analyser Monthly Standardisation Data.
-    AnalyserA08 = ""                                    # Read in Analysis Data
-    PeakExtract = ""                                    # Readi in Peak Stability Data
-    TempExtract = ""                                    # Read in Temp Stability Data
-    resourcepath = "C:\\PSAGen"
-    newanalyser = 0
-    autosend = 0
-    blankrep = 0
-    # pyi_splash.close()
+class HomeWindow(QMainWindow, Ui_PSAHome):
+    psadatafname = ""                                                                           # Filename of the folder where the PSA report data is
+    jsonin1fname = ""                                                                           # Filename of the previous Month's PSA Report JSON file
+    jsonin2fname = ""                                                                           # Filename of the PSA Report JSON file from 2 Month's ago
+    jsonoutfname = ""                                                                           # Filename of the output JSON file
+    jsonname = ""                                                                               # Filename of relevant JSON File
+    masterpsafname = "J:\\Client Analysers\\Analyser PSA Report\\PSA Report Config data.xlsx"   # Filename where the PSA Report Master configuration document is kept.
+    PSAMasterData = ""                                                                          # Master file data variable from PSA Master file.
+    AnalyserStatus = ""                                                                         # PSA Report file data from PSA Report file.
+    PeakControl = ""                                                                            # Analyser Peak Control Data
+    VersionNumbers = ""                                                                         # version numbers data
+    AnalyserIO = ""                                                                             # Analyser IO Data Variable
+    AnalyserA17 = ""                                                                            # Analyser Monthly Standardisation Data Variable
+    AnalyserA08 = ""                                                                            # Analysis Data Variable
+    PeakExtract = ""                                                                            # Peak Stability Data Variable
+    TempExtract = ""                                                                            # Temp Stability Data Variable
+    resourcepath = "C:\\PSAGen"                                                                 # Path to the UI Resources folder where all images are stored
+    newanalyser = 0                                                                             # New Analyser flag
+    autosend = 0                                                                                # Autosend Email Flag
+    blankrep = 0                                                                                # Issue Blank report flag
+
+    # pyi_splash.close()                                                                        # Used to close splash screen in packaged software
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -70,9 +72,8 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
         self.page6 = PSA_pg6()
         self.connectSignalsSlots()
         self.popanalysers()
-        self.psamasterloc.setText(HomeWindow.masterpsafname)    # Update PSA Master file location Label
+        self.psamasterloc.setText(HomeWindow.masterpsafname)  # Update PSA Master file location Label
 
-    # Setup Signals and Slots for Pushbuttons
     def connectSignalsSlots(self):
         self.PreviewReportPB.released.connect(self.updateReport)
         self.ImportReportPB.released.connect(self.importPSAData)
@@ -92,6 +93,7 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
         self.AutoSendReport.stateChanged.connect(lambda: self.AutoSendToggle(self.AutoSendReport))
         self.AnalyserListComboBox.currentTextChanged.connect(self.AnalyserChanged)
         self.UpdateChecklistPB.released.connect(self.UpdatePSAChecklist)
+        self.IssueBlankPB.released.connect(self.IssueBlank)
 
     def importPSAData(self):
         HomeWindow.psadatafname = self.GetFolder("Select Folder containing PSA Report Data")
@@ -136,10 +138,11 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
             self.page6.RepAgo1.setEnabled(False)  # deactivate the import from 1 report Ago button pushbutton.
             self.page6.RepAgo2.setEnabled(False)  # deactivate the import from 2 reports Ago button pushbutton.
 
-    def AnalyserChanged(self):              # determines if the Selected analyser has changed and if so disables the buttons
+    def AnalyserChanged(self):  # determines if the Selected analyser has changed and if so disables the buttons
         self.PreviewReportPB.setEnabled(False)
         self.ExportReportPB.setEnabled(False)
         self.UpdateChecklistPB.setEnabled(False)
+        self.ImportReportPB.setEnabled(True)
         self.PB_pg.setEnabled(False)
         self.PB_pg_2.setEnabled(False)
         self.PB_pg_3.setEnabled(False)
@@ -152,7 +155,7 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
         anal = self.AnalyserListComboBox.currentText()
         # Switches default folder based on which analyser is selected.
         if anal[0:3] == "C15":
-            fname = QFileDialog.getExistingDirectory(self,message,"J:\\Client Analysers\\NG-1500")
+            fname = QFileDialog.getExistingDirectory(self, message, "J:\\Client Analysers\\NG-1500")
         elif anal[0:3] == "C21":
             fname = QFileDialog.getExistingDirectory(self, message, "J:\\Client Analysers\\CS-2100")
         elif anal[0:3] == "CMM":
@@ -176,14 +179,14 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
         # Update the default path vairable in the ReadINData Class
         # HomeWindow.psadatafname = fname
 
-
         # # Update the data in the Data Variables in Use
         # self.updatereadindata()
 
     def JSONFname(self):
+
         # this function determines the filename of the output data file
-        dates = HomeWindow.AnalyserStatus.loc[HomeWindow.AnalyserStatus["Result Name"] == "LastPsaReportTime", "Value"] # get the date of the last psa report generation
-        dates = pd.to_datetime(dates,yearfirst=True)   #setup dataframe as a date time series in the correct format
+        dates = HomeWindow.AnalyserStatus.loc[HomeWindow.AnalyserStatus["Result Name"] == "LastPsaReportTime", "Value"]  # get the date of the last psa report generation
+        dates = pd.to_datetime(dates, yearfirst=True)  # setup dataframe as a date time series in the correct format
         mnth = dates.dt.month.to_string(index=False)
         yr = dates.dt.year.to_string(index=False)
         psafname = HomeWindow.psadatafname
@@ -198,7 +201,7 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
 
     def UpdateJSON(self):
 
-        self.JSONFname()    # Update Output JSON Filename
+        self.JSONFname()  # Update Output JSON Filename
         print(HomeWindow.jsonoutfname)
         # Update JSON File
         reportdata['Summary'][0]['SiteName'] = self.page1.site_name.text()
@@ -213,11 +216,11 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
 
         # this loop populates the JSON by looking to see if any data exists in the first cell of the row. If not then it skips. If is does, the data is pulled into the JSON
         # pull the data from the Action Taken table row 1 to fill the JSON
-        for i in range(0,5):
+        for i in range(0, 5):
             it = self.page1.ActionTakenTable.item(i, 0)
             if it and it.text():
-                jsonid = "Action" + str(i+1)
-                reportdata['ActionTaken'][0][jsonid][0]['Date']=str(self.page1.ActionTakenTable.item(i, 0).text())
+                jsonid = "Action" + str(i + 1)
+                reportdata['ActionTaken'][0][jsonid][0]['Date'] = str(self.page1.ActionTakenTable.item(i, 0).text())
                 reportdata['ActionTaken'][0][jsonid][0]['Time'] = str(self.page1.ActionTakenTable.item(i, 1).text())
                 reportdata['ActionTaken'][0][jsonid][0]['Action'] = str(self.page1.ActionTakenTable.item(i, 2).text())
                 reportdata['ActionTaken'][0][jsonid][0]['Description'] = str(self.page1.ActionTakenTable.item(i, 3).text())
@@ -226,22 +229,21 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
 
         # this loop populates the JSON by looking to see if any data exists in the first cell of the row. If not then it skips. If is does, the data is pulled into the JSON
         # Populating the Action required section of the JSON file
-        for i in range(0,5):
+        for i in range(0, 5):
             it = self.page1.ActionTakenTable.item(i, 0)
             if it and it.text():
-                jsonid = "ActionReq" + str(i+1)
+                jsonid = "ActionReq" + str(i + 1)
                 reportdata['ActionRequired'][0][jsonid][0]['Action'] = str(self.page1.ActionRequiredTable.item(i, 0).text())
                 reportdata['ActionRequired'][0][jsonid][0]['ByWhom'] = str(self.page1.ActionRequiredTable.item(i, 1).text())
                 reportdata['ActionRequired'][0][jsonid][0]['ByWhen'] = str(self.page1.ActionRequiredTable.item(i, 2).text())
             else:
                 pass
 
-
         # populating JSON with Detector stability info
-        for i in range(0,16):
+        for i in range(0, 16):
             it = self.page2.tableWidget.item(0, i)
             if it and it.text():
-                jsonid = "Detector" + str(i+1)
+                jsonid = "Detector" + str(i + 1)
                 reportdata['DetectorStability'][0][jsonid][0]['Enabled'] = str(self.page2.tableWidget.item(0, i).text())
                 reportdata['DetectorStability'][0][jsonid][0]['Stable'] = str(self.page2.tableWidget.item(1, i).text())
 
@@ -382,9 +384,9 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
         # This section encodes the plots into the JSON File for transmission to engineer
         # encode Temperature Plot for storage in JSON
         with open(HomeWindow.resourcepath + "\\Temperatures.png", mode="rb") as tf:
-             data = base64.b64encode(tf.read()).decode("utf-8")
+            data = base64.b64encode(tf.read()).decode("utf-8")
         reportdata['Plots'][0]['TempPlot'] = data
-        with open(HomeWindow.jsonoutfname,'w') as file:
+        with open(HomeWindow.jsonoutfname, 'w') as file:
             json.dump(reportdata, file, indent=1)
 
         # encode Detector Stability Plot for storage in JSON
@@ -421,50 +423,51 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
     def ExportReport(self):
         with open(HomeWindow.jsonoutfname) as f:
             jsondata = json.load(f)
-        configdatafname = "J:\\Client Analysers\\Analyser PSA Report\\PSA Report Config data.xlsx"   # generates the checklist filename based on the year of the period of the report being produced. This will deal with the January / december issue
-        configdata = openpyxl.load_workbook(configdatafname)            # Load config data from Config Data spreadsheet
-        engineers = configdata["Engineers"]                             # Select Engineers sheet
-        serveng = jsondata["Summary"][0]["ServEng"]                     # load relevant service engineers from JSON
-        maxrow = engineers.max_row                                      # Determine max row of document
+        configdatafname = "J:\\Client Analysers\\Analyser PSA Report\\PSA Report Config data.xlsx"  # generates the checklist filename based on the year of the period of the report being produced. This will deal with the January / december issue
+        configdata = openpyxl.load_workbook(configdatafname)  # Load config data from Config Data spreadsheet
+        engineers = configdata["Engineers"]  # Select Engineers sheet
+        serveng = jsondata["Summary"][0]["ServEng"]  # load relevant service engineers from JSON
+        maxrow = engineers.max_row  # Determine max row of document
 
-        for row in range(1, maxrow + 1):                                # For loop for searching through the engineers sheet to determine the email address
-            engcol = "{}{}".format("A", row)                            # this sets up the cell reference in the PSA report Config Excel document that we are going to search through.
-            emailcol = "{}{}".format("B", row)                          # this sets up the cell reference in the PSA report Config Excel document that we are going to find the email address.
-            engnamecol = "{}{}".format("C", row)                           # this sets up the cell reference in the PSA report Config Excel document that we are going to find the engineer's preferred name.
-            x = engineers[engcol].value                                 # Load the engineers name into a variable for checking
+        for row in range(1, maxrow + 1):  # For loop for searching through the engineers sheet to determine the email address
+            engcol = "{}{}".format("A", row)  # this sets up the cell reference in the PSA report Config Excel document that we are going to search through.
+            emailcol = "{}{}".format("B", row)  # this sets up the cell reference in the PSA report Config Excel document that we are going to find the email address.
+            engnamecol = "{}{}".format("C", row)  # this sets up the cell reference in the PSA report Config Excel document that we are going to find the engineer's preferred name.
+            x = engineers[engcol].value  # Load the engineers name into a variable for checking
 
-            if x == serveng:                                            # if statement that triggers when the engineers name is found.
-                engemail = engineers[emailcol].value                    # put the engineers email address into the engemail variable which is used later for setting the engineers email address in the email
-                engname = engineers[engnamecol].value                   # put the engineer's preferred name in the variable engname
+            if x == serveng:  # if statement that triggers when the engineers name is found.
+                engemail = engineers[emailcol].value  # put the engineers email address into the engemail variable which is used later for setting the engineers email address in the email
+                engname = engineers[engnamecol].value  # put the engineer's preferred name in the variable engname
                 break
-        outlook = win32com.client.Dispatch('outlook.application')       # invoke outlook to automatically generate the email
-        mail = outlook.CreateItem(0)                                    # This creates the email object. The 0 refers to the item type from the office documentation OlItemType. This can be others eg 1 for appointments, 2 for contacts etc.
-        mail.To = engemail                                              # insert the relevant engineer's email address
+        outlook = win32com.client.Dispatch('outlook.application')  # invoke outlook to automatically generate the email
+        mail = outlook.CreateItem(0)  # This creates the email object. The 0 refers to the item type from the office documentation OlItemType. This can be others eg 1 for appointments, 2 for contacts etc.
+        mail.To = engemail  # insert the relevant engineer's email address
         mail.CC = 'l.biggins@scantech.com.au; i.nerush@scantech.com.au; d.rossouw@scantech.com.au; l.balzan@scantech.com.au; m.kalicinski@scantech.com.au'
         if HomeWindow.blankrep == 1:
             subjectline = str(jsondata["Summary"][0]["AnalyserNo"]) + " Blank Monthly PSA Report data for " + str(jsondata["Summary"][0]["Period"])
             emailbody = "<html><body style=font-family:Calibri;> Hi " + str(engname) + " <br><br> Attached is the monthly report data " \
-                        "for " + str(jsondata["Summary"][0]["AnalyserNo"]) + ".<br>No PSA data was received this month. This was due " \
-                        "to either the analyser or the remote connection being offline.<br>Please look into the issue and see if it can be " \
-                        "resolved for next month's report. <br><br>Even though this report is blank, there should be an attachment " \
-                        "called " + str(HomeWindow.jsonname) + " which contains the blank report information you will need to generate the blank " \
-                        "pdf report. <br><br> </body></html>"
+                                                                                       "for " + str(jsondata["Summary"][0]["AnalyserNo"]) + ".<br>No PSA data was received this month. This was due " \
+                                                                                                                                            "to either the analyser or the remote connection being offline.<br>Please look into the issue and see if it can be " \
+                                                                                                                                            "resolved for next month's report. <br><br>Even though this report is blank, there should be an attachment " \
+                                                                                                                                            "called " + str(
+                HomeWindow.jsonname) + " which contains the blank report information you will need to generate the blank " \
+                                       "pdf report. <br><br> </body></html>"
         else:
             subjectline = str(jsondata["Summary"][0]["AnalyserNo"]) + " Monthly PSA Report data for " + str(jsondata["Summary"][0]["Period"])
             emailbody = "<html><body style=font-family:Calibri;> Hi " + str(engname) + " <br><br> Attached is the monthly report data " \
-                        "for " + str(jsondata["Summary"][0]["AnalyserNo"]) + ". <br>You will need this JSON file to generate your PDF report." \
-                        "<br>Please remember to CC Igor, Lucas & Daniel when sending your PDF report and upload the PDF and JSON, overwriting" \
-                        " the old JSON, to the server once sent to the customer."
-        mail.Subject = subjectline   # Build the subject line automatically.
+                                                                                       "for " + str(jsondata["Summary"][0]["AnalyserNo"]) + ". <br>You will need this JSON file to generate your PDF report." \
+                                                                                                                                            "<br>Please remember to CC Igor, Lucas & Daniel when sending your PDF report and upload the PDF and JSON, overwriting" \
+                                                                                                                                            " the old JSON, to the server once sent to the customer."
+        mail.Subject = subjectline  # Build the subject line automatically.
         mail.BodyFormat = 2
         mail.HTMLBody = emailbody
-        mail.Attachments.Add(HomeWindow.jsonoutfname)                   # add the json file as an attachment
-        if HomeWindow.autosend == 0:                                    # if statement to determine if the email should be sent directly or displayed for manual sending.
+        mail.Attachments.Add(HomeWindow.jsonoutfname)  # add the json file as an attachment
+        if HomeWindow.autosend == 0:  # if statement to determine if the email should be sent directly or displayed for manual sending.
             mail.Display()
         elif HomeWindow.autosend == 1:
             mail.Send()
         print("Exporting report to email")
-        self.UpdateChecklistPB.setEnabled(True)                         # activate the update checklist pushbutton which will allow the PSA report checklist to be updated.
+        self.UpdateChecklistPB.setEnabled(True)  # activate the update checklist pushbutton which will allow the PSA report checklist to be updated.
 
     def updateReport(self):
 
@@ -477,10 +480,10 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
         self.PB_pg_6.setEnabled(True)
         # Update data accordingly
         anal = self.AnalyserListComboBox.currentText()
-        repdate = str(datetime.date.today())                                # get today's date
+        repdate = str(datetime.date.today())  # get today's date
         serveng = HomeWindow.PSAMasterData.loc[HomeWindow.PSAMasterData["Analyser Number"] == anal, "Service Engineer"].to_string(index=False)  # get the service engineer as a string without dataframe nonsense
-        application = HomeWindow.PSAMasterData.loc[HomeWindow.PSAMasterData["Analyser Number"] == anal, "Application"].to_string(index=False)   # get the service engineer as a string without dataframe nonsense
-        customer = HomeWindow.PSAMasterData.loc[HomeWindow.PSAMasterData["Analyser Number"] == anal, "Customer Name"].to_string(index=False)    # get the service engineer as a string without dataframe nonsense
+        application = HomeWindow.PSAMasterData.loc[HomeWindow.PSAMasterData["Analyser Number"] == anal, "Application"].to_string(index=False)  # get the service engineer as a string without dataframe nonsense
+        customer = HomeWindow.PSAMasterData.loc[HomeWindow.PSAMasterData["Analyser Number"] == anal, "Customer Name"].to_string(index=False)  # get the service engineer as a string without dataframe nonsense
         region = HomeWindow.PSAMasterData.loc[HomeWindow.PSAMasterData["Analyser Number"] == anal, "Region"].to_string(index=False)  # get the service engineer as a string without dataframe nonsense
         # Update UI
         self.page1.rep_analyser_data.setText(anal)
@@ -534,7 +537,7 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
 
     def UpdatePg1(self):
         fname = HomeWindow.jsonin1fname
-        with open(fname) as f:                          # open json using filename generated earlier.
+        with open(fname) as f:  # open json using filename generated earlier.
             reportdata = json.load(f)
         # Update the Action Taken Table on Page 1
         self.page1.ActionTakenTable.setItem(0, 0, QTableWidgetItem(str(reportdata['ActionTaken'][0]['Action1'][0]['Date'])))
@@ -576,31 +579,31 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
 
     def UpdatePg6(self):
 
-        if self.IncLastMonth.isChecked():                                   # If statement that checks the status of the include last month checkbox. If checked will ask user for folder where last report's json is else uses default.
-            fname1 = self.GetFolder("Select Folder containing Last Month's PSA Report Data")    # gets the filename of the JSON file containing last month's data
-            if fname1:                                                      # if statement to execute default file load in the event the user cancels the previous report load
-                fname = glob.glob(fname1 + "\*.json")                       # if the user has selected a folder, we then need to check if a json file exists in that folder
-                if fname:                                                   # if the json exists in the folder then generate the correct file name to allow it to be opened
+        if self.IncLastMonth.isChecked():  # If statement that checks the status of the include last month checkbox. If checked will ask user for folder where last report's json is else uses default.
+            fname1 = self.GetFolder("Select Folder containing Last Month's PSA Report Data")  # gets the filename of the JSON file containing last month's data
+            if fname1:  # if statement to execute default file load in the event the user cancels the previous report load
+                fname = glob.glob(fname1 + "\*.json")  # if the user has selected a folder, we then need to check if a json file exists in that folder
+                if fname:  # if the json exists in the folder then generate the correct file name to allow it to be opened
                     fname = QDir.toNativeSeparators(fname[0])
                     HomeWindow.jsonin1fname = fname
-                else:                                                       # if the json doesn't exist in this folder, print json not available and use default
+                else:  # if the json doesn't exist in this folder, print json not available and use default
                     print("JSON not available in " + fname1)
                     print("Using blank default JSON in C:\\PSAGen")
                     fname = "C:\\PSAGen\\ReportData.json"
-            if not fname1:                                                  # if user cancels, no file name will be produced so print error and use default.
+            if not fname1:  # if user cancels, no file name will be produced so print error and use default.
                 print("Last report folder not selected, using default instead")
                 print("Using blank default JSON in C:\\PSAGen")
                 fname = "C:\\PSAGen\\ReportData.json"
 
-            with open(fname) as f:                                          # open json using filename generated earlier.
+            with open(fname) as f:  # open json using filename generated earlier.
                 reportdata = json.load(f)
         else:
             print("Excluding last report, so using blank defaults in C:\\PSAGen instead")
-            with open("C:\\PSAGen\\ReportData.json") as f:                  # force default in event include last month is unchecked.
+            with open("C:\\PSAGen\\ReportData.json") as f:  # force default in event include last month is unchecked.
                 reportdata = json.load(f)
 
         # Update PLC Status Table
-        BeltRunning = QTableWidgetItem(HomeWindow.AnalyserIO.loc[HomeWindow.AnalyserIO["Parameter Name"] == "BeltRunning","Value"].to_string(index=False))
+        BeltRunning = QTableWidgetItem(HomeWindow.AnalyserIO.loc[HomeWindow.AnalyserIO["Parameter Name"] == "BeltRunning", "Value"].to_string(index=False))
         ForceAnalyse = QTableWidgetItem(HomeWindow.AnalyserIO.loc[HomeWindow.AnalyserIO["Parameter Name"] == "ForceAnalyse", "Value"].to_string(index=False))
         ForceStandardise = QTableWidgetItem(HomeWindow.AnalyserIO.loc[HomeWindow.AnalyserIO["Parameter Name"] == "ForceStandardise", "Value"].to_string(index=False))
 
@@ -618,9 +621,9 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
         self.page6.PlantPLCTable.setItem(1, 3, QTableWidgetItem(str(reportdata['PLCStatus'][0]['ForceAnalyse'][0]['Comment'])))
         self.page6.PlantPLCTable.setItem(2, 3, QTableWidgetItem(str(reportdata['PLCStatus'][0]['ForceStandardise'][0]['Comment'])))
         # Update Analyser Status Table
-        AnalyserOK = QTableWidgetItem(HomeWindow.AnalyserStatus.loc[HomeWindow.AnalyserStatus["Result Name"] == "AnalyserOK","Value"].to_string(index=False))
-        StandardsOK = QTableWidgetItem(HomeWindow.AnalyserStatus.loc[HomeWindow.AnalyserStatus["Result Name"] == "StandardsOK","Value"].to_string(index=False))
-        IOControlOK = QTableWidgetItem(HomeWindow.AnalyserStatus.loc[HomeWindow.AnalyserStatus["Result Name"] == "IOControlOK","Value"].to_string(index=False))
+        AnalyserOK = QTableWidgetItem(HomeWindow.AnalyserStatus.loc[HomeWindow.AnalyserStatus["Result Name"] == "AnalyserOK", "Value"].to_string(index=False))
+        StandardsOK = QTableWidgetItem(HomeWindow.AnalyserStatus.loc[HomeWindow.AnalyserStatus["Result Name"] == "StandardsOK", "Value"].to_string(index=False))
+        IOControlOK = QTableWidgetItem(HomeWindow.AnalyserStatus.loc[HomeWindow.AnalyserStatus["Result Name"] == "IOControlOK", "Value"].to_string(index=False))
         SpectraStable = QTableWidgetItem(HomeWindow.AnalyserStatus.loc[HomeWindow.AnalyserStatus["Result Name"] == "SpectraStable", "Value"].to_string(index=False))
         self.page6.PlantPLCTable_2.setItem(0, 0, AnalyserOK)
         self.page6.PlantPLCTable_2.setItem(1, 0, StandardsOK)
@@ -641,7 +644,7 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
         self.page6.PlantPLCTable_2.setItem(3, 3, QTableWidgetItem(str(reportdata['AnalyserStatus'][0]['SpectraStable'][0]['Comment'])))
 
         # Update PLC Analyser Results
-        SystemOK = QTableWidgetItem(HomeWindow.AnalyserIO.loc[HomeWindow.AnalyserIO["Parameter Name"] == "SystemRunning","Value"].to_string(index=False))
+        SystemOK = QTableWidgetItem(HomeWindow.AnalyserIO.loc[HomeWindow.AnalyserIO["Parameter Name"] == "SystemRunning", "Value"].to_string(index=False))
         if HomeWindow.AnalyserIO.loc[HomeWindow.AnalyserIO["Parameter Name"] == "SourceControlFault", "Value"].to_string(index=False) == "   OK\nFALSE":
             SourceControlFault = QTableWidgetItem("FALSE")
         else:
@@ -667,9 +670,9 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
         self.page6.PlantPLCTable_3.setItem(3, 3, QTableWidgetItem(str(reportdata['PLCResults'][0]['SourceOn'][0]['Comment'])))
 
         # Update Analyser Config Table
-        AnalysisPeriod = QTableWidgetItem(HomeWindow.AnalyserStatus.loc[HomeWindow.AnalyserStatus["Result Name"] == "AnalysisPeriod","Value"].to_string(index=False))
-        AnalMinLoadLimit = QTableWidgetItem(HomeWindow.AnalyserStatus.loc[HomeWindow.AnalyserStatus["Result Name"] == "AnalMinLoadLimit","Value"].to_string(index=False))
-        StandardisePeriod = QTableWidgetItem(HomeWindow.AnalyserStatus.loc[HomeWindow.AnalyserStatus["Result Name"] == "StandardisePeriod","Value"].to_string(index=False))
+        AnalysisPeriod = QTableWidgetItem(HomeWindow.AnalyserStatus.loc[HomeWindow.AnalyserStatus["Result Name"] == "AnalysisPeriod", "Value"].to_string(index=False))
+        AnalMinLoadLimit = QTableWidgetItem(HomeWindow.AnalyserStatus.loc[HomeWindow.AnalyserStatus["Result Name"] == "AnalMinLoadLimit", "Value"].to_string(index=False))
+        StandardisePeriod = QTableWidgetItem(HomeWindow.AnalyserStatus.loc[HomeWindow.AnalyserStatus["Result Name"] == "StandardisePeriod", "Value"].to_string(index=False))
         self.page6.PlantPLCTable_4.setItem(0, 0, AnalysisPeriod)
         self.page6.PlantPLCTable_4.setItem(1, 0, AnalMinLoadLimit)
         self.page6.PlantPLCTable_4.setItem(2, 0, StandardisePeriod)
@@ -685,9 +688,9 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
         self.page6.PlantPLCTable_4.setItem(2, 3, QTableWidgetItem(str(reportdata['AnalyserConfiguration'][0]['StandardisePeriod'][0]['Comment'])))
 
         # Update Standardisation Table
-        FirstStandard = QTableWidgetItem(HomeWindow.AnalyserStatus.loc[HomeWindow.AnalyserStatus["Result Name"] == "FirstStandardTime","Value"].to_string(index=False))
-        LastStandard = QTableWidgetItem(HomeWindow.AnalyserStatus.loc[HomeWindow.AnalyserStatus["Result Name"] == "LastStandardiseTime","Value"].to_string(index=False))
-        NumStandard = QTableWidgetItem(HomeWindow.AnalyserStatus.loc[HomeWindow.AnalyserStatus["Result Name"] == "PeriodCount","Value"].to_string(index=False))
+        FirstStandard = QTableWidgetItem(HomeWindow.AnalyserStatus.loc[HomeWindow.AnalyserStatus["Result Name"] == "FirstStandardTime", "Value"].to_string(index=False))
+        LastStandard = QTableWidgetItem(HomeWindow.AnalyserStatus.loc[HomeWindow.AnalyserStatus["Result Name"] == "LastStandardiseTime", "Value"].to_string(index=False))
+        NumStandard = QTableWidgetItem(HomeWindow.AnalyserStatus.loc[HomeWindow.AnalyserStatus["Result Name"] == "PeriodCount", "Value"].to_string(index=False))
         NumStandardMonth = QTableWidgetItem(str(HomeWindow.AnalyserA17))
         self.page6.PlantPLCTable_5.setItem(0, 0, FirstStandard)
         self.page6.PlantPLCTable_5.setItem(1, 0, LastStandard)
@@ -708,8 +711,8 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
         self.page6.PlantPLCTable_5.setItem(3, 3, QTableWidgetItem(str(reportdata['Standardisation'][0]['NumStdPeriodsThisMnth'][0]['Comment'])))
 
         # Update Software Versions Table
-        Product = QTableWidgetItem(HomeWindow.VersionNumbers.loc[HomeWindow.VersionNumbers["Module"] == "Product","Version"].to_string(index=False))
-        CsSchedule = QTableWidgetItem(HomeWindow.VersionNumbers.loc[HomeWindow.VersionNumbers["Module"] == "CsSchedule","Version"].to_string(index=False))
+        Product = QTableWidgetItem(HomeWindow.VersionNumbers.loc[HomeWindow.VersionNumbers["Module"] == "Product", "Version"].to_string(index=False))
+        CsSchedule = QTableWidgetItem(HomeWindow.VersionNumbers.loc[HomeWindow.VersionNumbers["Module"] == "CsSchedule", "Version"].to_string(index=False))
         self.page6.PlantPLCTable_6.setItem(0, 0, Product)
         self.page6.PlantPLCTable_6.setItem(1, 0, CsSchedule)
         # Creating the comment item and populating with Blanks
@@ -721,8 +724,8 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
         self.page6.PlantPLCTable_6.setItem(1, 3, QTableWidgetItem(str(reportdata['SoftwareVersions'][0]['CsSchedule'][0]['Comment'])))
 
         # Update Disk Space Table
-        DiskSpace = QTableWidgetItem(HomeWindow.VersionNumbers.loc[HomeWindow.VersionNumbers["Module"] == "DiskSpace","Version"].to_string(index=False))
-        PercDiskSpace = QTableWidgetItem(HomeWindow.VersionNumbers.loc[HomeWindow.VersionNumbers["Module"] == "%DiskSpace","Version"].to_string(index=False))
+        DiskSpace = QTableWidgetItem(HomeWindow.VersionNumbers.loc[HomeWindow.VersionNumbers["Module"] == "DiskSpace", "Version"].to_string(index=False))
+        PercDiskSpace = QTableWidgetItem(HomeWindow.VersionNumbers.loc[HomeWindow.VersionNumbers["Module"] == "%DiskSpace", "Version"].to_string(index=False))
         self.page6.PlantPLCTable_7.setItem(0, 0, DiskSpace)
         self.page6.PlantPLCTable_7.setItem(1, 0, PercDiskSpace)
         # Creating the comment item and populating with Blanks
@@ -740,7 +743,7 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
         anal = self.AnalyserListComboBox.currentText()
         # Switches default folder based on which analyser is selected.
         if anal[0:3] == "C15":
-            fname = QFileDialog.getExistingDirectory(self,"Open PSA File in PSA Folder","J:\\Client Analysers\\NG-1500")
+            fname = QFileDialog.getExistingDirectory(self, "Open PSA File in PSA Folder", "J:\\Client Analysers\\NG-1500")
         elif anal[0:3] == "C21":
             fname = QFileDialog.getExistingDirectory(self, "Open PSA File in PSA Folder", "J:\\Client Analysers\\CS-2100")
         elif anal[0:3] == "CMM":
@@ -767,7 +770,7 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
         # **************************************************************************************************************************************************
         # This section imports the relevant data into the required data frames
         # **************************************************************************************************************************************************
-        print ("Filename is: " + str(fname))
+        print("Filename is: " + str(fname))
         # Import the Analyser Status sheet from the PSAReport.xls file in the relevant folder defined by fname
         StatusColumns1RA = ["Result Name", "Value"]
         AnalyserStatus1RA = pd.read_excel(open(fname, 'rb'), sheet_name="Analyser Status")
@@ -967,7 +970,6 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
         self.page6.PlantPLCTable_7.setItem(0, 2, DiskSpace)
         self.page6.PlantPLCTable_7.setItem(1, 2, PercDiskSpace)
 
-    # used in Update report
     def UpdateFigs(self):
         self.page2.label_3.setPixmap(QtGui.QPixmap(HomeWindow.resourcepath + "\\Detector_Stability.png"))
         self.page3.Temps.setPixmap(QtGui.QPixmap(HomeWindow.resourcepath + "\\Temperatures.png"))
@@ -975,23 +977,22 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
         self.page4.Results1.setPixmap(QtGui.QPixmap(HomeWindow.resourcepath + "\\Results1.png"))
         self.page5.Results2.setPixmap(QtGui.QPixmap(HomeWindow.resourcepath + "\\Results2.png"))
 
-    # used in Update report
     def UpdateDetStab(self):
         # calculate the number of detecotrs
-        Dets = HomeWindow.PeakControl.shape[1]-2
+        Dets = HomeWindow.PeakControl.shape[1] - 2
 
         # clear the table each time the function is called.
         for i in range(16):
             self.page2.tableWidget.setItem(0, i, self.ClearTable())
             self.page2.tableWidget.setItem(1, i, self.ClearTable())
 
-        x=0
+        x = 0
         # update the detecotr status table based on the totoal number of detectors.
         while x < Dets:
             # read in the detector disabled status
-            disabled = HomeWindow.PeakControl.loc[HomeWindow.PeakControl["Result Name"] == "DetectorDisabled", "Detector "+str(x+1)].to_string(index=False)
+            disabled = HomeWindow.PeakControl.loc[HomeWindow.PeakControl["Result Name"] == "DetectorDisabled", "Detector " + str(x + 1)].to_string(index=False)
             # read in the detector Stability status
-            stablity = HomeWindow.PeakControl.iloc[21, x+1]
+            stablity = HomeWindow.PeakControl.iloc[21, x + 1]
 
             # Choose which colour and wording to update the Detector enabled row of detecotr stability table with
             if disabled == "FALSE":
@@ -1012,10 +1013,10 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
             x += 1
 
     def RepPeriod(self):
-        dates = HomeWindow.AnalyserStatus.loc[HomeWindow.AnalyserStatus["Result Name"] == "LastPsaReportTime", "Value"] # get the date of the last psa report generation
-        dates1 = pd.to_datetime(dates,yearfirst=True)   #setup dataframe as a date time series in the correct format
-        Period = dates1.dt.month_name().to_string(index=False) + " " + dates1.dt.year.to_string(index=False) #concatenate the month name and year integer into a string called period using the to_string method to eliminate indexs
-        return Period   # return Period to main
+        dates = HomeWindow.AnalyserStatus.loc[HomeWindow.AnalyserStatus["Result Name"] == "LastPsaReportTime", "Value"]  # get the date of the last psa report generation
+        dates1 = pd.to_datetime(dates, yearfirst=True)  # setup dataframe as a date time series in the correct format
+        Period = dates1.dt.month_name().to_string(index=False) + " " + dates1.dt.year.to_string(index=False)  # concatenate the month name and year integer into a string called period using the to_string method to eliminate indexs
+        return Period  # return Period to main
 
     def RepEmail(self, region):
 
@@ -1047,11 +1048,11 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
         return email
 
     def StdDate(self):
-        stddate = HomeWindow.AnalyserStatus.loc[HomeWindow.AnalyserStatus["Result Name"] == "LastStandardiseTime", "Value"] # get the date of the last psa report generation
-        stddate = stddate.to_string(index=False)   #setup dataframe as a date time series in the correct format
+        stddate = HomeWindow.AnalyserStatus.loc[HomeWindow.AnalyserStatus["Result Name"] == "LastStandardiseTime", "Value"]  # get the date of the last psa report generation
+        stddate = stddate.to_string(index=False)  # setup dataframe as a date time series in the correct format
         stddate = datetime.datetime.strptime(stddate, "%a %y/%m/%d %H:%M")
         tdate = datetime.datetime.today()
-        difference = (tdate.year - stddate.year)*12 + (tdate.month-stddate.month)
+        difference = (tdate.year - stddate.year) * 12 + (tdate.month - stddate.month)
         if difference > 6:
             output = "No"
         else:
@@ -1062,8 +1063,8 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
     def DiskSpaceOK(self):
         diskspace = HomeWindow.VersionNumbers.loc[HomeWindow.VersionNumbers["Module"] == "%DiskSpace", "Version"]
         diskspace = diskspace.to_string(index=False)
-        diskspace = float(diskspace.replace("%",""))
-        if diskspace > 10.00 :
+        diskspace = float(diskspace.replace("%", ""))
+        if diskspace > 10.00:
             diskspaceok = "Yes"
         else:
             diskspaceok = "No"
@@ -1073,18 +1074,18 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
     def openReport(self):
         options = QFileDialog.Options()
         options |= QFileDialog.DontUseNativeDialog
-        fileName, _ = QFileDialog.getOpenFileName(self,"Choose Report File to Open", "","csv (*.csv)",
-        options=options)
-        print (fileName)
+        fileName, _ = QFileDialog.getOpenFileName(self, "Choose Report File to Open", "", "csv (*.csv)",
+                                                  options=options)
+        print(fileName)
 
     def popanalysers(self):
-        configdatafname = "J:\\Client Analysers\\Analyser PSA Report\\PSA Report Config data.xlsx"     # generates the checklist filename based on the year of the period of the report being produced. This will deal with the January / december issue
-        configdata = openpyxl.load_workbook(configdatafname)            # Load config data from Config Data spreadsheet
-        andetails = configdata["AnalyserDetails"]                       # Select Analyser Details sheet
-        maxrow = andetails.max_row                                      # Determine max row of document
-        for row in range(1, maxrow + 1):                                # For loop for searching through the Analyser Details sheet to determine the elemental result names to be plotted.
-            ancol = "{}{}".format("A", row)                             # this sets up the analyser cell reference to be used.
-            reqcol = "{}{}".format("G", row)                            # this sets up the psa report required reference cell
+        configdatafname = "J:\\Client Analysers\\Analyser PSA Report\\PSA Report Config data.xlsx"  # generates the checklist filename based on the year of the period of the report being produced. This will deal with the January / december issue
+        configdata = openpyxl.load_workbook(configdatafname)  # Load config data from Config Data spreadsheet
+        andetails = configdata["AnalyserDetails"]  # Select Analyser Details sheet
+        maxrow = andetails.max_row  # Determine max row of document
+        for row in range(1, maxrow + 1):  # For loop for searching through the Analyser Details sheet to determine the elemental result names to be plotted.
+            ancol = "{}{}".format("A", row)  # this sets up the analyser cell reference to be used.
+            reqcol = "{}{}".format("G", row)  # this sets up the psa report required reference cell
             repreq = andetails[reqcol].value
             if repreq == "Yes":
                 x = andetails[ancol].value
@@ -1092,24 +1093,30 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
             else:
                 pass
 
-    def UpdatePSAChecklist(self):                                              # this must only be called after the JSON has been updated since this function uses that JSON to update the PSA Checklist
-        with open(HomeWindow.jsonoutfname) as f:                               # reload the json file to use in the function
+    def UpdatePSAChecklist(self):  # this must only be called after the JSON has been updated since this function uses that JSON to update the PSA Checklist
+        with open(HomeWindow.jsonoutfname) as f:  # reload the json file to use in the function
             jsondata = json.load(f)
+        if HomeWindow.blankrep == 1:
+            periodd = datetime.date.today() + relativedelta(months=-1)  # Subtract a month from today's date as the report is for the previous month
+            period = periodd.strftime("%B %Y")  # Report Period string - Month & Year
+            year = periodd.strftime("%Y")
 
-        dates = HomeWindow.AnalyserStatus.loc[HomeWindow.AnalyserStatus["Result Name"] == "LastPsaReportTime", "Value"]  # get the date of the last psa report generation. This gives the period of the report.
-        dates1 = pd.to_datetime(dates,yearfirst=True)                           # setup dataframe as a date time series in the correct format
-        year = dates1.dt.year.to_string(index=False)                            # get the year of the report
-        period = dates1.dt.month_name().to_string(index=False) + " " + dates1.dt.year.to_string(index=False)    # concatenate the month name and year integer into a string called period using the to_string method to eliminate indexs
-        checklistfname = "C:\\PSAGen\\PSA Report Checklist " + year + ".xlsx"   # generates the checklist filename based on the year of the period of the report being produced. This will deal with the January / december issue
-        checklist = openpyxl.load_workbook(checklistfname)                      # load the relevant checklist
-        psachecklist = checklist["PSA Checklist"]                               # load the relevant sheet from the checklist
-        analyser = jsondata["Summary"][0]["AnalyserNo"]                         # pull the analyser in question from the json
-        analyser = analyser.replace("-","")                                     # remove the hyphens from the analyser name
-        maxrow = psachecklist.max_row                                           # calculate the max number of rows in the checklist
-        for row in range(1, maxrow + 1):                                        # For loop to search for the relevant analyser to update in the checklist
-            job = "{}{}".format("A", row)                                       # this sets up the cell reference in the PSA Checklist Excel document that we are going to search through.
-            x = psachecklist[job].value                                         # pull the relevant analyser from the checklist
-            if x == analyser:                                                   # if statement which generates the correct cell references for the function to update.
+        else:
+            dates = HomeWindow.AnalyserStatus.loc[HomeWindow.AnalyserStatus["Result Name"] == "LastPsaReportTime", "Value"]  # get the date of the last psa report generation. This gives the period of the report.
+            dates1 = pd.to_datetime(dates, yearfirst=True)  # setup dataframe as a date time series in the correct format
+            period = dates1.dt.month_name().to_string(index=False) + " " + dates1.dt.year.to_string(index=False)  # concatenate the month name and year integer into a string called period using the to_string method to eliminate indexs
+            year = dates1.dt.year.to_string(index=False)  # get the year of the report
+
+        checklistfname = "C:\\PSAGen\\PSA Report Checklist " + year + ".xlsx"  # generates the checklist filename based on the year of the period of the report being produced. This will deal with the January / december issue
+        checklist = openpyxl.load_workbook(checklistfname)  # load the relevant checklist
+        psachecklist = checklist["PSA Checklist"]  # load the relevant sheet from the checklist
+        analyser = jsondata["Summary"][0]["AnalyserNo"]  # pull the analyser in question from the json
+        analyser = analyser.replace("-", "")  # remove the hyphens from the analyser name
+        maxrow = psachecklist.max_row  # calculate the max number of rows in the checklist
+        for row in range(1, maxrow + 1):  # For loop to search for the relevant analyser to update in the checklist
+            job = "{}{}".format("A", row)  # this sets up the cell reference in the PSA Checklist Excel document that we are going to search through.
+            x = psachecklist[job].value  # pull the relevant analyser from the checklist
+            if x == analyser:  # if statement which generates the correct cell references for the function to update.
                 if period == "January " + year:
                     c1 = "{}{}".format("E", row)
                     c2 = "{}{}".format("F", row)
@@ -1146,44 +1153,46 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
                 else:
                     c1 = "{}{}".format("BH", row)
                     c2 = "{}{}".format("BI", row)
-
-                psachecklist[c1].value = jsondata["Summary"][0]["ReportDate"]
+                if HomeWindow.blankrep == 1:
+                    psachecklist[c1].value = "Blank"
+                else:
+                    psachecklist[c1].value = jsondata["Summary"][0]["ReportDate"]
                 psachecklist[c2].value = jsondata["Summary"][0]["ReportDate"]
                 break
             else:
-                print("Checking Next Line")
+                pass
 
-        openpyxl.Workbook.save(checklist,checklistfname)                        # save and overwrite the updated checklist
+        openpyxl.Workbook.save(checklist, checklistfname)  # save and overwrite the updated checklist
         print("PSA Checklist Updated")
 
     def IssueBlank(self):
         # This function generates a blank PSA report when required.
-        self.ImportReportPB.setEnabled(False)                               # Disable Import Report Pushbutton
-        HomeWindow.blankrep = 1                                             # Set the Blank report flag
-        configdatafname = "J:\\Client Analysers\\Analyser PSA Report\\PSA Report Config data.xlsx"     # generates the checklist filename based on the year of the period of the report being produced. This will deal with the January / december issue
-        configdata = openpyxl.load_workbook(configdatafname)                # Load config data from Config Data spreadsheet
-        andetails = configdata["AnalyserDetails"]                           # Select Analyser Details sheet
-        maxrow = andetails.max_row                                          # Determine max row of document
-        analyser = self.AnalyserListComboBox.currentText()                  # get the relevant analyser from the GUI Combobox
-        for row in range(1, maxrow + 1):                                    # For loop for searching through the Analyser Details sheet to determine the elemental result names to be plotted.
-            ancol = "{}{}".format("A", row)                                 # this sets up the analyser cell reference to be used.
-            appcol = "{}{}".format("D", row)                                # this sets up the application reference cell
-            engcol = "{}{}".format("C", row)                                # this sets up the service engineer reference cell
-            regcol = "{}{}".format("F", row)                                # this sets up the service engineer reference cell
-            custcol = "{}{}".format("B", row)                               # this sets up the service engineer reference cell
-            blankanal = andetails[ancol].value                              # this puts the analyser which is getting a blank report into a variable
-            if blankanal == analyser:                                       # if statement to fine the correct analyser in the list
-                app = andetails[appcol].value                               # determine the application fo the variable
-                serveng = andetails[engcol].value                           # determine the relevant service engineer
-                region = andetails[regcol].value                            # determine the relevant region
-                regemail = self.RepEmail(region)                            # determine the relevant regional email address
-                repdate = datetime.date.today().strftime("%d %B %Y")        # get Today's date and convert to a string
-                period = datetime.date.today() + relativedelta(months=-1)   # Subtract a month from today's date as the report is for the previous month
-                peroidm = period.strftime("%B")                             # Report Period string - Month
-                periody= period.strftime("%Y")                              # Report Period string - Year
-                period = period.strftime("%B %Y")                           # Report Period string - Month & Year
-                cust = andetails[custcol].value                             # get customer details
-                reportdata['Summary'][0]['SiteName'] = cust                 # populate the
+        self.ImportReportPB.setEnabled(False)  # Disable Import Report Pushbutton
+        HomeWindow.blankrep = 1  # Set the Blank report flag
+        configdatafname = "J:\\Client Analysers\\Analyser PSA Report\\PSA Report Config data.xlsx"  # generates the checklist filename based on the year of the period of the report being produced. This will deal with the January / december issue
+        configdata = openpyxl.load_workbook(configdatafname)  # Load config data from Config Data spreadsheet
+        andetails = configdata["AnalyserDetails"]  # Select Analyser Details sheet
+        maxrow = andetails.max_row  # Determine max row of document
+        analyser = self.AnalyserListComboBox.currentText()  # get the relevant analyser from the GUI Combobox
+        for row in range(1, maxrow + 1):  # For loop for searching through the Analyser Details sheet to determine the elemental result names to be plotted.
+            ancol = "{}{}".format("A", row)  # this sets up the analyser cell reference to be used.
+            appcol = "{}{}".format("D", row)  # this sets up the application reference cell
+            engcol = "{}{}".format("C", row)  # this sets up the service engineer reference cell
+            regcol = "{}{}".format("F", row)  # this sets up the service engineer reference cell
+            custcol = "{}{}".format("B", row)  # this sets up the service engineer reference cell
+            blankanal = andetails[ancol].value  # this puts the analyser which is getting a blank report into a variable
+            if blankanal == analyser:  # if statement to fine the correct analyser in the list
+                app = andetails[appcol].value  # determine the application fo the variable
+                serveng = andetails[engcol].value  # determine the relevant service engineer
+                region = andetails[regcol].value  # determine the relevant region
+                regemail = self.RepEmail(region)  # determine the relevant regional email address
+                repdate = datetime.date.today().strftime("%d %B %Y")  # get Today's date and convert to a string
+                period = datetime.date.today() + relativedelta(months=-1)  # Subtract a month from today's date as the report is for the previous month
+                shortm = period.strftime("%m")  # Report Period string - Month Short format
+                shorty = period.strftime("%y")  # Report Period string - Year Short Format
+                period = period.strftime("%B %Y")  # Report Period string - Month & Year
+                cust = andetails[custcol].value  # get customer details
+                reportdata['Summary'][0]['SiteName'] = cust  # populate the
                 reportdata['Summary'][0]['ReportDate'] = repdate
                 reportdata['Summary'][0]['AnalyserNo'] = analyser
                 reportdata['Summary'][0]['ServEng'] = serveng
@@ -1197,15 +1206,15 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
                 reportdata['ActionRequired'][0]['ActionReq1'][0]['Action'] = "Attempt to resolve why analyser or remote connection is offline"
                 reportdata['ActionRequired'][0]['ActionReq1'][0]['ByWhom'] = "Site\\Scantech"
                 reportdata['ActionRequired'][0]['ActionReq1'][0]['ByWhen'] = "As Soon As Possible"
-                HomeWindow.psadatafname = self.GetFolder("Select Folder to save blank JSON")                # Get the filename of the folder where the JSON will be dumped.
-                HomeWindow.jsonname = str(analyser) + " PSA Report " + periody + peroidm + " - Blank.json"  # setting the filename which will be used to output the JSON file
+                HomeWindow.psadatafname = self.GetFolder("Select Folder to save blank JSON")  # Get the filename of the folder where the JSON will be dumped.
+                HomeWindow.jsonname = "Blank " + str(analyser) + " PSA Report " + shorty + shortm + ".json"  # setting the filename which will be used to output the JSON file
                 HomeWindow.jsonoutfname = HomeWindow.psadatafname + "\\" + HomeWindow.jsonname
                 with open(HomeWindow.jsonoutfname, 'w') as file:
                     json.dump(reportdata, file, indent=1)
                 break
             else:
                 pass
-        self.ExportReportPB.setEnabled(True)                                # Enable the export JSON pushbutton.
+        self.ExportReportPB.setEnabled(True)  # Enable the export JSON pushbutton.
 
     def hide_pages(self):
         self.page1.hide()
@@ -1240,39 +1249,40 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
         self.page6.show()
 
 
-
-class PSA_pg1(QMainWindow,Ui_PSAPage1):
-    def __init__(self, parent=None):
-        super().__init__(parent)
-        self.setupUi(self)
-
-class PSA_pg2(QMainWindow,Ui_PSAPage2):
-    def __init__(self, parent=None):
-        super().__init__(parent)
-        self.setupUi(self)
-
-class PSA_pg3(QMainWindow,Ui_PSAPage3):
-    def __init__(self, parent=None):
-        super().__init__(parent)
-        self.setupUi(self)
-
-class PSA_pg4(QMainWindow,Ui_PSAPage4):
-    def __init__(self, parent=None):
-        super().__init__(parent)
-        self.setupUi(self)
-
-class PSA_pg5(QMainWindow,Ui_PSAPage5):
-    def __init__(self, parent=None):
-        super().__init__(parent)
-        self.setupUi(self)
-
-class PSA_pg6(QMainWindow,Ui_PSAPage6):
+class PSA_pg1(QMainWindow, Ui_PSAPage1):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setupUi(self)
 
 
+class PSA_pg2(QMainWindow, Ui_PSAPage2):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setupUi(self)
 
+
+class PSA_pg3(QMainWindow, Ui_PSAPage3):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setupUi(self)
+
+
+class PSA_pg4(QMainWindow, Ui_PSAPage4):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setupUi(self)
+
+
+class PSA_pg5(QMainWindow, Ui_PSAPage5):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setupUi(self)
+
+
+class PSA_pg6(QMainWindow, Ui_PSAPage6):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setupUi(self)
 
 
 app = QApplication(sys.argv)

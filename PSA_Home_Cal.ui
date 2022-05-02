@@ -280,7 +280,7 @@
       <string>Update PSA Checklist</string>
      </property>
     </widget>
-    <widget class="QPushButton" name="IssueBlank">
+    <widget class="QPushButton" name="IssueBlankPB">
      <property name="geometry">
       <rect>
        <x>60</x>
@@ -333,7 +333,7 @@
       </rect>
      </property>
      <property name="text">
-      <string>TextLabel</string>
+      <string/>
      </property>
      <property name="alignment">
       <set>Qt::AlignCenter</set>
@@ -407,7 +407,7 @@
       </rect>
      </property>
      <property name="text">
-      <string>TextLabel</string>
+      <string/>
      </property>
      <property name="alignment">
       <set>Qt::AlignCenter</set>
