@@ -582,7 +582,7 @@ class gen_pdf():
 
     def generate_pdf(self, fname, root):
         print(fname)
-        fname2 = fname + "\\ReportData.json"
+        fname2 = fname + "\\OBA-040 PSA Report 2203.json"
         print(fname2)
         with open(fname2, "r") as f:
             reportdata = json.load(f)

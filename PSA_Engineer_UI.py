@@ -21,16 +21,16 @@ from PyQt5.QtWidgets import (QApplication, QMainWindow, QFileDialog, QTableWidge
 from PyQt5 import (QtCore, QtGui)
 from PyQt5.QtCore import QDir
 import GeneratePSAReportPDF as genpdf
-import pyi_splash # this is just here for the packaging to allow the splash screen to close. It will always throw an error since the library cannot be installed.
+# import pyi_splash # this is just here for the packaging to allow the splash screen to close. It will always throw an error since the library cannot be installed.
 
-pyi_splash.update_text("Scantech Monthly PSA Report Generator")
-pyi_splash.update_text("Scantech Monthly PSA Report Generator")
-pyi_splash.update_text("Apparently you have to do this twice")
+# pyi_splash.update_text("Scantech Monthly PSA Report Generator")
+# pyi_splash.update_text("Scantech Monthly PSA Report Generator")
+# pyi_splash.update_text("Apparently you have to do this twice")
 
 # regen_ui_eng()                  # Regenerate the UI. This is used to update the UI file after changes
 
 class HomeWindow(QMainWindow,Ui_PSAHome):
-    pyi_splash.close()
+    # pyi_splash.close()
     reportdata = []                     # Class Variable for report data to be used throughout the report
     fname = ""                          # Root directory indicator class variable
     fname2 = ""                         # Root directory indicator class variable No.2
@@ -54,7 +54,7 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
         if fname:
             fname = QDir.toNativeSeparators(fname)
             fname2 = fname
-            fname = glob.glob(fname + "\\ReportData.json")
+            fname = glob.glob(fname + "\\*.json")
             fname = fname[0]
         # if user presses cancel, return control to calling function
         if not fname:
@@ -337,6 +337,7 @@ class HomeWindow(QMainWindow,Ui_PSAHome):
         self.UpdateDetStab()
         self.UpdatePg1()
         self.UpdatePg6()
+        self.UpdateFigs()
 
 
 

@@ -117,7 +117,7 @@ class HomeWindow(QMainWindow, Ui_PSAHome):
             HomeWindow.TempExtract = Read_TempExtract(HomeWindow.psadatafname, HomeWindow.resourcepath)  # Read in Temp Stability Data
             print("Read Temp Extract Complete")
             self.PreviewReportPB.setEnabled(True)
-            self.IssueBlank.setEnabled(False)
+            self.IssueBlankPB.setEnabled(False)
             self.psadataloc.setText(HomeWindow.psadatafname)
         if not HomeWindow.psadatafname:
             return
