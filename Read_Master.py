@@ -48,7 +48,7 @@ def Read_PeakControl(inputfname):
     return PeakControldf
 
 
-def Read_PeakExtract(inputfname, outputfname):     #extracting the peak control data for determining detector stability
+def Read_PeakExtract(inputfname, outputfname):     # extracting the peak control data for determining detector stability
 
     fname = inputfname + "\PeakExtract.csv"
 
@@ -124,10 +124,16 @@ def Read_PeakExtract(inputfname, outputfname):     #extracting the peak control 
         PeakExtractdf = pd.DataFrame(PeakExtract.iloc[:, [4, 11, 18, 25, 32, 39, 46, 53, 60, 67, 74, 81, 88, 95, 102, 109]])  # extract the 4 columns of dector data. This is only applicable to 4 detector analysers. This will need to be updated to do a selection to allow for any number of detecotrs
         PeakExtractdf.columns = ["Det1", "Det2", "Det3", "Det4", "Det5", "Det6", "Det7", "Det8", "Det9", "Det10", "Det11", "Det12", "Det13", "Det14", "Det15", "Det16"]  # renaming the columns of the new dataframe created for detector stability values only.
 
-    DetStab = PeakExtractdf.plot().get_figure()                         # plot the data
+    DetStab = PeakExtractdf.plot(figsize=(10, 5)).get_figure()                         # plot the data
     plt.title("Detector Stability")                                     # add a title
     plt.xticks(rotation=90)                                             # rotate the X axis titles
-    DetStab.savefig(outputfname + "\\Detector_Stability.png")     # save the plot to file
+    plt.ylim(178, 182)                                                   # Set the Y Axis limits for the plot
+    plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left', mode="expand", borderaxespad=0)                  # places the legend above the plot
+    plt.tight_layout()
+    plt.yticks(np.arange(178, 182, step=0.5))                                # setup the y axis ticks correctly
+    plt.grid(which='both', axis="y")                                    # display the axis ticks
+    DetStab.tight_layout()
+    DetStab.savefig(outputfname + "\\Detector_Stability.png")           # save the plot to file
 
     return PeakExtractdf
 

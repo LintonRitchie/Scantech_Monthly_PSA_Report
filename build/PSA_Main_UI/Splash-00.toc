@@ -1,4 +1,4 @@
-('C:\\PSAGen\\ScantechSqrLogo.PNG',
+('C:\\PSAGen\\ScantechFullLogo.png',
  'C:\\Users\\l.ritchie\\PycharmProjects\\Scantech_Monthly_PSA_Report\\build\\PSA_Main_UI\\Splash-00.res',
  'C:\\Users\\l.ritchie\\PycharmProjects\\Scantech_Monthly_PSA_Report\\build\\PSA_Main_UI\\Splash-00_script.tcl',
  None,

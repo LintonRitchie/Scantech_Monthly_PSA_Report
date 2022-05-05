@@ -371,7 +371,7 @@ class Ui_PSAPage2(object):
         self.label_3.setScaledContents(True)
         self.label_3.setObjectName("label_3")
         self.groupBox_3 = QtWidgets.QGroupBox(self.centralwidget)
-        self.groupBox_3.setGeometry(QtCore.QRect(670, 150, 120, 61))
+        self.groupBox_3.setGeometry(QtCore.QRect(550, 150, 235, 75))
         font = QtGui.QFont()
         font.setFamily("Calibri")
         font.setPointSize(10)
@@ -381,8 +381,23 @@ class Ui_PSAPage2(object):
         self.groupBox_3.setAlignment(QtCore.Qt.AlignCenter)
         self.groupBox_3.setObjectName("groupBox_3")
         self.NextPage = QtWidgets.QPushButton(self.groupBox_3)
-        self.NextPage.setGeometry(QtCore.QRect(20, 30, 75, 25))
+        self.NextPage.setGeometry(QtCore.QRect(5, 20, 50, 50))
         self.NextPage.setObjectName("NextPage")
+        self.pg1 = QtWidgets.QPushButton(self.groupBox_3)
+        self.pg1.setGeometry(QtCore.QRect(60, 20, 30, 50))
+        self.pg1.setObjectName("pg1")
+        self.pg3 = QtWidgets.QPushButton(self.groupBox_3)
+        self.pg3.setGeometry(QtCore.QRect(95, 20, 30, 50))
+        self.pg3.setObjectName("pg3")
+        self.pg4 = QtWidgets.QPushButton(self.groupBox_3)
+        self.pg4.setGeometry(QtCore.QRect(130, 20, 30, 50))
+        self.pg4.setObjectName("pg4")
+        self.pg5 = QtWidgets.QPushButton(self.groupBox_3)
+        self.pg5.setGeometry(QtCore.QRect(165, 20, 30, 50))
+        self.pg5.setObjectName("pg5")
+        self.pg6 = QtWidgets.QPushButton(self.groupBox_3)
+        self.pg6.setGeometry(QtCore.QRect(200, 20, 30, 50))
+        self.pg6.setObjectName("pg6")
         self.groupBox_2.raise_()
         self.groupBox.raise_()
         self.label.raise_()
@@ -401,7 +416,6 @@ class Ui_PSAPage2(object):
         self.retranslateUi(PSAPage2)
         self.DetTempStable.currentTextChanged['QString'].connect(self.DetTempStable.setStyleSheet) # type: ignore
         self.ElecCabTempStable.currentTextChanged['QString'].connect(self.ElecCabTempStable.setStyleSheet) # type: ignore
-        self.NextPage.released.connect(PSAPage2.hide) # type: ignore
         QtCore.QMetaObject.connectSlotsByName(PSAPage2)
 
     def retranslateUi(self, PSAPage2):
@@ -468,7 +482,17 @@ class Ui_PSAPage2(object):
         item = self.tableWidget.horizontalHeaderItem(15)
         item.setText(_translate("PSAPage2", "Det 16"))
         self.groupBox_3.setTitle(_translate("PSAPage2", "Page Control"))
-        self.NextPage.setText(_translate("PSAPage2", "Close"))
+        self.NextPage.setText(_translate("PSAPage2", "Save"))
+        self.pg1.setText(_translate("PSAPage2", "PG\n"
+"1"))
+        self.pg3.setText(_translate("PSAPage2", "PG\n"
+"3"))
+        self.pg4.setText(_translate("PSAPage2", "PG\n"
+"4"))
+        self.pg5.setText(_translate("PSAPage2", "PG\n"
+"5"))
+        self.pg6.setText(_translate("PSAPage2", "PG\n"
+"6"))
 import PSAReportResources_rc
 
 

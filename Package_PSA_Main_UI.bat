@@ -1,0 +1,10 @@
+pyinstaller PSA_Main_UI.py ^
+-p C:\Users\l.ritchie\PycharmProjects\Scantech_Monthly_PSA_Report\venv\Lib\site-packages\ ^
+-p C:\Users\l.ritchie\PycharmProjects\Scantech_Monthly_PSA_Report\venv\Lib\site-packages\win32\ ^
+-p C:\Users\l.ritchie\PycharmProjects\Scantech_Monthly_PSA_Report\venv\Lib\site-packages\win32\lib\ ^
+-p C:\Users\l.ritchie\PycharmProjects\Scantech_Monthly_PSA_Report\venv\Lib\site-packages\win32com\ ^
+-p C:\Users\l.ritchie\PycharmProjects\Scantech_Monthly_PSA_Report\venv\Lib\site-packages\win32ctypes\pywin32 ^
+-p C:\Users\l.ritchie\PycharmProjects\Scantech_Monthly_PSA_Report\venv\Lib\site-packages\win32ctypes\core\ctypes ^
+-p C:\Users\l.ritchie\PycharmProjects\Scantech_Monthly_PSA_Report\venv\Lib\site-packages\pywin32_system32 ^
+--splash C:\PSAGen\ScantechFullLogo.png ^
+--hiddenimport pkg_resources ^

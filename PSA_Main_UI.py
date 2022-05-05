@@ -57,6 +57,7 @@ class HomeWindow(QMainWindow, Ui_PSAHome):
     newanalyser = 0                                                                             # New Analyser flag
     autosend = 0                                                                                # Autosend Email Flag
     blankrep = 0                                                                                # Issue Blank report flag
+    virgdata = "C:\\PSAGen\\ReportData.json"                                                    # File location of an empty datafile
 
     # pyi_splash.close()                                                                        # Used to close splash screen in packaged software
 
@@ -73,6 +74,7 @@ class HomeWindow(QMainWindow, Ui_PSAHome):
         self.connectSignalsSlots()
         self.popanalysers()
         self.psamasterloc.setText(HomeWindow.masterpsafname)  # Update PSA Master file location Label
+        self.progressBar.hide()
 
     def connectSignalsSlots(self):
         self.PreviewReportPB.released.connect(self.updateReport)
@@ -84,11 +86,44 @@ class HomeWindow(QMainWindow, Ui_PSAHome):
         self.PB_pg_4.released.connect(self.show_page_4)
         self.PB_pg_5.released.connect(self.show_page_5)
         self.PB_pg_6.released.connect(self.show_page_6)
+        self.page1.pg2.released.connect(self.show_page_2)
+        self.page1.pg3.released.connect(self.show_page_3)
+        self.page1.pg4.released.connect(self.show_page_4)
+        self.page1.pg5.released.connect(self.show_page_5)
+        self.page1.pg6.released.connect(self.show_page_6)
+        self.page2.pg1.released.connect(self.show_page_1)
+        self.page2.pg3.released.connect(self.show_page_3)
+        self.page2.pg4.released.connect(self.show_page_4)
+        self.page2.pg5.released.connect(self.show_page_5)
+        self.page2.pg6.released.connect(self.show_page_6)
+        self.page3.pg1.released.connect(self.show_page_1)
+        self.page3.pg2.released.connect(self.show_page_2)
+        self.page3.pg4.released.connect(self.show_page_4)
+        self.page3.pg5.released.connect(self.show_page_5)
+        self.page3.pg6.released.connect(self.show_page_6)
+        self.page4.pg1.released.connect(self.show_page_1)
+        self.page4.pg2.released.connect(self.show_page_2)
+        self.page4.pg3.released.connect(self.show_page_3)
+        self.page4.pg5.released.connect(self.show_page_5)
+        self.page4.pg6.released.connect(self.show_page_6)
+        self.page5.pg1.released.connect(self.show_page_1)
+        self.page5.pg2.released.connect(self.show_page_2)
+        self.page5.pg3.released.connect(self.show_page_3)
+        self.page5.pg4.released.connect(self.show_page_4)
+        self.page5.pg6.released.connect(self.show_page_6)
+        self.page6.pg1.released.connect(self.show_page_1)
+        self.page6.pg2.released.connect(self.show_page_2)
+        self.page6.pg3.released.connect(self.show_page_3)
+        self.page6.pg4.released.connect(self.show_page_4)
+        self.page6.pg5.released.connect(self.show_page_5)
         self.page1.NextPage.released.connect(self.UpdateJSON)
         self.page2.NextPage.released.connect(self.UpdateJSON)
+        self.page3.NextPage.released.connect(self.UpdateJSON)
+        self.page4.NextPage.released.connect(self.UpdateJSON)
+        self.page5.NextPage.released.connect(self.UpdateJSON)
+        self.page6.NextPage.released.connect(self.UpdateJSON)
         self.page6.RepAgo1.released.connect(self.NewAnUpdatePg6_1RepAgo)
         self.page6.RepAgo2.released.connect(self.NewAnUpdatePg6_2RepAgo)
-        self.page6.NextPage.released.connect(self.UpdateJSON)
         self.NewAnalyser.stateChanged.connect(lambda: self.EnableUpdateHistData(self.NewAnalyser))
         self.AutoSendReport.stateChanged.connect(lambda: self.AutoSendToggle(self.AutoSendReport))
         self.AnalyserListComboBox.currentTextChanged.connect(self.AnalyserChanged)
@@ -96,30 +131,43 @@ class HomeWindow(QMainWindow, Ui_PSAHome):
         self.IssueBlankPB.released.connect(self.IssueBlank)
 
     def importPSAData(self):
+        self.progressBar.setHidden(False)
         HomeWindow.psadatafname = self.GetFolder("Select Folder containing PSA Report Data")
         if HomeWindow.psadatafname:
             HomeWindow.PSAMasterData = Read_Master(HomeWindow.masterpsafname)  # Read in master file data from PSA Master file.
-            print("Read Master Complete")
+            self.StepLabel.setText("Read Master Complete")
+            self.progressBar.setValue(10)
             HomeWindow.AnalyserStatus = Read_AnalyserStatus(HomeWindow.psadatafname)  # Read in PSA Report file data from PSA Report file.
-            print("Read Analyser Status Complete")
+            self.StepLabel.setText("Read Analyser Status Complete")
+            self.progressBar.setValue(20)
             HomeWindow.PeakControl = Read_PeakControl(HomeWindow.psadatafname)  # Read in Analyser Peak Control Data
-            print("Read Peak Control Complete")
+            self.StepLabel.setText("Read Peak Control Complete")
+            self.progressBar.setValue(30)
             HomeWindow.VersionNumbers = Read_VersionNumbers(HomeWindow.psadatafname)  # Read in version numbers data
-            print("Read Version Numbers Complete")
+            self.StepLabel.setText("Read Version Numbers Complete")
+            self.progressBar.setValue(40)
             HomeWindow.AnalyserIO = Read_AnalyserIO(HomeWindow.psadatafname)  # Read in Analyser IO Data
-            print("Read Analyser IO Complete")
+            self.StepLabel.setText("Read Analyser IO Complete")
+            self.progressBar.setValue(50)
             HomeWindow.AnalyserA17 = Read_A_17_Standard(HomeWindow.psadatafname)  # Read in Analyser Standardisation data
-            print("Read Analyser Std Data Complete")
+            self.StepLabel.setText("Read Analyser Std Data Complete")
+            self.progressBar.setValue(60)
             HomeWindow.AnalyserA08 = Read_A_08_Analyse(HomeWindow.psadatafname, HomeWindow.resourcepath, self.AnalyserListComboBox.currentText())  # Read in Analysis Data
-            print("Read Analyser A_XX Complete")
+            self.StepLabel.setText("Read Analyser A_XX Complete")
+            self.progressBar.setValue(70)
             HomeWindow.PeakExtract = Read_PeakExtract(HomeWindow.psadatafname, HomeWindow.resourcepath)  # Readi in Peak Stability Data
-            print("Read Peak Extract Complete")
+            self.StepLabel.setText("Read Peak Extract Complete")
+            self.progressBar.setValue(80)
             HomeWindow.TempExtract = Read_TempExtract(HomeWindow.psadatafname, HomeWindow.resourcepath)  # Read in Temp Stability Data
-            print("Read Temp Extract Complete")
+            self.StepLabel.setText("Read Temp Extract Complete")
+            self.progressBar.setValue(90)
+            self.StepLabel.setText("Data import complete")
             self.PreviewReportPB.setEnabled(True)
             self.IssueBlankPB.setEnabled(False)
             self.psadataloc.setText(HomeWindow.psadatafname)
+            self.progressBar.setValue(100)
         if not HomeWindow.psadatafname:
+            self.progressBar.setHidden(True)
             return
 
     def AutoSendToggle(self, b):
@@ -143,6 +191,7 @@ class HomeWindow(QMainWindow, Ui_PSAHome):
         self.ExportReportPB.setEnabled(False)
         self.UpdateChecklistPB.setEnabled(False)
         self.ImportReportPB.setEnabled(True)
+        self.IssueBlankPB.setEnabled(True)
         self.PB_pg.setEnabled(False)
         self.PB_pg_2.setEnabled(False)
         self.PB_pg_3.setEnabled(False)
@@ -150,6 +199,9 @@ class HomeWindow(QMainWindow, Ui_PSAHome):
         self.PB_pg_5.setEnabled(False)
         self.PB_pg_6.setEnabled(False)
         HomeWindow.blankrep = 0
+        self.progressBar.setValue(0)
+        self.progressBar.setHidden(True)
+        self.StepLabel.setText("")
 
     def GetFolder(self, message):
         anal = self.AnalyserListComboBox.currentText()
@@ -202,7 +254,7 @@ class HomeWindow(QMainWindow, Ui_PSAHome):
     def UpdateJSON(self):
 
         self.JSONFname()  # Update Output JSON Filename
-        print(HomeWindow.jsonoutfname)
+        self.StepLabel.setText(HomeWindow.jsonoutfname)
         # Update JSON File
         reportdata['Summary'][0]['SiteName'] = self.page1.site_name.text()
         reportdata['Summary'][0]['ReportDate'] = self.page1.rep_date_data.text()
@@ -417,10 +469,13 @@ class HomeWindow(QMainWindow, Ui_PSAHome):
         with open(HomeWindow.jsonoutfname, 'w') as file:
             json.dump(reportdata, file, indent=1)
 
-        print("JSON Updated")
+        self.StepLabel.setText("JSON Updated")
+        self.progressBar.setHidden(False)
+        self.progressBar.setValue(100)
         self.ExportReportPB.setEnabled(True)
 
     def ExportReport(self):
+        self.progressBar.setValue(0)
         with open(HomeWindow.jsonoutfname) as f:
             jsondata = json.load(f)
         configdatafname = "J:\\Client Analysers\\Analyser PSA Report\\PSA Report Config data.xlsx"  # generates the checklist filename based on the year of the period of the report being produced. This will deal with the January / december issue
@@ -466,11 +521,13 @@ class HomeWindow(QMainWindow, Ui_PSAHome):
             mail.Display()
         elif HomeWindow.autosend == 1:
             mail.Send()
-        print("Exporting report to email")
+        self.StepLabel.setText("Exporting report to email")
+        self.progressBar.setHidden(False)
+        self.progressBar.setValue(100)
         self.UpdateChecklistPB.setEnabled(True)  # activate the update checklist pushbutton which will allow the PSA report checklist to be updated.
 
     def updateReport(self):
-
+        self.progressBar.setValue(0)
         self.ExportReportPB.setEnabled(False)
         self.PB_pg.setEnabled(True)
         self.PB_pg_2.setEnabled(True)
@@ -496,11 +553,16 @@ class HomeWindow(QMainWindow, Ui_PSAHome):
         self.page1.disp_stduptodate.setText(self.StdDate())
         self.page1.disp_endiskspc.setText(self.DiskSpaceOK())
         self.UpdateDetStab()
+        self.progressBar.setValue(25)
         self.UpdatePg6()
+        self.progressBar.setValue(45)
         self.UpdatePg1()
+        self.progressBar.setValue(65)
         self.UpdateFigs()
+        self.progressBar.setValue(85)
         self.show_page_1()
-        print("Report Updated")
+        self.progressBar.setValue(100)
+        self.StepLabel.setText("Report Updated")
 
     def EnabledYes(self):
         enabled = "Yes"
@@ -587,19 +649,23 @@ class HomeWindow(QMainWindow, Ui_PSAHome):
                     fname = QDir.toNativeSeparators(fname[0])
                     HomeWindow.jsonin1fname = fname
                 else:  # if the json doesn't exist in this folder, print json not available and use default
-                    print("JSON not available in " + fname1)
-                    print("Using blank default JSON in C:\\PSAGen")
-                    fname = "C:\\PSAGen\\ReportData.json"
+                    self.StepLabel.setText("JSON not available in " + fname1)
+                    self.StepLabel.setText("Using blank default JSON in C:\\PSAGen")
+                    fname = HomeWindow.virgdata
+                    HomeWindow.jsonin1fname = fname
             if not fname1:  # if user cancels, no file name will be produced so print error and use default.
-                print("Last report folder not selected, using default instead")
-                print("Using blank default JSON in C:\\PSAGen")
-                fname = "C:\\PSAGen\\ReportData.json"
+                self.StepLabel.setText("Last report folder not selected, using default instead")
+                self.StepLabel.setText("Using blank default JSON in C:\\PSAGen")
+                fname = HomeWindow.virgdata
+                HomeWindow.jsonin1fname = fname
 
             with open(fname) as f:  # open json using filename generated earlier.
                 reportdata = json.load(f)
         else:
-            print("Excluding last report, so using blank defaults in C:\\PSAGen instead")
-            with open("C:\\PSAGen\\ReportData.json") as f:  # force default in event include last month is unchecked.
+            self.StepLabel.setText("Excluding last report, so using blank defaults in C:\\PSAGen instead")
+            fname = HomeWindow.virgdata
+            HomeWindow.jsonin1fname = fname
+            with open(fname) as f:  # force default in event include last month is unchecked.
                 reportdata = json.load(f)
 
         # Update PLC Status Table
@@ -770,7 +836,7 @@ class HomeWindow(QMainWindow, Ui_PSAHome):
         # **************************************************************************************************************************************************
         # This section imports the relevant data into the required data frames
         # **************************************************************************************************************************************************
-        print("Filename is: " + str(fname))
+        self.StepLabel.setText("Filename is: " + str(fname))
         # Import the Analyser Status sheet from the PSAReport.xls file in the relevant folder defined by fname
         StatusColumns1RA = ["Result Name", "Value"]
         AnalyserStatus1RA = pd.read_excel(open(fname, 'rb'), sheet_name="Analyser Status")
@@ -887,7 +953,7 @@ class HomeWindow(QMainWindow, Ui_PSAHome):
         # **************************************************************************************************************************************************
         # This section imports the relevant data into the required data frames
         # **************************************************************************************************************************************************
-        print("Filename is: " + str(fname))
+        self.StepLabel.setText("Filename is: " + str(fname))
         # Import the Analyser Status sheet from the PSAReport.xls file in the relevant folder defined by fname
         StatusColumns2RA = ["Result Name", "Value"]
         AnalyserStatus2RA = pd.read_excel(open(fname, 'rb'), sheet_name="Analyser Status")
@@ -1076,7 +1142,7 @@ class HomeWindow(QMainWindow, Ui_PSAHome):
         options |= QFileDialog.DontUseNativeDialog
         fileName, _ = QFileDialog.getOpenFileName(self, "Choose Report File to Open", "", "csv (*.csv)",
                                                   options=options)
-        print(fileName)
+        self.StepLabel.setText(fileName)
 
     def popanalysers(self):
         configdatafname = "J:\\Client Analysers\\Analyser PSA Report\\PSA Report Config data.xlsx"  # generates the checklist filename based on the year of the period of the report being produced. This will deal with the January / december issue
@@ -1094,6 +1160,8 @@ class HomeWindow(QMainWindow, Ui_PSAHome):
                 pass
 
     def UpdatePSAChecklist(self):  # this must only be called after the JSON has been updated since this function uses that JSON to update the PSA Checklist
+        self.progressBar.setValue(0)
+        self.progressBar.setHidden(False)
         with open(HomeWindow.jsonoutfname) as f:  # reload the json file to use in the function
             jsondata = json.load(f)
         if HomeWindow.blankrep == 1:
@@ -1163,10 +1231,13 @@ class HomeWindow(QMainWindow, Ui_PSAHome):
                 pass
 
         openpyxl.Workbook.save(checklist, checklistfname)  # save and overwrite the updated checklist
-        print("PSA Checklist Updated")
+        self.progressBar.setValue(100)
+        self.StepLabel.setText("PSA Checklist Updated")
 
     def IssueBlank(self):
         # This function generates a blank PSA report when required.
+        self.progressBar.setHidden(False)
+        self.progressBar.setValue(0)
         self.ImportReportPB.setEnabled(False)  # Disable Import Report Pushbutton
         HomeWindow.blankrep = 1  # Set the Blank report flag
         configdatafname = "J:\\Client Analysers\\Analyser PSA Report\\PSA Report Config data.xlsx"  # generates the checklist filename based on the year of the period of the report being produced. This will deal with the January / december issue
@@ -1214,6 +1285,8 @@ class HomeWindow(QMainWindow, Ui_PSAHome):
                 break
             else:
                 pass
+        self.progressBar.setValue(100)
+        self.StepLabel.setText("Blank Report Generated")
         self.ExportReportPB.setEnabled(True)  # Enable the export JSON pushbutton.
 
     def hide_pages(self):

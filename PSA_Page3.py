@@ -62,7 +62,7 @@ class Ui_PSAPage3(object):
         self.label_4.setScaledContents(True)
         self.label_4.setObjectName("label_4")
         self.groupBox = QtWidgets.QGroupBox(self.centralwidget)
-        self.groupBox.setGeometry(QtCore.QRect(670, 150, 120, 60))
+        self.groupBox.setGeometry(QtCore.QRect(550, 150, 235, 75))
         font = QtGui.QFont()
         font.setFamily("Calibri")
         font.setPointSize(10)
@@ -72,8 +72,23 @@ class Ui_PSAPage3(object):
         self.groupBox.setAlignment(QtCore.Qt.AlignCenter)
         self.groupBox.setObjectName("groupBox")
         self.NextPage = QtWidgets.QPushButton(self.groupBox)
-        self.NextPage.setGeometry(QtCore.QRect(20, 30, 75, 25))
+        self.NextPage.setGeometry(QtCore.QRect(5, 20, 50, 50))
         self.NextPage.setObjectName("NextPage")
+        self.pg1 = QtWidgets.QPushButton(self.groupBox)
+        self.pg1.setGeometry(QtCore.QRect(60, 20, 30, 50))
+        self.pg1.setObjectName("pg1")
+        self.pg2 = QtWidgets.QPushButton(self.groupBox)
+        self.pg2.setGeometry(QtCore.QRect(95, 20, 30, 50))
+        self.pg2.setObjectName("pg2")
+        self.pg4 = QtWidgets.QPushButton(self.groupBox)
+        self.pg4.setGeometry(QtCore.QRect(130, 20, 30, 50))
+        self.pg4.setObjectName("pg4")
+        self.pg5 = QtWidgets.QPushButton(self.groupBox)
+        self.pg5.setGeometry(QtCore.QRect(165, 20, 30, 50))
+        self.pg5.setObjectName("pg5")
+        self.pg6 = QtWidgets.QPushButton(self.groupBox)
+        self.pg6.setGeometry(QtCore.QRect(200, 20, 30, 50))
+        self.pg6.setObjectName("pg6")
         PSAPage3.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(PSAPage3)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 21))
@@ -84,7 +99,6 @@ class Ui_PSAPage3(object):
         PSAPage3.setStatusBar(self.statusbar)
 
         self.retranslateUi(PSAPage3)
-        self.NextPage.released.connect(PSAPage3.hide) # type: ignore
         QtCore.QMetaObject.connectSlotsByName(PSAPage3)
 
     def retranslateUi(self, PSAPage3):
@@ -93,7 +107,17 @@ class Ui_PSAPage3(object):
         self.psa_report_title.setText(_translate("PSAPage3", "PSA Report"))
         self.psa_report_title_2.setText(_translate("PSAPage3", "Page 3"))
         self.groupBox.setTitle(_translate("PSAPage3", "Page Control"))
-        self.NextPage.setText(_translate("PSAPage3", "Close"))
+        self.NextPage.setText(_translate("PSAPage3", "Save"))
+        self.pg1.setText(_translate("PSAPage3", "PG\n"
+"1"))
+        self.pg2.setText(_translate("PSAPage3", "PG\n"
+"2"))
+        self.pg4.setText(_translate("PSAPage3", "PG\n"
+"4"))
+        self.pg5.setText(_translate("PSAPage3", "PG\n"
+"5"))
+        self.pg6.setText(_translate("PSAPage3", "PG\n"
+"6"))
 import PSAReportResources_rc
 
 

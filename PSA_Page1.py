@@ -613,7 +613,7 @@ class Ui_PSAPage1(object):
         self.label_ActionTaken_2.setIndent(0)
         self.label_ActionTaken_2.setObjectName("label_ActionTaken_2")
         self.groupBox = QtWidgets.QGroupBox(self.centralwidget)
-        self.groupBox.setGeometry(QtCore.QRect(670, 150, 120, 61))
+        self.groupBox.setGeometry(QtCore.QRect(549, 150, 235, 75))
         font = QtGui.QFont()
         font.setFamily("Calibri")
         font.setPointSize(10)
@@ -623,8 +623,23 @@ class Ui_PSAPage1(object):
         self.groupBox.setAlignment(QtCore.Qt.AlignCenter)
         self.groupBox.setObjectName("groupBox")
         self.NextPage = QtWidgets.QPushButton(self.groupBox)
-        self.NextPage.setGeometry(QtCore.QRect(20, 30, 75, 25))
+        self.NextPage.setGeometry(QtCore.QRect(5, 20, 50, 50))
         self.NextPage.setObjectName("NextPage")
+        self.pg2 = QtWidgets.QPushButton(self.groupBox)
+        self.pg2.setGeometry(QtCore.QRect(60, 20, 30, 50))
+        self.pg2.setObjectName("pg2")
+        self.pg3 = QtWidgets.QPushButton(self.groupBox)
+        self.pg3.setGeometry(QtCore.QRect(95, 20, 30, 50))
+        self.pg3.setObjectName("pg3")
+        self.pg4 = QtWidgets.QPushButton(self.groupBox)
+        self.pg4.setGeometry(QtCore.QRect(130, 20, 30, 50))
+        self.pg4.setObjectName("pg4")
+        self.pg5 = QtWidgets.QPushButton(self.groupBox)
+        self.pg5.setGeometry(QtCore.QRect(165, 20, 30, 50))
+        self.pg5.setObjectName("pg5")
+        self.pg6 = QtWidgets.QPushButton(self.groupBox)
+        self.pg6.setGeometry(QtCore.QRect(200, 20, 30, 50))
+        self.pg6.setObjectName("pg6")
         PSAPage1.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(PSAPage1)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 21))
@@ -635,7 +650,6 @@ class Ui_PSAPage1(object):
         PSAPage1.setStatusBar(self.statusbar)
 
         self.retranslateUi(PSAPage1)
-        self.NextPage.released.connect(PSAPage1.hide) # type: ignore
         self.AnalOpCor.currentTextChanged['QString'].connect(self.AnalOpCor.setStyleSheet) # type: ignore
         self.EnableDetStable.currentTextChanged['QString'].connect(self.EnableDetStable.setStyleSheet) # type: ignore
         self.DetEncTempStable.currentTextChanged['QString'].connect(self.DetEncTempStable.setStyleSheet) # type: ignore
@@ -765,7 +779,17 @@ class Ui_PSAPage1(object):
         item.setText(_translate("PSAPage1", "Action"))
         self.label_ActionTaken_2.setText(_translate("PSAPage1", "Action Required"))
         self.groupBox.setTitle(_translate("PSAPage1", "Page Control"))
-        self.NextPage.setText(_translate("PSAPage1", "Close"))
+        self.NextPage.setText(_translate("PSAPage1", "Save"))
+        self.pg2.setText(_translate("PSAPage1", "PG\n"
+"2"))
+        self.pg3.setText(_translate("PSAPage1", "PG\n"
+"3"))
+        self.pg4.setText(_translate("PSAPage1", "PG\n"
+"4"))
+        self.pg5.setText(_translate("PSAPage1", "PG\n"
+"5"))
+        self.pg6.setText(_translate("PSAPage1", "PG\n"
+"6"))
 import PSAReportResources_rc
 
 

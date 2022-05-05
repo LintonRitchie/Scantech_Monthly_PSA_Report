@@ -1,5 +1,7 @@
 from fpdf import FPDF
 import json
+import glob
+from PyQt5.QtCore import QDir
 
 
 def create_letterhead(pdf, WIDTH, fname):
@@ -582,7 +584,8 @@ class gen_pdf():
 
     def generate_pdf(self, fname, root):
         print(fname)
-        fname2 = fname + "\\OBA-040 PSA Report 2203.json"
+        fname2 = glob.glob(fname + "\*.json")                   # implements a wildcard search for the json file within the selected folder
+        fname2 = QDir.toNativeSeparators(fname2[0])             # ensure folder path in correct windows format
         print(fname2)
         with open(fname2, "r") as f:
             reportdata = json.load(f)
