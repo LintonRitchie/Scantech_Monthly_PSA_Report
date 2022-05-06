@@ -51,15 +51,11 @@ def Read_PeakControl(inputfname):
 def Read_PeakExtract(inputfname, outputfname):     # extracting the peak control data for determining detector stability
 
     fname = inputfname + "\PeakExtract.csv"
-
     # read the csv containing the data. Since the 1st row is stupidly setup with tab & comma seperators as well as incomplete headings, we have to ignore it.
-    PeakExtract = pd.read_csv(open(fname,'rb'), skiprows=1,header=None)
-
+    PeakExtract = pd.read_csv(open(fname, 'rb'), skiprows=1, header=None)
     # determine how many detectors are present
     ndets = (PeakExtract.shape[1]-2)/7
-
     # simplify dataframe with only detector stability data for the relevant number of detectors
-
     if ndets == 1:
         PeakExtractdf = pd.DataFrame(PeakExtract.iloc[:, [4]])  # extract the 4 columns of dector data. This is only applicable to 4 detector analysers. This will need to be updated to do a selection to allow for any number of detecotrs
         PeakExtractdf.columns = ["Det1"]  # renaming the columns of the new dataframe created for detector stability values only.
@@ -124,16 +120,28 @@ def Read_PeakExtract(inputfname, outputfname):     # extracting the peak control
         PeakExtractdf = pd.DataFrame(PeakExtract.iloc[:, [4, 11, 18, 25, 32, 39, 46, 53, 60, 67, 74, 81, 88, 95, 102, 109]])  # extract the 4 columns of dector data. This is only applicable to 4 detector analysers. This will need to be updated to do a selection to allow for any number of detecotrs
         PeakExtractdf.columns = ["Det1", "Det2", "Det3", "Det4", "Det5", "Det6", "Det7", "Det8", "Det9", "Det10", "Det11", "Det12", "Det13", "Det14", "Det15", "Det16"]  # renaming the columns of the new dataframe created for detector stability values only.
 
-    DetStab = PeakExtractdf.plot(figsize=(10, 5)).get_figure()                         # plot the data
-    plt.title("Detector Stability")                                     # add a title
-    plt.xticks(rotation=90)                                             # rotate the X axis titles
-    plt.ylim(178, 182)                                                   # Set the Y Axis limits for the plot
-    plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left', mode="expand", borderaxespad=0)                  # places the legend above the plot
-    plt.tight_layout()
-    plt.yticks(np.arange(178, 182, step=0.5))                                # setup the y axis ticks correctly
-    plt.grid(which='both', axis="y")                                    # display the axis ticks
-    DetStab.tight_layout()
-    DetStab.savefig(outputfname + "\\Detector_Stability.png")           # save the plot to file
+    PeakDates = pd.DataFrame(PeakExtract.iloc[:, 0])                                # Get the dates of the stability readings
+    PeakDates.columns = ["Date"]                                                    # Assign the column heading of Date
+    ssize = PeakDates.pivot_table(columns=['Date'], aggfunc='size')                 # count the numbers of days
+    stepsize = ssize                                                                # create a step size dataframe. This is used to determine where to put the date stamps
+
+    for i in range(len(ssize)):                                                     # For loop to calculate the correct x axis locations for date stamps
+        if i < (len(ssize) - 1):
+            stepsize[i+1] = ssize[i] + ssize[i+1]
+        else:
+            break
+
+    PeakDates = PeakDates.drop_duplicates()                                         # remove duplicate dates from dataframe
+    DetStab = PeakExtractdf.plot(figsize=(8, 5)).get_figure()                       # plot the data on a figure which is 8x5 inches
+    plt.legend(ncol=6, loc='upper center', mode="expand", borderaxespad=0.1)        # places the legend above the plot
+    plt.title("Detector Stability")                                                 # add a title
+    plt.xticks(ticks=stepsize, labels=PeakDates.iloc[:, 0], rotation=90)            # rotate the X axis titles
+    plt.ylim(178, 182.5)                                                            # Set the Y Axis limits for the plot
+    plt.yticks(np.arange(178, 182.5, step=0.5))                                     # setup the y axis ticks correctly
+    plt.grid(True, which='both', axis="y")                                          # display the axis ticks
+    DetStab.set_tight_layout(True)                                                  # activate the tight layout option. This prevents the axis labels from being cutoff
+    plt.tight_layout(pad=1.3)                                                       # define the padding around the edge of the plot
+    DetStab.savefig(outputfname + "\\Detector_Stability.png", dpi=600)              # save the plot to file with a resolution of 600dpi
 
     return PeakExtractdf
 
@@ -154,7 +162,7 @@ def Read_TempExtract(inputfname, outputfname):                                  
     plt.grid(which='both', axis="y")                                    # display the axis ticks
     # plt.xticks(rotation=90)                                           # rotate the X axis titles
     #plt.show()                                                          # show the plot
-    TempStab.savefig(outputfname + "\\Temperatures.png")                      # save the plot to file
+    TempStab.savefig(outputfname + "\\Temperatures.png", dpi=600)                      # save the plot to file
     return TempExtractdf
 
 
@@ -163,27 +171,27 @@ def Read_A_08_Analyse(inputfname, outputfname, analyser):                       
     fname = glob.glob(inputfname + "\A*Analyse.csv")                            # implements a wildcard search for analysis data. This can be A_01__Analyse or A_0X__Analyse or anything in between
     fname = QDir.toNativeSeparators(fname[0])                                   # ensure folder path in correct windows format
 
-    AllExtract = pd.read_csv(open(fname,'r'),header=0, index_col=False)                              # read the csv containing the data. Index Col must = false to ensure the headings are not shifted
+    AllExtract = pd.read_csv(open(fname, 'r'), header=0, index_col=False)                              # read the csv containing the data. Index Col must = false to ensure the headings are not shifted
 
     # Columns Check for Tonnage data
     if "S034" in AllExtract.columns:            # check S034 in the array
         if "S029" in AllExtract.columns:        # Check S029 in the array
-            TonsAnalysed = AllExtract.groupby('Date')[['S034','S029']].sum()    # perform the Tonnage total with S034 & S029
+            TonsAnalysed = AllExtract.groupby('Date')[['S034', 'S029']].sum()    # perform the Tonnage total with S034 & S029
         else:
             TonsAnalysed = AllExtract.groupby('Date')[['S034']].sum()           # else perform with just S034
     else:
-        TonsAnalysed = pd.DataFrame(columns=["S034","S029"])                    # else produce blank array
+        TonsAnalysed = pd.DataFrame(columns=["S034", "S029"])                    # else produce blank array
 
     # Plot Daily tonnes as a stacked histogram of Tons Analysed and Tons not analysed
-    plt.figure(figsize=(10,6))
-    plt.tick_params(axis='x', which='both',labelsize=5,labelrotation=45,grid_color='grey', grid_alpha=0.8)
+    plt.figure(figsize=(10, 6))
+    plt.tick_params(axis='x', which='both', labelsize=5, labelrotation=45, grid_color='grey', grid_alpha=0.8)
     plt.title("Total Daily Tonnes", pad=30)
     plt.grid(which='both', axis='y')
-    plt.bar(TonsAnalysed.index, TonsAnalysed["S029"], 0.4, color = 'red', label='Tons not Analysed',zorder=1)
-    plt.bar(TonsAnalysed.index,TonsAnalysed["S034"],0.4,bottom=TonsAnalysed["S029"],color = 'green', label='Tons Analysed',zorder=2)
+    plt.bar(TonsAnalysed.index, TonsAnalysed["S029"], 0.4, color='red', label='Tons not Analysed',zorder=1)
+    plt.bar(TonsAnalysed.index, TonsAnalysed["S034"], 0.4, bottom=TonsAnalysed["S029"], color='green', label='Tons Analysed',zorder=2)
     plt.legend(bbox_to_anchor=(0., 1.02, 1., .102), loc='lower left',
                ncol=2, mode="expand", borderaxespad=0)                  # places the legend above the plot
-    plt.savefig(outputfname + "\\Daily_Tonnes.png")
+    plt.savefig(outputfname + "\\Daily_Tonnes.png", dpi=600)
     plt.close()
 
     # Parameters for controlling Results plots
@@ -198,7 +206,7 @@ def Read_A_08_Analyse(inputfname, outputfname, analyser):                       
     # read in the correct results to plot
 
     columns1 = [1, 3, 4, 5, 6, 7, 8]
-    df = AllExtract.iloc[:,columns1]
+    df = AllExtract.iloc[:, columns1]
 
     # Plot First 3 results for report as a single figure with 3 subplots
     Results = df.groupby('Date').mean()
@@ -252,7 +260,7 @@ def Read_A_08_Analyse(inputfname, outputfname, analyser):                       
 
     plt.subplots_adjust(bottom=0.07,top=0.97, hspace=0.3)
 
-    plt.savefig(outputfname + "\\Results1.png")
+    plt.savefig(outputfname + "\\Results1.png", dpi=600)
     plt.close()
 
     fig = plt.figure(figsize=(figw,figh))
@@ -280,7 +288,7 @@ def Read_A_08_Analyse(inputfname, outputfname, analyser):                       
 
     plt.subplots_adjust(bottom=0.07,top=0.97, hspace=0.5)
 
-    plt.savefig(outputfname + "\\Results2.png")
+    plt.savefig(outputfname + "\\Results2.png", dpi=600)
     plt.close()
 
 
